@@ -11,6 +11,31 @@
 <jsp:include page="/WEB-INF/views/layout/staticHeader.jsp"/>
 <style type="text/css">
 
+.body-container {
+    margin: 0 auto 15px;
+    width: 900px;
+    min-height: 450px;
+}
+
+.body-title {
+    color: #424951;
+    padding-top: 25px;
+    padding-bottom: 5px;
+    margin: 0 0 25px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.body-title h3 {
+    font-size: 23px;
+    min-width: 300px;
+    font-family: "Malgun Gothic", "맑은 고딕", NanumGothic, 나눔고딕, 돋움, sans-serif;
+    font-weight: bold;
+    margin: 0 0 -5px 0;
+    padding-bottom: 5px;
+    display: inline-block;
+    border-bottom: 3px solid #424951;
+}
+
 .grid-box {
 	margin-top: 3px; margin-bottom: 5px;
 	display: grid;
@@ -50,8 +75,8 @@
 .gallery_list .gallery_icon {color:#676767;clear: both;}
 .gallery_list .gallery_icon i {font-style:normal; vertical-align: super;}
 .gallery_list .gallery_icon img {margin-right:3px;}
-.gallery_list .gallery_like {font-size:9pt;float: right;}
-.gallery_list .gallery_like img {margin-bottom:4px;}
+.gallery_list .gallery_like {font-size:9pt;float: right;font-family: dotum;}
+.gallery_list .gallery_like img {width: 16.5px; height:14px;margin-bottom: 2px;}
 
 
 /* 카테고리 */
@@ -146,10 +171,10 @@ ul li, ol li {list-style: none}
         <table class="table">
 			<tr>
 				<td width="50%">
-					${dataCount}개(${page}/${total_page} 페이지)
+					302개(3/101 페이지)
 				</td>
 				<td align="right">
-					<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/sphoto/write.do';">사진올리기</button>
+					<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}">사진올리기</button>
 				</td>
 			</tr>
 		</table>
@@ -184,7 +209,7 @@ ul li, ol li {list-style: none}
 		            		<img class="imgcss" src="${pageContext.request.contextPath}/resource/images/answer.png" alt="comment">
 		            		<i>1</i></span>
 		            	<span class="gallery_like" onclick="#">
-		            		<img src="${pageContext.request.contextPath}/resource/images/thumbsup.png" alt="추천" title="추천">
+		            		<img src="${pageContext.request.contextPath}/resource/images/list_heart.png" alt="추천" title="추천">
 		            		<i>0</i>
 		            	</span>
 		            </li>
@@ -200,7 +225,7 @@ ul li, ol li {list-style: none}
 		<table class="table">
 			<tr>
 				<td width="100">
-					<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/notice/list.do';">새로고침</button>
+					<button type="button" class="btn" onclick="">새로고침</button>
 				</td>
 				<td align="center">
 					<form name="searchForm" action="${pageContext.request.contextPath}/notice/list.do" method="post">

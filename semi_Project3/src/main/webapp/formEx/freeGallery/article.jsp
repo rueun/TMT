@@ -58,6 +58,31 @@
 
 
 /* 내꺼 */
+.body-container {
+    margin: 0 auto 15px;
+    width: 900px;
+    min-height: 450px;
+}
+
+.body-title {
+    color: #424951;
+    padding-top: 25px;
+    padding-bottom: 5px;
+    margin: 0 0 25px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.body-title h3 {
+    font-size: 23px;
+    min-width: 300px;
+    font-family: "Malgun Gothic", "맑은 고딕", NanumGothic, 나눔고딕, 돋움, sans-serif;
+    font-weight: bold;
+    margin: 0 0 -5px 0;
+    padding-bottom: 5px;
+    display: inline-block;
+    border-bottom: 3px solid #424951;
+}
+
 .sub-info {
 	width: 100%;
 	padding: 16px;
@@ -428,23 +453,16 @@ $(document).ready(function(){
 					<c:choose>
 						<c:when test="${sessionScope.member.userId==dto.userId}">
 							<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/sphoto/update.do?num=${dto.num}&page=${page}';">수정</button>
+							<button type="button" class="btn" onclick="deletePhoto();">삭제</button>
 						</c:when>
 						<c:otherwise>
 							<button type="button" class="btn" disabled="disabled">수정</button>
+							<button type="button" class="btn" disabled="disabled">삭제</button>
 						</c:otherwise>
 					</c:choose>
-			    	
-					<c:choose>
-			    		<c:when test="${sessionScope.member.userId==dto.userId || sessionScope.member.userId=='admin'}">
-			    			<button type="button" class="btn" onclick="deletePhoto();">삭제</button>
-			    		</c:when>
-			    		<c:otherwise>
-			    			<button type="button" class="btn" disabled="disabled">삭제</button>
-			    		</c:otherwise>
-			    	</c:choose>
 				</td>
 				<td align="right">
-					<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/sphoto/list.do?page=${page}';">목록</button>
+					<button type="button" class="btn" onclick="">목록</button>
 				</td>
 			</tr>
 		</table>
