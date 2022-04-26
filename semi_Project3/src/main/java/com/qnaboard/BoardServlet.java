@@ -1,4 +1,4 @@
-package com.board;
+package com.qnaboard;
 
 import java.io.IOException;
 import java.net.URLDecoder;

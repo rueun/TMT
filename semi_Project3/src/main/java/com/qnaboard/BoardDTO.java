@@ -1,8 +1,9 @@
-package com.board;
+package com.qnaboard;
 
 public class BoardDTO {
 	private int listNum;
 	private int boardNum;
+	private String categoryType;
 	private String userId;
 	private String userName;
 	private String subject;
@@ -14,6 +15,35 @@ public class BoardDTO {
 	private int depth;
 	private int parent;
 	
+	private int fileNum;
+	private String imageFilename;
+	private String[] imageFiles;
+	
+	
+	public String getCategoryType() {
+		return categoryType;
+	}
+	public void setCategoryType(String categoryType) {
+		this.categoryType = categoryType;
+	}
+	public int getFileNum() {
+		return fileNum;
+	}
+	public void setFileNum(int fileNum) {
+		this.fileNum = fileNum;
+	}
+	public String getImageFilename() {
+		return imageFilename;
+	}
+	public void setImageFilename(String imageFilename) {
+		this.imageFilename = imageFilename;
+	}
+	public String[] getImageFiles() {
+		return imageFiles;
+	}
+	public void setImageFiles(String[] imageFiles) {
+		this.imageFiles = imageFiles;
+	}
 	public int getListNum() {
 		return listNum;
 	}

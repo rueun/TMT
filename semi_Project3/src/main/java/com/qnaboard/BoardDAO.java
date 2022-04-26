@@ -1,4 +1,4 @@
-package com.board;
+package com.qnaboard;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
