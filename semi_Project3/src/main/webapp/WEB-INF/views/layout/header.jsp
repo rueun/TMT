@@ -60,8 +60,8 @@
 		
 		<li><a href="#">장터</a>
 			<ul>
-				<li><a href="#">팝니다</a></li>
-				<li><a href="#">삽니다</a></li>
+				<li><a href="${pageContext.request.contextPath}/sell/list.do">팝니다</a></li>
+				<li><a href="${pageContext.request.contextPath}/buy/list.do">삽니다</a></li>
 			</ul>
 		</li>
 	</ul>
