@@ -118,7 +118,7 @@ ul li, ol li {list-style: none}
 }
 .category li.on a, .category li:hover a {
 	border-bottom-color:transparent; 
-	border-top:1px solid #444
+	border-top:1px solid #444;
 }
 .category li.on a:after, .category li:hover a:after { 
 	content:''; 
@@ -142,7 +142,16 @@ ul li, ol li {list-style: none}
 }
 
 </style>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript">
+$(function() {
+	$("ul.category li").click(function() {
+		$("ul.category li").removeClass("on");
+		$(this).addClass("on");
+	});
+});
 
+</script>
 </head>
 <body>
 
@@ -174,7 +183,7 @@ ul li, ol li {list-style: none}
 					302개(3/101 페이지)
 				</td>
 				<td align="right">
-					<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}">사진올리기</button>
+					<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/freeGallery/write.do';">사진올리기</button>
 				</td>
 			</tr>
 		</table>

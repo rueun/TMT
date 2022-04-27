@@ -130,7 +130,7 @@ function sendBoard() {
 				<tr> 
 					<td>작성자</td>
 					<td> 
-						<p>${sessionScope.member.userName}</p>
+						<p>안뇽</p>
 					</td>
 				</tr>
 				

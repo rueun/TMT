@@ -45,7 +45,7 @@
 		</li>
 		<li><a href="#">갤러리</a>
 			<ul>
-				<li><a href="#">자유 갤러리</a></li>
+				<li><a href="${pageContext.request.contextPath}/freeGallery/list.do">자유 갤러리</a></li>
 				<li><a href="#">코딩갤러리</a></li>
 			</ul>
 		</li>
