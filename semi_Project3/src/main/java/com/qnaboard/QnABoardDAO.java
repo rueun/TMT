@@ -150,28 +150,33 @@ public class QnABoardDAO {
 		int result = 0;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		String sql;
+		StringBuilder sb = new StringBuilder();
 
 		try {
-			sql = "SELECT NVL(COUNT(*), 0) FROM QnAboard b JOIN member1 m ON b.userId = m.userId ";
-			if (condition.equals("all")) {
-				sql += "  WHERE INSTR(subject, ?) >= 1 OR INSTR(content, ?) >= 1 ";
-			} else if (condition.equals("reg_date")) {
-				keyword = keyword.replaceAll("(\\-|\\/|\\.)", "");
-				sql += "  WHERE TO_CHAR(reg_date, 'YYYYMMDD') = ? ";
-			} else {
-				sql += "  WHERE INSTR(" + condition + ", ?) >= 1 ";
+			sb.append("SELECT NVL(COUNT(*), 0) FROM QnAboard b JOIN member1 m ON b.userId = m.userId ");
+			if (keyword != "") {
+				if (condition.equals("all")) {
+					sb.append("     WHERE INSTR(subject, ?) >= 1 OR INSTR(content, ?) >= 1 ");
+				} else if (condition.equals("reg_date")) {
+					keyword = keyword.replaceAll("(\\-|\\/|\\.)", "");
+					sb.append("     WHERE TO_CHAR(reg_date, 'YYYYMMDD') = ?");
+				} else {
+					sb.append("     WHERE INSTR(" + condition + ", ?) >= 1 ");
+				}
 			}
-			
-			if(! categoryType.equals("all")) {
-				sql += " AND categoryType = '"+categoryType+"' ";
+			if (keyword != "" && !categoryType.equals("all")) {
+				sb.append(" AND categoryType='" + categoryType + "' ");
+			} else if (keyword == "" && !categoryType.equals("all")) {
+				sb.append(" WHERE categoryType='" + categoryType + "' ");
 			}
 
-			pstmt = conn.prepareStatement(sql);
+			pstmt = conn.prepareStatement(sb.toString());
 
-			pstmt.setString(1, keyword);
-			if (condition.equals("all")) {
-				pstmt.setString(2, keyword);
+			if (keyword != "") {
+				pstmt.setString(1, keyword);
+				if (condition.equals("all")) {
+					pstmt.setString(2, keyword);
+				}
 			}
 
 			rs = pstmt.executeQuery();
@@ -211,7 +216,7 @@ public class QnABoardDAO {
 		try {
 			sb.append(" SELECT * FROM ( ");
 			sb.append("     SELECT ROWNUM rnum, tb.* FROM ( ");
-			sb.append("         SELECT boardNum, b.userId, userName, categoryType ");
+			sb.append("         SELECT boardNum, b.userId, userName, categoryType, ");
 			sb.append("               subject, groupNum, orderNo, depth, hitCount,");
 			sb.append("               TO_CHAR(reg_date, 'YYYY-MM-DD') reg_date ");
 			sb.append("         FROM QnAboard b ");
@@ -263,7 +268,7 @@ public class QnABoardDAO {
 
 		return list;
 	}
-	
+
 	// 검색시 게시물 리스트
 	public List<QnABoardDTO> listBoard(int start, int end, String condition, String keyword, String categoryType) {
 		List<QnABoardDTO> list = new ArrayList<QnABoardDTO>();
@@ -274,36 +279,43 @@ public class QnABoardDAO {
 		try {
 			sb.append(" SELECT * FROM ( ");
 			sb.append("     SELECT ROWNUM rnum, tb.* FROM ( ");
-			sb.append("         SELECT boardNum, b.userId, userName, categoryType ");
-			sb.append("               subject, groupNum, orderNo, depth, hitCount,");
+			sb.append("         SELECT boardNum, b.userId, userName, categoryType, ");
+			sb.append("               subject, groupNum, orderNo, depth, hitCount, ");
 			sb.append("               TO_CHAR(reg_date, 'YYYY-MM-DD') reg_date ");
 			sb.append("         FROM QnAboard b ");
 			sb.append("         JOIN member1 m ON b.userId = m.userId ");
-			if (condition.equals("all")) {
-				sb.append("     WHERE INSTR(subject, ?) >= 1 OR INSTR(content, ?) >= 1 ");
-			} else if (condition.equals("reg_date")) {
-				keyword = keyword.replaceAll("(\\-|\\/|\\.)", "");
-				sb.append("     WHERE TO_CHAR(reg_date, 'YYYYMMDD') = ?");
-			} else {
-				sb.append("     WHERE INSTR(" + condition + ", ?) >= 1 ");
+			if (keyword != "") {
+				if (condition.equals("all")) {
+					sb.append("     WHERE INSTR(subject, ?) >= 1 OR INSTR(content, ?) >= 1 ");
+				} else if (condition.equals("reg_date")) {
+					keyword = keyword.replaceAll("(\\-|\\/|\\.)", "");
+					sb.append("     WHERE TO_CHAR(reg_date, 'YYYYMMDD') = ?");
+				} else {
+					sb.append("     WHERE INSTR(" + condition + ", ?) >= 1 ");
+				}
 			}
-			if (!categoryType.equals("all")) {
-				sb.append(" AND categoryType = '"+categoryType+"' ");
+			if (keyword != "" && !categoryType.equals("all")) {
+				sb.append(" AND categoryType='" + categoryType + "' ");
+			} else if (keyword == "" && !categoryType.equals("all")) {
+				sb.append(" WHERE categoryType='" + categoryType + "' ");
 			}
 			sb.append("         ORDER BY groupNum DESC, orderNo ASC ");
 			sb.append("     ) tb WHERE ROWNUM <= ? ");
 			sb.append(" ) WHERE rnum >= ? ");
 
 			pstmt = conn.prepareStatement(sb.toString());
-			if (condition.equals("all")) {
+			if (keyword != "" && condition.equals("all")) {
 				pstmt.setString(1, keyword);
 				pstmt.setString(2, keyword);
 				pstmt.setInt(3, end);
 				pstmt.setInt(4, start);
-			} else {
+			} else if (keyword != "" && !condition.equals("all")) {
 				pstmt.setString(1, keyword);
 				pstmt.setInt(2, end);
 				pstmt.setInt(3, start);
+			} else if (keyword == "") {
+				pstmt.setInt(1, end);
+				pstmt.setInt(2, start);
 			}
 
 			rs = pstmt.executeQuery();

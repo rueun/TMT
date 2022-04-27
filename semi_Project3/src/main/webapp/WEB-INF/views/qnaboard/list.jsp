@@ -266,7 +266,7 @@ function searchList() {
 					</td>
 					<td align="center">
 						<form name="searchForm"
-							action="${pageContext.request.contextPath}/board/list.do"
+							action="${pageContext.request.contextPath}/qnaboard/list.do"
 							method="post">
 							<select name="condition" class="form-select">
 								<option value="all"
@@ -281,7 +281,7 @@ function searchList() {
 									${condition=="content"?"selected='selected'":"" }>내용</option>
 							</select> 
 							<input type="text" name="keyword" value="${keyword}" class="form-control">
-							<input type="hidden" name="categoryType" value="${categoryType }">;
+							<input type="hidden" name="categoryType" value="${categoryType}">;
 							<button type="button" class="btn" onclick="searchList();">검색</button>
 						</form>
 					</td>

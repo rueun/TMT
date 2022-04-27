@@ -6,6 +6,7 @@ import java.net.URLEncoder;
 import java.util.List;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,6 +16,7 @@ import com.member.SessionInfo;
 import com.util.MyServlet;
 import com.util.MyUtil;
 
+@MultipartConfig
 @WebServlet("/qnaboard/*")
 public class QnABoardServlet extends MyServlet {
 	private static final long serialVersionUID = 1L;
@@ -107,7 +109,7 @@ public class QnABoardServlet extends MyServlet {
 
 			// 게시물 가져오기
 			List<QnABoardDTO> list = null;
-			if (keyword.length() == 0) {
+			if (keyword.length() == 0 && categoryType.equals("all")) {
 				list = dao.listBoard(start, end);
 			} else {
 				list = dao.listBoard(start, end, condition, keyword, categoryType);
@@ -128,8 +130,8 @@ public class QnABoardServlet extends MyServlet {
 			}
 
 			// 페이징 처리
-			String listUrl = cp + "/board/list.do";
-			String articleUrl = cp + "/board/article.do?page=" + current_page;
+			String listUrl = cp + "/qnaboard/list.do";
+			String articleUrl = cp + "/qnaboard/article.do?page=" + current_page;
 			if (query.length() != 0) {
 				listUrl += "?" + query;
 				articleUrl += "&" + query;
@@ -153,7 +155,7 @@ public class QnABoardServlet extends MyServlet {
 		}
 
 		// JSP로 포워딩
-		forward(req, resp, "/WEB-INF/views/board/list.jsp");
+		forward(req, resp, "/WEB-INF/views/qnaboard/list.jsp");
 	}
 
 	private void writeForm(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
