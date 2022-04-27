@@ -2,7 +2,7 @@ package com.member;
 
 public class SessionInfo {
 	private String userId;
-	private String userName;
+	private String userNickName;
 	private int userRoll;
 	
 	public String getUserId() {
@@ -11,11 +11,11 @@ public class SessionInfo {
 	public void setUserId(String userId) {
 		this.userId = userId;
 	}
-	public String getUserName() {
-		return userName;
+	public String getUserNickName() {
+		return userNickName;
 	}
-	public void setUserName(String userName) {
-		this.userName = userName;
+	public void setUserNickName(String userNickName) {
+		this.userNickName = userNickName;
 	}
 	public int getUserRoll() {
 		return userRoll;

@@ -17,7 +17,7 @@ public class MemberDAO {
 		StringBuilder sb = new StringBuilder();
 		
 		try {
-			sb.append(" SELECT userId, userPwd ,userName");
+			sb.append(" SELECT userId, userPwd ,userNickName");
 			sb.append(" FROM member1");
 			sb.append(" WHERE userId = ? AND userPwd = ? AND enabled = 1");
 		
@@ -33,7 +33,7 @@ public class MemberDAO {
 				
 				dto.setUserId(rs.getString("userId"));
 				dto.setUserPwd(rs.getString("userPwd"));
-				dto.setUserName(rs.getString("userName"));
+				dto.setUserNickName(rs.getString("userNickName"));
 			}
 			
 		} catch (SQLException e) {

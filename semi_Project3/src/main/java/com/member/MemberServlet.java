@@ -66,7 +66,7 @@ public class MemberServlet extends MyServlet{
 			// 세션에 저장할 내용
 			SessionInfo info = new SessionInfo();
 			info.setUserId(dto.getUserId());
-			info.setUserName(dto.getUserName());
+			info.setUserNickName(dto.getUserNickName());
 
 			// 세션에 member이라는 이름으로 저장
 			session.setAttribute("member", info);
