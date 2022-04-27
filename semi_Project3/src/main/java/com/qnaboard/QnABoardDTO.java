@@ -1,6 +1,6 @@
 package com.qnaboard;
 
-public class BoardDTO {
+public class QnABoardDTO {
 	private int listNum;
 	private int boardNum;
 	private String categoryType;

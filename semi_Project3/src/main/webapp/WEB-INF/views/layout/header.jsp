@@ -52,7 +52,7 @@
 		<li><a href="#">고객센터</a>
 			<ul>
 				<li><a href="${pageContext.request.contextPath}/notice/list.do">공지사항</a></li>
-				<li><a href="${pageContext.request.contextPath }/board/list.do">질문답변</a></li>
+				<li><a href="${pageContext.request.contextPath }/qnaboard/list.do">질문답변</a></li>
 				<li><a href="#">이벤트</a></li>
 				<li><a href="#">일정</a></li>
 			</ul>

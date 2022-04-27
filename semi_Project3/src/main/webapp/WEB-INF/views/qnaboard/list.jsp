@@ -200,14 +200,14 @@ function searchList() {
 
 
 			<ul class="category">
-				<li class="on"><a href="#">전체</a></li>
-				<li><a href="#">일반</a></li>
-				<li><a href="#">게시판</a></li>
-				<li><a href="#">갤러리</a></li>
-				<li><a href="#">주문/결제</a></li>
-				<li><a href="#">반품/교환/환불</a></li>
-				<li><a href="#">배송문의</a></li>
-				<li><a href="#">회원서비스</a></li>
+				<li class="on"><a href="${pageContext.request.contextPath}/qnaboard/list.do?categoryType=all">전체</a></li>
+				<li><a href="${pageContext.request.contextPath}/qnaboard/list.do?categoryType=normal">일반</a></li>
+				<li><a href="${pageContext.request.contextPath}/qnaboard/list.do?categoryType=board">게시판</a></li>
+				<li><a href="${pageContext.request.contextPath}/qnaboard/list.do?categoryType=gallery">갤러리</a></li>
+				<li><a href="${pageContext.request.contextPath}/qnaboard/list.do?categoryType=payment">주문/결제</a></li>
+				<li><a href="${pageContext.request.contextPath}/qnaboard/list.do?categoryType=return">반품/교환/환불</a></li>
+				<li><a href="${pageContext.request.contextPath}/qnaboard/list.do?categoryType=delivery">배송문의</a></li>
+				<li><a href="${pageContext.request.contextPath}/qnaboard/list.do?categoryType=servie">회원서비스</a></li>
 			</ul>
 
 			<table class="table">
@@ -279,14 +279,15 @@ function searchList() {
 									${condition=="subject"?"selected='selected'":"" }>제목</option>
 								<option value="content"
 									${condition=="content"?"selected='selected'":"" }>내용</option>
-							</select> <input type="text" name="keyword" value="${keyword}"
-								class="form-control">
+							</select> 
+							<input type="text" name="keyword" value="${keyword}" class="form-control">
+							<input type="hidden" name="categoryType" value="${categoryType }">;
 							<button type="button" class="btn" onclick="searchList();">검색</button>
 						</form>
 					</td>
 					<td align="right" width="100">
 						<button type="button" class="btn"
-							onclick="location.href='${pageContext.request.contextPath}/board/write.do';">글올리기</button>
+							onclick="location.href='${pageContext.request.contextPath}/qnaboard/write.do';">글올리기</button>
 					</td>
 				</tr>
 			</table>
