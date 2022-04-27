@@ -292,7 +292,7 @@ a {
     padding: 15px;
     box-sizing: border-box;
     border: 0;
-    resize: vertical;
+    resize: none;
 }
 </style>
 </head>
