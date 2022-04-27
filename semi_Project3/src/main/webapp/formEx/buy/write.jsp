@@ -10,6 +10,15 @@
 <title>spring</title>
 <jsp:include page="/WEB-INF/views/layout/staticHeader.jsp"/>
 <style type="text/css">
+#price {
+width: 50%;
+float: left;
+}
+
+.body-title11 {
+font-size: 24px;
+}
+
 .table-form td {
 	padding: 7px 0;
 }
@@ -30,49 +39,17 @@
 	width: 96%;
 }
 
-
-.body-title1 { font-size: 24px;}
-.table-list thead > tr:first-child{
-	background: #FFFFFF;
+.table-form .img {
+	width: 37px; height: 37px; border: none; vertical-align: middle;
 }
-.table-list th, .table-list td {
-	text-align: center;
-}
-.table-list .left {
-	text-align: left; padding-left: 5px; 
-}
-
-.table-list .num {
-	width: 5%; color: black;
-}
-.table-list .subject {
-     width: 45%; color: black;
-}
-.table-list .name {
-	width: 15%; color: black;
-}
-.table-list .date {
-	width: 15%; color: black;
-}
-.table-list .hit {
-	width: 5%; color: black;
-}
-
-.table-list .price {
-	width: 15%; color: black;
-}
-.table-list .file {
-	width: 50px; color: black;
-}
-
-.table-list .notice {
-display: inline-block; padding: 1px 3px; background: #ed4c00; color: #fff;
+.table-form .info {
+	vertical-align: middle; font-size: 11px; color: #333;
 }
 </style>
 
 <script type="text/javascript">
-function sendBoard() {
-    const f = document.boardForm;
+function sendOk() {
+    const f = document.photoForm;
 	let str;
 	
     str = f.subject.value.trim();
@@ -88,22 +65,17 @@ function sendBoard() {
         f.content.focus();
         return;
     }
+    
+    let mode = "${mode}";
+    if( (mode === "write") && (!f.selectFile.value) ) {
+        alert("이미지 파일을 추가 하세요. ");
+        f.selectFile.focus();
+        return;
+    }
 
-    f.action = "${pageContext.request.contextPath}/notice/${mode}_ok.do";
+    f.action = "${pageContext.request.contextPath}/photo/${mode}_ok.do";
     f.submit();
 }
-
-<c:if test="${mode=='update'}">
-function deleteFile(fileNum) {
-	if(confirm('파일을 삭제하시겠습니까 ? ')) {
-		let query = "num=${dto.num}&page=${page}&fileNum="+fileNum;
-		let url = "${pageContext.request.contextPath}/notice/deleteFile.do?"+query;
-		//alert(url);
-		location.href = url;
-	}
-}
-</c:if>
-
 </script>
 </head>
 <body>
@@ -113,12 +85,12 @@ function deleteFile(fileNum) {
 </header>
 	
 <main>
-	<div class="body-container" style="width: 1200px;">
-		<div class="body-title1">
-			<h3><i class="fa-solid fa-avocado"></i> 삽니다 </h3>
+	<div class="body-container" style="width: 1100px;">
+		<div class="body-title11">
+			<h3><i class="fa-solid fa-basket-shopping"></i> 삽니다 </h3>
 		</div>
         
-		<form name="boardForm" method="post" enctype="multipart/form-data">
+		<form name="photoForm" method="post" enctype="multipart/form-data">
 			<table class="table table-border table-form">
 				<tr> 
 					<td>제&nbsp;&nbsp;&nbsp;&nbsp;목</td>
@@ -126,13 +98,19 @@ function deleteFile(fileNum) {
 						<input type="text" name="subject" maxlength="100" class="form-control" value="${dto.subject}">
 					</td>
 				</tr>
-				<tr>
-				<td>가&nbsp;&nbsp;&nbsp;&nbsp;격</td>
+				<tr> 
+					<td>가&nbsp;&nbsp;&nbsp;&nbsp;격</td>
 					<td> 
-						<input type="text" name="subject" maxlength="100" class="form-control" value="${dto.price}">
+						<input type="text" name="price" maxlength="100" class="form-control" value="${dto.price}">
 					</td>
 				</tr>
 				
+				<tr> 
+					<td>작성자</td>
+					<td> 
+						<p>${sessionScope.member.userName}</p>
+					</td>
+				</tr>
 				
 				<tr> 
 					<td valign="top">내&nbsp;&nbsp;&nbsp;&nbsp;용</td>
@@ -140,47 +118,44 @@ function deleteFile(fileNum) {
 						<textarea name="content" class="form-control">${dto.content}</textarea>
 					</td>
 				</tr>
-				
-				<tr>
-					<td>첨&nbsp;&nbsp;&nbsp;&nbsp;부</td>
+
+				<tr> 
+					<td>이미지</td>
 					<td> 
-						<input type="file" name="selectFile" class="form-control" multiple="multiple">
+						<input type="file" name="selectFile" accept="image/*" class="form-control">
 					</td>
 				</tr>
 				
 				<c:if test="${mode=='update'}">
-				<c:forEach var="vo" items="${listFile}">
-				<tr>
-				<td>첨부된 파일</td>
-				<td>
-				<p>
-				<a href="javascript:deleteFile('${vo.fileNum}');"><i class="far fa-trash-alt"></i></a>
-				${vo.originalFilename}
-				</p>
-				</td>
-				</tr>
-				
-				</c:forEach>
-				
+					<tr>
+						<td>등록이미지</td>
+						<td>
+							<p>
+								<img src="${pageContext.request.contextPath}/uploads/photo/${dto.imageFilename}" class="img">
+								<span class="info">(새로운 이미지가 등록되면 기존 이미지는 삭제 됩니다.)</span>
+							</p>
+						</td>
+					</tr>
 				</c:if>
+				
 			</table>
 				
 			<table class="table">
 				<tr> 
 					<td align="center">
-						<button type="button" class="btn" onclick="sendBoard();"> ${mode=="update"?"수정완료":"등록하기"}</button>
+						<button type="button" class="btn" onclick="sendOk();">${mode=='update'?'수정완료':'등록하기'}</button>
 						<button type="reset" class="btn">다시입력</button>
-						<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/notice/list.do';">${mode=="update"?"수정취소":"등록취소" }</button>
-					<c:if test="${mode=='update'}">
-					<input type="hidden" name="num" value="${dto.num}">
-					<input type="hidden" name="page" value="${page}">
-					</c:if>
+						<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/photo/list.do';">${mode=='update'?'수정취소':'등록취소'}</button>
+						<c:if test="${mode=='update'}">
+							<input type="hidden" name="num" value="${dto.num}">
+							<input type="hidden" name="imageFilename" value="${dto.imageFilename}">
+							<input type="hidden" name="page" value="${page}">
+						</c:if>
 					</td>
 				</tr>
 			</table>
 	
 		</form>
-
         
 	</div>
 </main>
