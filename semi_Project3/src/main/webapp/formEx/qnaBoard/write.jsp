@@ -82,7 +82,7 @@ function sendBoard() {
         return;
     }
 
-    f.action = "${pageContext.request.contextPath}/notice/${mode}_ok.do";
+    f.action = "${pageContext.request.contextPath}/qnaboard/${mode}_ok.do";
     f.submit();
 }
 <c:if test="${mode=='update'}">
@@ -113,8 +113,9 @@ function sendBoard() {
 				<tr>
 					<td>카&nbsp;테&nbsp;고&nbsp;리</td>
 					<td> 
-						<select name="category" class="form-select">
+						<select name="categoryType" class="form-select">
 							<option value="">분류</option>
+							<option value="all">전체</option>
 							<option value="normal">일반</option>
 							<option value="board">게시판</option>
 							<option value="gallery">갤러리</option>
@@ -129,7 +130,7 @@ function sendBoard() {
 				<tr> 
 					<td>작성자</td>
 					<td> 
-						<p>${sessionScope.member.userName}</p>
+						<p>${sessionScope.member.userNickName}</p>
 					</td>
 				</tr>
 				
