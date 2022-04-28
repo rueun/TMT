@@ -10,6 +10,7 @@ public class FreeGalleryDTO {
 	private String reg_date;
 	private int hitCount;
 	private int likeCount;
+	private int replyCount;
 	
 	
 	// 파일 관련
@@ -88,6 +89,12 @@ public class FreeGalleryDTO {
 	}
 	public void setImageFiles(String[] imageFiles) {
 		this.imageFiles = imageFiles;
+	}
+	public int getReplyCount() {
+		return replyCount;
+	}
+	public void setReplyCount(int replyCount) {
+		this.replyCount = replyCount;
 	}
 	
 }

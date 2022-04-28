@@ -139,14 +139,14 @@
 .area-reply strong {font-size: 16px;}
 .area_reply{margin-top:51px; margin-bottom: 40px;}
 .area_reply .tit_reply{font-weight:normal;font-size:20px;color:#222;display:block;margin-bottom:14px}
-.area_reply .fld_reply{border:none; padding:20px;border-top:1px solid #e8e8e8;background-color:#fafafa;position:relative}
-.area_reply .reply_write{position:relative;padding:7px 12px;border:1px solid #e8e8e8;background-color:#fff}
-.area_reply .tf_reply{width:100%;height:70px;border:1px solid #fff;font-size:13px;resize:none;box-sizing:border-box;color:#5c5c5c}
-.area_reply .writer_btn{float:right;margin-top:10px}
-.area_reply .writer_btn .btn_enter{border: 0 none; background-color: transparent; cursor: pointer; float:left;width:71px;height:36px;border-radius:18px;font-size:13px;line-height:38px;background-color:#6bacce;color:#fff}
+.reply .fld_reply{border:none; padding:20px;border-top:1px solid #e8e8e8;background-color:#fafafa;position:relative}
+.reply .reply_write{position:relative;padding:7px 12px;border:1px solid #e8e8e8;background-color:#fff}
+.reply .tf_reply{width:100%;height:70px;border:1px solid #fff;font-size:13px;resize:none;box-sizing:border-box;color:#5c5c5c}
+.reply .writer_btn{float:right;margin-top:10px}
+.reply .writer_btn .btn_enter{border: 0 none; background-color: transparent; cursor: pointer; float:left;width:71px;height:36px;border-radius:18px;font-size:13px;line-height:38px;background-color:#6bacce;color:#fff}
 .list_reply .thumb_profile{float:left;width:48px;height:48px;margin-right:20px;border-radius:48px;background-position:-140px -20px;margin-top:2px;}
 .list_reply .img_profile{display:block;width:100%;height:100%;border-radius:48px;}
-.area_reply .list_reply li{position:relative;padding:23px 0 22px 0;border-top:1px solid #efefef; min-height:53px}
+.area_reply .list_reply li{position:relative;padding:23px 0 22px 0;border-bottom:1px solid #efefef; min-height:53px}
 
 .area_reply .list_reply li:first-child{border-top:0 none}
 #tt-body-page .list_reply li:first-child{padding-top:0}
@@ -157,25 +157,11 @@
 .area_reply .txt_reply{display:block;padding-top:4px;font-size:13px;line-height:21px;color:#5c5c5c;clear:both}
 .area_reply .list_reply li:hover .area_more,
 .area_reply .list_reply li:hover .area_more .reply_layer { display:block }
-.area_reply .list_reply li:first-child .reply_layer { top:2px }
 .area_more .reply_layer { position:absolute; right:0px; top:25px }
 .area_more .reply_layer .link_reply { margin:0 2px;font-size:12px;color:#6bacce }
 .area_more .reply_layer .link_reply:hover { text-decoration: none}
 .area_more .reply_layer { position: absolute; right: 0px; top: 25px;}
 li {list-style: none;}
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 .pre {
 	border-top: 1px solid lightgray;
@@ -302,6 +288,41 @@ $(document).ready(function(){
 
 
 </script>
+
+
+<script type="text/javascript">
+function login() {
+	location.href="${pageContext.request.contextPath}/member/login.do";
+}
+
+function ajaxFun(url, method, query, dataType, fn) {
+	$.ajax({
+		type:method,
+		url:url,
+		data:query,
+		dataType:dataType,
+		success:function(data){
+			fn(data);
+		},
+		beforeSend:function(jqXHR){
+			jqXHR.setRequestHeader("AJAX", true); // header에 AJAX라는 속성명에 true를 설정
+		},
+		error:function(jqXHR) {
+			if(jqXHR.status === 403){
+				login();
+				return false;
+			} else if(jqXHR.status === 400){
+				alert("요청처리를 실패했습니다.");
+				return false;
+			}
+			
+			console.log(jqXHR.responseTet);
+		}
+	});
+}
+
+
+</script>
 </head>
 <body>
 
@@ -354,75 +375,19 @@ $(document).ready(function(){
     		</div>
        	</div>
         
-        <div class="area_reply">
-        	<strong class="tit_reply"><span id="commentCount9543_0">2</span> Comments</strong>
-        	<div class="entry_comment">
-        		<ul class="list_reply">
-        			<li class="rp_general">
-        				<span class="ico_skin thumb_profile">
-        					<img src="${pageContext.request.contextPath}/resource/images/image.png" width="48" height="48" class="img_profile" alt="프로필사진">
-        				</span>
-        				<span class="reply_content">
-        					<span class="tit_nickname">짱구라네</span>
-        					<span class="txt_date">2022-12-31 12:23</span>
-        					<span class="txt_reply">
-        						가능한 기본 설정[=디폴트]은 그냥 유지 합니다.
-        						<br>
-        						ㄴㅇ라ㅣ닝ㄹㅈ
-        						<br>
-        						sdklfjwlkqjtgwqjtg
-        					</span>
-        				</span>
-        				<div class="area_more">
-	        				<div class="reply_layer">
-	        					<div class="inner_reply_layer">
-	        						<div class="layer_body">
-	        							<a href="#none" onclick="updateComment();" class="link_reply">수정</a>
-	        							<a href="#none" onclick="deleteComment();" class="link_reply">삭제</a>
-	        						</div>
-	        					</div>
-	        				</div>
-        				</div>
-        			</li>
-        			
-        			<li class="rp_general">
-        				<span class="ico_skin thumb_profile">
-        					<img src="${pageContext.request.contextPath}/resource/images/image.png" width="48" height="48" class="img_profile" alt="프로필사진">
-        				</span>
-        				<span class="reply_content">
-        					<span class="tit_nickname">짱구라네</span>
-        					<span class="txt_date">2022-12-31 12:23</span>
-        					<span class="txt_reply">
-        						가능한 기본 설정[=디폴트]은 그냥 유지 합니다.
-        						<br>
-        						호호잇
-        					</span>
-        				</span>
-        				<div class="area_more">
-	        				<div class="reply_layer">
-	        					<div class="inner_reply_layer">
-	        						<div class="layer_body">
-	        							<a href="#none" onclick="updateComment();" class="link_reply">수정</a>
-	        							<a href="#none" onclick="deleteComment();" class="link_reply">삭제</a>
-	        						</div>
-	        					</div>
-	        				</div>
-        				</div>
-        			</li>
-        		</ul>
-        		
-        		<form action="" onsubmit="return false" method="post">
-        			<fieldset class="fld_reply">
-        				<div class="reply_write">
-							<textarea name="comment" id="comment" class="tf_reply" placeholder="댓글을 입력해주세요" tabindex="3"></textarea>
-						</div>
-						<div class="writer_btn">
-							<button type="submit" class="btn_enter" onclick="addComment(); return false;" tabindex="5">Send</button>
-						</div>
-        			</fieldset>
-        		</form>
-        	</div>
-        </div>
+        <div id="area_reply"></div>
+        <div class="reply">
+	        <form action="" onsubmit="return false" method="post">
+	     		<fieldset class="fld_reply">
+		     		<div class="reply_write">
+						<textarea name="comment" id="comment" class="tf_reply" placeholder="댓글을 입력해주세요" tabindex="3"></textarea>
+					</div>
+					<div class="writer_btn">
+						<button type="submit" class="btn_enter" onclick="addComment(); return false;" tabindex="5">Send</button>
+					</div>
+	     		</fieldset>
+	     	</form>
+     	</div>
         
         
 

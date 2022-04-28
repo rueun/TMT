@@ -94,7 +94,7 @@ ul li, ol li {list-style: none}
 	bottom: -1px;
 	left: 0px
 }
-.category li a {
+.category li span {
 	text-decoration: none;
     cursor: pointer;
     color: #666;
@@ -106,7 +106,7 @@ ul li, ol li {list-style: none}
 	padding: 9px 20px
 	
 }
-.category li a:after { 
+.category li span:after { 
 	content:''; 
 	display:block; 
 	position:absolute; 
@@ -116,11 +116,11 @@ ul li, ol li {list-style: none}
 	width:1px; 
 	background:#e6e3df
 }
-.category li.on a, .category li:hover a {
+.category li.on span, .category li:hover span {
 	border-bottom-color:transparent; 
 	border-top:1px solid #444;
 }
-.category li.on a:after, .category li:hover a:after { 
+.category li.on span:after, .category li:hover span:after { 
 	content:''; 
 	display:block; 
 	position:absolute; 
@@ -130,7 +130,7 @@ ul li, ol li {list-style: none}
 	width:1px; 
 	background:#444
 }
-.category li.on a:before, .category li:hover a:before { 
+.category li.on span:before, .category li:hover span:before { 
 	content:''; 
 	display:block; 
 	position:absolute; 
@@ -144,11 +144,48 @@ ul li, ol li {list-style: none}
 </style>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script type="text/javascript">
+function searchList() {
+	const f = document.searchForm;
+	f.submit();
+}
+</script>
+<script type="text/javascript">
 $(function() {
+	$("ul.category li").removeClass("on");
+	switch($('input[name=category]').val()) {
+		case "all" : $("ul.category li:nth-child(1)").addClass("on"); break;
+		case "daily" :  $("ul.category li:nth-child(2)").addClass("on"); break;
+		case "food" : $("ul.category li:nth-child(3)").addClass("on"); break;
+		case "family" : $("ul.category li:nth-child(4)").addClass("on"); break;
+		case "animal" : $("ul.category li:nth-child(5)").addClass("on"); break;
+		case "landscape" : $("ul.category li:nth-child(6)").addClass("on"); break;
+		case "nightscape" : $("ul.category li:nth-child(7)").addClass("on"); break;
+		case "travel" : $("ul.category li:nth-child(8)").addClass("on"); break;
+		case "authentication" : $("ul.category li:nth-child(9)").addClass("on"); break;
+	}
+	
+	// li 태그는 value 값이 int 형만 가능
 	$("ul.category li").click(function() {
 		$("ul.category li").removeClass("on");
 		$(this).addClass("on");
+		var category = "";
+		switch($(this).val()) {
+			case 0 : category = "all"; break;
+			case 1 : category = "daily"; break;
+			case 2 : category = "food"; break;
+			case 3 : category = "family"; break;
+			case 4 : category = "animal"; break;
+			case 5 : category = "landscape"; break;
+			case 6 : category = "nightscape"; break;
+			case 7 : category = "travel"; break;
+			case 8 : category = "authentication"; break;
+		}
+		$('input[name=category]').val(category);
+		$('form[name=searchForm] .btn').trigger("click");
 	});
+	
+	
+	
 });
 
 </script>
@@ -166,21 +203,20 @@ $(function() {
 		</div>
         
 		<ul class="category">
-			<li class="on"><a href="#">전체</a></li>
-			<li><a href="#">일반</a></li>
-			<li><a href="#">음식</a></li>
-			<li><a href="#">인물</a></li>
-			<li><a href="#">아이/가족</a></li>
-			<li><a href="#">동물</a></li>
-			<li><a href="#">풍경</a></li>
-			<li><a href="#">야경</a></li>
-			<li><a href="#">여행</a></li>
-			<li><a href="#">인증</a></li>
+			<li value="0"><span>전체</span></li>
+			<li value="1"><span>일상</span></li>
+			<li value="2"><span>음식</span></li>
+			<li value="3"><span>아이/가족</span></li>
+			<li value="4"><span>동물</span></li>
+			<li value="5"><span>풍경</span></li>
+			<li value="6"><span>야경</span></li>
+			<li value="7"><span>여행</span></li>
+			<li value="8"><span>인증</span></li>
 		</ul>
         <table class="table">
 			<tr>
 				<td width="50%">
-					302개(3/101 페이지)
+					${dataCount}개 (${page}/${total_page} 페이지)
 				</td>
 				<td align="right">
 					<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/freeGallery/write.do';">사진올리기</button>
@@ -190,40 +226,42 @@ $(function() {
 		
 		
 		<div class="grid-box">
-			<div class="gallery_list" title="$할로" onclick="">
-				<ul>
-            		<li class="gallery_img">
-            			<a href="#">
-            				<img src="${pageContext.request.contextPath}/resource/images/image.png" onfocus="blur()" border="0">
-            			</a>        	
-            		</li>
-            		
-            		<li class="gallery_info">
-	                	<span class="gallery_title">
-	                		<a href=""><font class="thumb_list_title">셀카임다</font></a>
-	                	</span>
-            		</li>
-            		
-		            <li class="gallery_info">
-		            	<span>
-		            		<a href="#" onclick="return false">
-		            			<font class="list_name">나는야 짱구라네</font></a>
-		            	</span>
-		                <span class="gallery_data ">13:46:15</span>
-		            </li>
-		            
-		            
-		            <li class="gallery_icon">
-		            	<span class="gallery_vote_data">
-		            		<img class="imgcss" src="${pageContext.request.contextPath}/resource/images/answer.png" alt="comment">
-		            		<i>1</i></span>
-		            	<span class="gallery_like" onclick="#">
-		            		<img src="${pageContext.request.contextPath}/resource/images/list_heart.png" alt="추천" title="추천">
-		            		<i>0</i>
-		            	</span>
-		            </li>
-        		</ul>			
-			</div>
+			<c:forEach var="dto" items="${list}" varStatus="status">
+				<div class="gallery_list" onclick="">
+					<ul>
+	            		<li class="gallery_img">
+	            			<a href="${articleUrl}&num=${dto.num}">
+	            				<img src="${pageContext.request.contextPath}/uploads/freeGallery/${dto.imageFilename}" onfocus="blur()" border="0">
+	            			</a>        	
+	            		</li>
+	            		
+	            		<li class="gallery_info">
+		                	<span class="gallery_title">
+		                		<a href=""><font class="thumb_list_title">${dto.subject}</font></a>
+		                	</span>
+	            		</li>
+	            		
+			            <li class="gallery_info">
+			            	<span>
+			            		<a href="#" onclick="return false">
+			            			<font class="list_name">${dto.userNickName}</font></a>
+			            	</span>
+			                <span class="gallery_data ">${dto.reg_date}</span>
+			            </li>
+			            
+			            
+			            <li class="gallery_icon">
+			            	<span class="gallery_vote_data">
+			            		<img class="imgcss" src="${pageContext.request.contextPath}/resource/images/answer.png" alt="comment">
+			            		<i>${dto.replyCount}</i></span>
+			            	<span class="gallery_like">
+			            		<img src="${pageContext.request.contextPath}/resource/images/list_heart.png" alt="추천" title="추천">
+			            		<i>${dto.likeCount}</i>
+			            	</span>
+			            </li>
+	        		</ul>			
+				</div>
+			</c:forEach>
 		</div>
 		
 		
@@ -234,17 +272,18 @@ $(function() {
 		<table class="table">
 			<tr>
 				<td width="100">
-					<button type="button" class="btn" onclick="">새로고침</button>
+					<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/freeGallery/list.do';">새로고침</button>
 				</td>
 				<td align="center">
-					<form name="searchForm" action="${pageContext.request.contextPath}/notice/list.do" method="post">
+					<form name="searchForm" action="${pageContext.request.contextPath}/freeGallery/list.do" method="post">
 						<select name="condition" class="form-select">
 							<option value="all" ${condition=="all" ? "selected='selected'":""}>제목+내용</option>
-							<option value="userName" ${condition=="userName" ? "selected='selected'":""}>작성자</option>
+							<option value="userNickName" ${condition=="userNickName" ? "selected='selected'":""}>작성자</option>
 							<option value="reg_date" ${condition=="reg_date" ? "selected='selected'":""}>등록일</option>
 							<option value="subject" ${condition=="subject" ? "selected='selected'":""}>제목</option>
 							<option value="content" ${condition=="content" ? "selected='selected'":""}>내용</option>
 						</select>
+						<input type="hidden" name ="category" value="${category}" >
 						<input type="text" name="keyword" value="${keyword}" class="form-control">
 						<button type="button" class="btn" onclick="searchList();">검색</button>
 					</form>
