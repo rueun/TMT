@@ -103,7 +103,7 @@ function sendBoard() {
 </header>
 	
 <main>
-	<div class="body-container" style="width: 800px;">
+	<div class="body-container" style="width: 1000px;">
 		<div class="body-title">
 			<h3><i class="fas fa-clipboard-list"></i> QnA </h3>
 		</div>
