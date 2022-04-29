@@ -216,7 +216,7 @@ public class QnABoardDAO {
 		try {
 			sb.append(" SELECT * FROM ( ");
 			sb.append("     SELECT ROWNUM rnum, tb.* FROM ( ");
-			sb.append("         SELECT boardNum, b.userId, userName, categoryType, ");
+			sb.append("         SELECT boardNum, b.userId, userName, userNickName, categoryType, ");
 			sb.append("               subject, groupNum, orderNo, depth, hitCount,");
 			sb.append("               TO_CHAR(reg_date, 'YYYY-MM-DD') reg_date ");
 			sb.append("         FROM QnAboard b ");
@@ -238,6 +238,7 @@ public class QnABoardDAO {
 				dto.setBoardNum(rs.getInt("boardNum"));
 				dto.setUserId(rs.getString("userId"));
 				dto.setUserName(rs.getString("userName"));
+				dto.setUserNickName(rs.getString("userNickName"));
 				dto.setCategoryType(rs.getString("categoryType"));
 				dto.setSubject(rs.getString("subject"));
 				dto.setGroupNum(rs.getInt("groupNum"));
@@ -279,7 +280,7 @@ public class QnABoardDAO {
 		try {
 			sb.append(" SELECT * FROM ( ");
 			sb.append("     SELECT ROWNUM rnum, tb.* FROM ( ");
-			sb.append("         SELECT boardNum, b.userId, userName, categoryType, ");
+			sb.append("         SELECT boardNum, b.userId, userName, userNickName, categoryType, ");
 			sb.append("               subject, groupNum, orderNo, depth, hitCount, ");
 			sb.append("               TO_CHAR(reg_date, 'YYYY-MM-DD') reg_date ");
 			sb.append("         FROM QnAboard b ");
@@ -326,6 +327,7 @@ public class QnABoardDAO {
 				dto.setBoardNum(rs.getInt("boardNum"));
 				dto.setUserId(rs.getString("userId"));
 				dto.setUserName(rs.getString("userName"));
+				dto.setUserNickName(rs.getString("userNickName"));
 				dto.setCategoryType(rs.getString("categoryType"));
 				dto.setSubject(rs.getString("subject"));
 				dto.setGroupNum(rs.getInt("groupNum"));
