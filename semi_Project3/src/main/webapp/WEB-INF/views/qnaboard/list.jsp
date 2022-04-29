@@ -289,7 +289,7 @@ $(function() {
 				<tr>
 					<td width="100">
 						<button type="button" class="btn"
-							onclick="location.href='${pageContext.request.contextPath}/board/list.do';"
+							onclick="location.href='${pageContext.request.contextPath}/qnaboard/list.do';"
 							title="새로고침">
 							새로고침<i class="fa-solid fa-arrow-rotate-right"></i>
 						</button>
