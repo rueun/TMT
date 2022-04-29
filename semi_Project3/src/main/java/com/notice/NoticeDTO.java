@@ -11,7 +11,13 @@ public class NoticeDTO {
 	private String reg_date;
 	private int hitCount;
 	
-	private int fileNum;
+	public int getNumFile() {
+		return numFile;
+	}
+	public void setNumFile(int numFile) {
+		this.numFile = numFile;
+	}
+	private int numFile;
 	private String saveFilename;
 	private String originalFilename;
 	
@@ -73,12 +79,7 @@ public class NoticeDTO {
 	public void setHitCount(int hitCount) {
 		this.hitCount = hitCount;
 	}
-	public int getFileNum() {
-		return fileNum;
-	}
-	public void setFileNum(int fileNum) {
-		this.fileNum = fileNum;
-	}
+	
 	public String getSaveFilename() {
 		return saveFilename;
 	}

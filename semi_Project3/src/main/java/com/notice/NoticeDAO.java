@@ -49,9 +49,9 @@ public class NoticeDAO {
 			pstmt.close();
 			pstmt = null;
 			
-			
+		
 			if(dto.getSaveFiles() != null) {
-				sql = "INSERT INTO noticeFile(fileNum, num, saveFilename, originalFilename) "
+				sql = "INSERT INTO noticeFile(numFile, num, saveFilename, originalFilename) "
 						+ "VALUES(noticeFile_seq.NEXTVAL, ?, ?, ?)";
 				
 				pstmt = conn.prepareStatement(sql);
@@ -185,7 +185,8 @@ public class NoticeDAO {
 		try {
 			sb.append( "SELECT * FROM ( "); 
 			sb.append( "  SELECT ROWNUM rnum, tb.* FROM (");
-			sb.append( "		SELECT num, notice, userName, subject, hitCount, reg_date");
+			sb.append( "		SELECT num, notice, userName, subject, hitCount,");
+			sb.append( "        TO_CHAR(reg_date, 'YYYY-MM-DD') reg_date  ");
 			sb.append( "		FROM notice n");
 			sb.append( "		JOIN member1 m ON n.userId = m.userId  ");
 			sb.append( "		ORDER BY num DESC ");
@@ -417,7 +418,7 @@ public class NoticeDAO {
 		String sql;
 		
 		try {
-			sql = "SELECT fileNum, saveFilename, originalFilename FROM noticeFile "
+			sql = "SELECT numFile, saveFilename, originalFilename FROM noticeFile "
 					+ " WHERE num = ?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setInt(1, num);
@@ -425,7 +426,7 @@ public class NoticeDAO {
 			rs = pstmt.executeQuery();
 			while(rs.next()) {
 				NoticeDTO dto = new NoticeDTO();
-				dto.setFileNum(rs.getInt("fileNum"));
+				dto.setNumFile(rs.getInt("numFile"));
 				dto.setSaveFilename(rs.getString("saveFilename"));
 				dto.setOriginalFilename(rs.getString("originalFilename"));
 				
@@ -599,7 +600,135 @@ public class NoticeDAO {
 			return dto;
 		}
 
-	
+		
+		// 조회수
+		public void updateHitCount(int num) throws Exception {
+			PreparedStatement pstmt = null;
+			String sql;
+			
+			try {
+				sql = "UPDATE notice SET hitCount=hitCount+1 WHERE num=?";
+				pstmt = conn.prepareStatement(sql);
+				pstmt.setInt(1, num);
+			
+				pstmt.executeUpdate();
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				if(pstmt != null) {
+					try {
+						pstmt.close();
+					}catch(Exception e2) {	
+					}
+				}
+			}
+			
+		}
+		
+		public void deleteNoticeFile(String mode, int num) throws SQLException {
+			// 파일 테이블 삭제
+			PreparedStatement pstmt = null;
+			String sql;
+			
+			try {
+				if(mode.equals("all")) {
+					sql = "DELETE FROM noticeFile WHERE num=?";
+				} else {
+					sql = "DELETE FROM noticeFile WHERE numFile=?";
+				}
+				pstmt = conn.prepareStatement(sql);
+				
+				pstmt.setInt(1, num);
+				pstmt.executeUpdate();
+				
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw e;
+			} finally {
+				if(pstmt != null) {
+					try {
+						pstmt.close();
+					} catch (Exception e2) {
+					}
+				}
+			}
+		}
+		
+		
+		// 수정
+		public void updateNotice(NoticeDTO dto) throws SQLException {
+			PreparedStatement pstmt = null;
+			String sql;
+			
+			try {
+				sql = "UPDATE notice SET notice=?, subject=?, content=? WHERE num=?";
+				pstmt = conn.prepareStatement(sql);
+				
+				pstmt.setInt(1, dto.getNotice());
+				pstmt.setString(2, dto.getSubject());
+				pstmt.setString(3, dto.getContent());
+				pstmt.setInt(4, dto.getNum());
+				
+				pstmt.executeUpdate();
+				
+				pstmt.close();
+				pstmt.close();
+				
+				if(dto.getSaveFiles() != null) {
+					sql = "INSERT INTO noticeFile(numFile, num, saveFilename, originalFilename)  "
+							+ "VALUES (noticeFile_seq.NEXTVAL, ?, ?, ?)";
+				
+					pstmt = conn.prepareStatement(sql);
+					
+					for(int i = 0; i<dto.getSaveFiles().length; i++) {
+						pstmt.setInt(1, dto.getNum());
+						pstmt.setString(2, dto.getSaveFiles()[i]);
+						pstmt.setString(3, dto.getOriginalFiles()[i]);
+						
+						pstmt.executeUpdate();
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				
+			} finally {
+				if(pstmt != null) {
+					try {
+						pstmt.close();
+					} catch (Exception e2) {
+					}
+				}
+			}
+			
+			
+		}
+		
+		public void deleteNotice(int num) throws SQLException {
+			PreparedStatement pstmt = null;
+			String sql;
+			
+			try {
+				sql = "DELETE FROM notice WHERE num=?";
+				
+				pstmt=conn.prepareStatement(sql);
+				pstmt.setInt(1, num);
+				pstmt.executeUpdate();
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw e;
+			} finally {
+				if(pstmt != null) {
+					try {
+						pstmt.close();
+					} catch (Exception e2) {
+					}
+				}
+			}
+		}
+		
 	
 	
 }
