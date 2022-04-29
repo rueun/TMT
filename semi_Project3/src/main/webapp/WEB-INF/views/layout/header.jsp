@@ -31,9 +31,8 @@
 	<ul id="nav" class="first">
 		<li><a href="#">홈페이지</a></li>
 		<li><a href="#">정보</a>
-		<li>
 			<ul>
-				<li><a href="#">장비 게시판</a></li>
+				<li><a href="${pageContext.request.contextPath}/infoBoard/list.do">정보 게시판</a></li>
 				<li><a href="#">코딩 게시판</a></li>
 			</ul>
 		</li>
