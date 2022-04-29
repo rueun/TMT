@@ -11,6 +11,40 @@
 <link rel="icon" href="data:;base64,iVBORw0KGgo=">
 <jsp:include page="/WEB-INF/views/layout/staticHeader.jsp"/>
 <style type="text/css">
+
+.body-container {
+    margin: 0 auto 15px;
+    width: 700px;
+    min-height: 450px;
+}
+
+.body-title {
+    color: #424951;
+    padding-top: 25px;
+    padding-bottom: 5px;
+    margin: 0 0 25px 0;
+}
+
+.body-title h3 {
+    font-size: 23px;
+    min-width: 300px;
+    font-family: "Malgun Gothic", "맑은 고딕", NanumGothic, 나눔고딕, 돋움, sans-serif;
+    font-weight: bold;
+    margin: 0 0 -5px 0;
+    padding-bottom: 5px;
+    display: inline-block;
+}
+
+.table-form textarea {
+    display: block;
+    width: 100%;
+    height: 300px;
+    padding: 15px;
+    box-sizing: border-box;
+    border: 0px;
+}
+
+
 .table-list thead > tr:first-child{
 	background: #f8f8f8;
 }
@@ -43,7 +77,29 @@
 	display: inline-block; padding: 1px 3px; background: #ed4c00; color: #fff;
 }
 
+.btn {
+    text-align: center;
+    display: inline-block;
+    min-width: 50px;
+    padding: 5px;
+    border: 1px solid #000;
+    border-radius: 2px;
+    font-size: inherit;
+}
+
 </style>
+<script type="text/javascript">
+<c:if test="${sessionScope.member.userId==dto.userId || sessionScope.member.userId=='admin'}">
+function deleteNotice() {
+	if(confirm('게시글을 삭제하시겠습니까?')){
+		let query = "num=${dto.num}&${query}";
+		let url = "${pageContext.request.contextPath}/notice/delete.do?"+query;
+		location.href=url;
+	}
+}
+</c:if>
+
+</script>
 </head>
 <body>
 <header>
@@ -52,8 +108,10 @@
 
 <main>
 	<div class="body-container" style="width: 700px;">
+		
 		<div class="body-title">
-			<h3><i class="fas fa-chalkboard"></i> 공지사항 </h3>
+			<h3> 공지사항 </h3>
+			<p>필독을 권유합니다.</p>
 		</div>
         
 		<table class="table table-border table-article">
@@ -71,7 +129,7 @@
 						이름 : ${dto.userName }
 					</td>
 					<td align="right">
-						${dto.reg_date } | 조회 ${dto.hitCount }
+						${dto.reg_date } | 조회수 ${dto.hitCount }
 					</td>
 				</tr>
 				
@@ -84,18 +142,25 @@
 				<c:forEach var="vo" items="${listFile}">
 					<tr>
 						<td colspan="2">
-							
+							첨부파일
+							<a href="${pageContext.request.contextPath}/notice/download.do?fileNum=${vo.numFile}">${vo.originalFilename }</a>
 						</td>
 					</tr>
 				</c:forEach>
 				<tr>
 					<td colspan="2">
 						이전글 : 
+						<c:if test="${not empty preReadNotice }">
+							<a href="${pageContext.request.contextPath }/notice/article.do?${query}&num=${preReadNotice.num}">${preReadNotice.subject }</a>
+						</c:if>
 					</td>
 				</tr>
 				<tr>
 					<td colspan="2">
-						다음글 : 
+						다음글 :
+						<c:if test="${not empty nextReadNotice }">
+							<a href="${pageContext.request.contextPath }/notice/article.do?${query}&num=${nextReadNotice.num}">${nextReadNotice.subject }</a>
+						</c:if> 
 					</td>
 				</tr>
 			</tbody>

@@ -6,14 +6,49 @@
 <html>
 <head>
 <meta charset="UTF-8"> 
-<!-- 바로 밑줄에 있는 게 뭔지 모르겠어요 -->
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Notice</title>
 <link rel="icon" href="data:;base64,iVBORw0KGgo=">
 <jsp:include page="/WEB-INF/views/layout/staticHeader.jsp"/>
 <style type="text/css">
+
+.body-container {
+    margin: 0 auto 15px;
+    width: 700px;
+    min-height: 450px;
+    position: relative;
+}
+
+.body-title {
+    color: #424951;
+    padding-top: 25px;
+    padding-bottom: 5px;
+    margin: 0 0 25px 0;
+}
+
+.body-title h3 {
+    font-size: 23px;
+    min-width: 300px;
+    font-family: "Malgun Gothic", "맑은 고딕", NanumGothic, 나눔고딕, 돋움, sans-serif;
+    font-weight: bold;
+    margin: 0 0 -5px 0;
+    padding-bottom: 5px;
+    display: inline-block;
+    border-bottom: 3px solid #424951;
+}
+
+.board_write .cont textarea {
+    display: block;
+    width: 100%;
+    height: 300px;
+    padding: 15px;
+    box-sizing: border-box;
+    border: 0;
+    resize: vertical;
+}
+
 .table-list thead > tr:first-child{ 
-	background: #f8f8f8; 
+	background: #fff;
 }
 .table-list th, .table-list td {
 	text-align: center;
@@ -44,6 +79,16 @@
 	display: inline-block; padding: 1px 3px; color: #fff;
 }
 
+.btn {
+    text-align: center;
+    display: inline-block;
+    min-width: 50px;
+    padding: 5px;
+    border: 1px solid #000;
+    border-radius: 2px;
+    font-size: inherit;
+}
+
 </style>
 <script type="text/javascript">
 function searchList() {
@@ -60,13 +105,13 @@ function searchList() {
 	
 <main>
 		<div class="body-container" style="width: 700px;" >
+		
 		<div class="body-title">
-			<h1><i class="fad fa-acorn"></i> 공지사항 </h1>
-			<p>필독을 권유합니다.</p>
+			<h1> 공지사항 </h1>
+			<br>
+			<p> 필독을 권유합니다.</p>
 		</div>
-        
-		
-		
+      
 		<table class="table table-border table-list">
 			<thead>
 				<tr>
