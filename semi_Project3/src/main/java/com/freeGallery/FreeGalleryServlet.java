@@ -2,8 +2,13 @@ package com.freeGallery;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -11,7 +16,9 @@ import javax.servlet.http.HttpSession;
 
 import com.member.SessionInfo;
 import com.util.MyUploadServlet;
+import com.util.MyUtil;
 
+@MultipartConfig
 @WebServlet("/freeGallery/*")
 public class FreeGalleryServlet extends MyUploadServlet {
 	private static final long serialVersionUID = 1L;
@@ -64,20 +71,155 @@ public class FreeGalleryServlet extends MyUploadServlet {
 	
 	private void list(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		// 자유 갤러리 게시물 리스트
-		// FreeGalleryDAO dao = new FreeGalleryDAO();
-		// MyUtil util = new MyUtil();
+		FreeGalleryDAO dao = new FreeGalleryDAO();
+		MyUtil util = new MyUtil();
+
+		String cp = req.getContextPath();
+		
+		try {
+			String page = req.getParameter("page");
+			int current_page = 1;
+			if (page != null) {
+				current_page = Integer.parseInt(page);
+			}
+			
+			// 검색
+			String condition = req.getParameter("condition");
+			String keyword = req.getParameter("keyword");
+			String category = req.getParameter("category");
+			
+			if (condition == null) {
+				condition = "all";
+				keyword = "";
+			}
+			
+			if (category == null) {
+				category = "all";
+			}
+
+			// GET 방식인 경우 디코딩
+			if (req.getMethod().equalsIgnoreCase("GET")) {
+				keyword = URLDecoder.decode(keyword, "utf-8");
+			}
+			
+			
+			// 전체데이터 개수
+			int dataCount;
+			if (keyword.length() == 0 && category.equals("all")) { // 조건 x, 카테고리 x
+				dataCount = dao.dataCount();
+			} else if(keyword.length() == 0 && !category.equals("all")) { // 조건 x, 카테고리 설정 o
+				dataCount = dao.dataCount(category);
+			} else if(keyword.length() != 0 && category.equals("all")) { // 조건 o, 카테고리 x
+				dataCount = dao.dataCount(condition, keyword);
+			} else { // 조건 o, 카테고리 o
+				dataCount = dao.dataCount(condition, keyword, category);
+			}
+
+			// 전체페이지수
+			int rows = 12;
+			int total_page = util.pageCount(rows, dataCount);
+			if (current_page > total_page) {
+				current_page = total_page;
+			}
+			
+			int start = (current_page - 1) * rows + 1;
+			int end = current_page * rows;
+			
+			// 게시물 가져오기
+			List<FreeGalleryDTO> list = null;
+			if (keyword.length() == 0 && category.equals("all")) { // 조건 x, 카테고리 설정 x
+				list = dao.listFreeGallery(start, end);
+			} else if(keyword.length() == 0 && !category.equals("all")) { // 조건 x, 카테고리 설정 o
+				list = dao.listFreeGallery(start, end, category);
+			} else if(keyword.length() != 0 && category.equals("all")) { // 조건 o, 카테고리 x
+				list = dao.listFreeGallery(start, end, condition, keyword);
+			} else { // 조건 o, 카테고리 o
+				list = dao.listFreeGallery(start, end, condition, keyword, category);
+			}
+			
+			String query = "";
+			
+			if(keyword.length() == 0 && !category.equals("all")) { // 조건 x, 카테고리 설정 o
+				query = "category=" + category;
+			} else if(keyword.length() != 0 && category.equals("all")) { // 조건 o, 카테고리 x
+				query = "condition=" + condition + "&keyword=" + URLEncoder.encode(keyword, "utf-8");
+			} else if(keyword.length() != 0 && !category.equals("all")) { // 조건 o, 카테고리 o
+				query = "condition=" + condition + "&keyword=" + URLEncoder.encode(keyword, "utf-8") + "&category=" + category;
+			}
+			
+			
+			
+			// 페이징 처리
+			String listUrl = cp + "/freeGallery/list.do";
+			String articleUrl = cp + "/freeGallery/article.do?page=" + current_page;
+			if (query.length() != 0) {
+				listUrl += "?" + query;
+				articleUrl += "&" + query;
+			}
+			
+			String paging = util.paging(current_page, total_page, listUrl);
+			
+			// 포워딩할 list.jsp에 넘길 값
+			req.setAttribute("list", list);
+			req.setAttribute("dataCount", dataCount);
+			req.setAttribute("articleUrl", articleUrl);
+			req.setAttribute("page", current_page);
+			req.setAttribute("total_page", total_page);
+			req.setAttribute("paging", paging);
+			req.setAttribute("condition", condition);
+			req.setAttribute("keyword", keyword);
+			req.setAttribute("category", category);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 		
 		forward(req, resp, "/WEB-INF/views/freeGallery/list.jsp");
 	}
 	
 	private void writeForm(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		// 자유 갤러리 이미지 올리기 폼(글 쓰기 폼)
-
+		req.setAttribute("mode", "write");
 		forward(req, resp, "/WEB-INF/views/freeGallery/write.jsp");
 	}
 	
 	private void writeSubmit(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		// 자유 갤러리 글 쓰기 완료
+		// 자유 갤러리 글 저장(완료)
+		FreeGalleryDAO dao = new FreeGalleryDAO();
+		
+		HttpSession session = req.getSession();
+		SessionInfo info = (SessionInfo) session.getAttribute("member");
+		
+		String cp = req.getContextPath();
+		if (req.getMethod().equalsIgnoreCase("GET")) {
+			resp.sendRedirect(cp + "/freeGallery/list.do");
+			return;
+		}
+		
+		try {
+			FreeGalleryDTO dto = new FreeGalleryDTO();
+			
+			dto.setUserId(info.getUserId());
+			dto.setCategory(req.getParameter("category"));
+			dto.setSubject(req.getParameter("subject"));
+			dto.setContent(req.getParameter("content"));
+			
+			// 나중에 이미지 파일도 insert하기
+			Map<String, String[]> map = doFileUpload(req.getParts(), pathname);
+			if (map != null) {
+				String[] saveFiles = map.get("saveFilenames");
+				dto.setImageFiles(saveFiles);
+			}
+			
+			
+			dao.insertFreeGallery(dto);
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		resp.sendRedirect(cp + "/freeGallery/list.do");
 	}
 	
 	private void article(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

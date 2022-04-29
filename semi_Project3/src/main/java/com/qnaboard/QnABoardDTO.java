@@ -6,6 +6,7 @@ public class QnABoardDTO {
 	private String categoryType;
 	private String userId;
 	private String userName;
+	private String userNickName;
 	private String subject;
 	private String content;
 	private String reg_date;
@@ -20,6 +21,12 @@ public class QnABoardDTO {
 	private String[] imageFiles;
 	
 	
+	public String getUserNickName() {
+		return userNickName;
+	}
+	public void setUserNickName(String userNickName) {
+		this.userNickName = userNickName;
+	}
 	public String getCategoryType() {
 		return categoryType;
 	}

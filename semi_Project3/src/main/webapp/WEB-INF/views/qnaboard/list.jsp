@@ -183,6 +183,36 @@ function searchList() {
 	f.submit();
 }
 </script>
+
+<script type="text/javascript">
+$(function() {
+	$("ul.category li").removeClass("on");
+	switch($('input[name=categoryType]').val()) {
+		case "all" : $("ul.category li:nth-child(1)").addClass("on"); break;
+		case "normal" :  $("ul.category li:nth-child(2)").addClass("on"); break;
+		case "board" : $("ul.category li:nth-child(3)").addClass("on"); break;
+		case "gallery" : $("ul.category li:nth-child(4)").addClass("on"); break;
+		case "payment" : $("ul.category li:nth-child(5)").addClass("on"); break;
+		case "return" : $("ul.category li:nth-child(6)").addClass("on"); break;
+		case "delivery" : $("ul.category li:nth-child(7)").addClass("on"); break;
+		case "service" : $("ul.category li:nth-child(8)").addClass("on"); break;
+	}
+	
+	
+	$("ul.category li").click(function() {
+		$("ul.category li").removeClass("on");
+		$(this).addClass("on");
+		var category = $(this).val();
+		$('input[name=category]').val(category);
+		$('form[name=searchForm] .btn').trigger("click");
+	});
+	
+	
+	
+});
+
+</script>
+
 </head>
 <body>
 
@@ -243,7 +273,7 @@ function searchList() {
 									<img src="${pageContext.request.contextPath }/resource/images/list_heart.png">
 								</c:if>
 							</td>
-							<td>${dto.userName}</td>
+							<td>${dto.userNickName}</td>
 							<td>${dto.reg_date}</td>
 							<td>${dto.hitCount}</td>
 						</tr>
@@ -266,7 +296,7 @@ function searchList() {
 					</td>
 					<td align="center">
 						<form name="searchForm"
-							action="${pageContext.request.contextPath}/board/list.do"
+							action="${pageContext.request.contextPath}/qnaboard/list.do"
 							method="post">
 							<select name="condition" class="form-select">
 								<option value="all"
@@ -281,7 +311,7 @@ function searchList() {
 									${condition=="content"?"selected='selected'":"" }>내용</option>
 							</select> 
 							<input type="text" name="keyword" value="${keyword}" class="form-control">
-							<input type="hidden" name="categoryType" value="${categoryType }">;
+							<input type="hidden" name="categoryType" value="${categoryType}">
 							<button type="button" class="btn" onclick="searchList();">검색</button>
 						</form>
 					</td>

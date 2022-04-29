@@ -61,13 +61,36 @@
 	border: none;
 }
 
+
+.img-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 65px);
+	grid-gap: 5px;
+}
+
+.img-grid .item {
+    object-fit: cover; /* 가로세로 비율은 유지하면서 컨테이너에 꽉 차도록 설정 */
+    width: 65px;
+    height: 65px;
+	cursor: pointer;
+}
+
 </style>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script type="text/javascript">
-function sendBoard() {
-    const f = document.boardForm;
+function sendOk() {
+    const f = document.freeGalleryForm;
 	let str;
 	
+	str = f.category.value.trim();
+    if(!str) {
+        alert("카테고리를 선택해주세요. ");
+        f.category.focus();
+        return;
+    }
+    
+    
     str = f.subject.value.trim();
     if(!str) {
         alert("제목을 입력하세요. ");
@@ -81,19 +104,94 @@ function sendBoard() {
         f.content.focus();
         return;
     }
+    
+    /*
+    let mode = "${mode}";
+    if( (mode === "write") && (!f.selectFile.value) ) {
+        alert("한 개 이상의 이미지를 등록해주세요.");
+        f.selectFile.focus();
+        return;
+    }
+    */
+    
 
-    f.action = "${pageContext.request.contextPath}/notice/${mode}_ok.do";
+    f.action = "${pageContext.request.contextPath}/freeGallery/${mode}_ok.do";
     f.submit();
 }
+
+// 업데이트 모드일 때 이미지 삭제
 <c:if test="${mode=='update'}">
 	function deleteFile(fileNum) {
-		if(confirm('파일을 삭제하시겠습니까 ? ')) {
+		if(confirm('이미지를 삭제하시겠습니까 ? ')) {
 			let query = "num=${dto.num}&page=${page}&fileNum="+fileNum;
-			let url = "${pageContext.request.contextPath}/notice/deleteFile.do?"+query;
+			let url = "${pageContext.request.contextPath}/freeGallery/deleteFile.do?"+query;
 			location.href = url;
 		}
 	}
 </c:if>
+
+// 이미지 파일 선택
+$(function() {
+	$("body").on("click", ".form .img-add", function() {
+		$("form input[name=selectFile]").trigger("click");
+	});
+	
+	// 파일 선택창에서 수정이 발생했을 때
+	$("form input[name=selectFile]").change(function() {
+		$(".img-grid").empty();
+		let $add = $("<img>", {class:"item img-add"});
+		$add.attr("src", "${pageContext.request.contextPath}/resource/images/add_photo.png");
+		$(".img-grid").append($add);
+		
+		if(! this.files){
+			return false;
+		}
+		
+		const fileArr = Array.from(this.files); // 유사배열을 배열로 변환
+		
+		fileArr.forEach((file, index)=>{
+			const reader = new FileReader();
+			let $img = $("<img>", {class:"item img-item"});
+			$img.attr("data-filename", file.name);
+			reader.onload = e => {
+				$img.attr("src", e.target.result);
+			};
+			reader.readAsDataURL(file);
+			$(".img-grid").append($img);
+		});
+	});
+	
+	
+	
+	// 선택한 이미지 파일 취소
+	$("body").on("click", ".form .img-item", function() {
+		if(! confirm("선택한 파일을 취소하시겠습니까 ? ")){
+			return false;
+		}
+		
+		let selectFiles = document.freeGalleryForm.selectFile.files;
+		const fileArr = Array.from(selectFiles);
+		let filename = $(this).attr("data-filename");
+		
+		for(let i=0; i<fileArr.length; i++){
+			if(filename === fileArr[i].name){
+				fileArr.splice(i, 1); // 배열의 내용 삭제
+				break;
+			}
+		}
+		
+		let dt = new DataTransfer(); // Drag&Drop 되는 대상 Data를 담는 역할을 한다.
+		for(file of fileArr) {
+			dt.items.add(file);
+		}
+		document.freeGalleryForm.selectFile.files = dt.files;
+		
+		$(this).remove();
+		
+	});
+	
+	
+});
 </script>
 </head>
 <body>
@@ -108,7 +206,7 @@ function sendBoard() {
 			<h3><i class="fas fa-clipboard-list"></i> 자유 갤러리 </h3>
 		</div>
         
-		<form name="boardForm" method="post" enctype="multipart/form-data">
+		<form name="freeGalleryForm" method="post" enctype="multipart/form-data">
 			<table class="table table-border table-form">
 				<tr>
 					<td>카&nbsp;테&nbsp;고&nbsp;리</td>
@@ -130,7 +228,7 @@ function sendBoard() {
 				<tr> 
 					<td>작성자</td>
 					<td> 
-						<p>안뇽</p>
+						<p>${sessionScope.member.userNickName}</p>
 					</td>
 				</tr>
 				
@@ -138,32 +236,37 @@ function sendBoard() {
 					<td>제&nbsp;&nbsp;&nbsp;&nbsp;목</td>
 					<td> 
 						<input type="text" name="subject" maxlength="100" placeholder="제목을 입력하세요"
-							class="form-control" value="${dto.subject}">
+							class="form-control" value="">
 					</td>
 				</tr>
 				
 				<tr> 
 					<td colspan="2"> 
-						<textarea name="content" class="form-control" placeholder="내용을 입력하세요">${dto.content}</textarea>
+						<textarea name="content" class="form-control" placeholder="내용을 입력하세요"></textarea>
 					</td>
 				</tr>
 				
 				<tr>
 					<td>파&nbsp;&nbsp;&nbsp;&nbsp;일</td>
 					<td> 
-						<input type="file" accept="image/*" name="selectFile" class="form-control" multiple="multiple">
+						<div class="form">
+							<div class="img-grid"><img class="item img-add" src="${pageContext.request.contextPath}/resource/images/add_photo.png"></div>
+							<input type="file" name="selectFile" accept="image/*" multiple="multiple" style="display: none;">
+						</div>
 					</td>
 				</tr>
 				
 				<c:if test="${mode=='update'}">
 					<c:forEach var="vo" items="${listFile}">
 						<tr>
-							<td>첨부된 파일</td>
+							<td>등록 이미지</td>
 							<td>
-								<p>
-									<a href="javascript:deleteFile('${vo.fileNum}');"><i class="fa fa-trash-alt"></i></a>
-									${vo.originalFilename}
-								</p>
+								<div class="img-box">
+									<c:forEach var="vo" items="${listFile}">
+										<img src="${pageContext.request.contextPath}/uploads/freeGallery/${vo.imageFilename}"
+											onclick="deleteFile('${vo.fileNum}');">
+									</c:forEach>
+								</div>
 							</td>
 						</tr>
 					</c:forEach>
@@ -173,9 +276,9 @@ function sendBoard() {
 			<table class="table">
 				<tr> 
 					<td align="center">
-						<button type="button" class="btn" onclick="sendBoard();">${mode=="update"?"수정완료":"등록하기"}</button>
+						<button type="button" class="btn" onclick="sendOk();">${mode=="update"?"수정완료":"등록하기"}</button>
 						<button type="reset" class="btn">다시입력</button>
-						<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}';">${mode=="update"?"수정취소":"등록취소"}</button>
+						<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/freeGallery/list.do';">${mode=="update"?"수정취소":"등록취소"}</button>
 						<c:if test="${mode=='update'}">
 							<input type="hidden" name="num" value="${dto.num}">
 							<input type="hidden" name="page" value="${page}">
