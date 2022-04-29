@@ -266,9 +266,84 @@ public class QnABoardServlet extends MyServlet {
 	}
 
 	private void replyForm(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		// 답변 폼
+		QnABoardDAO dao = new QnABoardDAO();
+		
+		String cp = req.getContextPath();
+		
+		String page = req.getParameter("page");
+		String condition = req.getParameter("condition");
+		String keyword = req.getParameter("keyword");
+		String categoryType = req.getParameter("categoryType");
+		if(categoryType==null) {
+			categoryType="all";
+		}
+		String query = "";
+		if(keyword != null) {
+			query = "page="+page+"&condition="+condition+"&keyword="+keyword+"&categoryType="+categoryType;
+		} else {
+			 query = "page="+page+"&condition="+condition+"&keyword="+"&categoryType="+categoryType;
+		}
+		
+		try {
+			int boardNum = Integer.parseInt(req.getParameter("boardNum"));
+			
+			QnABoardDTO dto = dao.readBoard(boardNum);
+			if(dto == null) {
+				resp.sendRedirect(cp + "/qnaboard/list.do?"+query);
+				return;
+			}
+			
+			String s = "[" + dto.getSubject() + "] 에 대한 답변입니다. \n";
+			dto.setContent(s);
+			
+			req.setAttribute("mode", "reply");
+			req.setAttribute("dto", dto);
+			req.setAttribute("query", query);
+			
+			forward(req, resp, "/WEB-INF/views/qnaboard/write.jsp");
+			return;
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		resp.sendRedirect(cp + "/qnaboard/list.do?"+query);
 	}
 
 	private void replySubmit(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		// 답변 완료
+		QnABoardDAO dao = new QnABoardDAO();
+		
+		HttpSession session = req.getSession();
+		SessionInfo info = (SessionInfo)session.getAttribute("member");
+		
+		String cp = req.getContextPath();
+		if(req.getMethod().equalsIgnoreCase("GET")) {
+			resp.sendRedirect(cp + "/qnaboard/list.do");
+			return;
+		}
+		
+		String query = req.getParameter("query");
+		
+		try {
+			QnABoardDTO dto = new QnABoardDTO();
+			
+			dto.setSubject(req.getParameter("subject"));
+			dto.setContent(req.getParameter("content"));
+			dto.setCategoryType(req.getParameter("categoryType"));
+			dto.setGroupNum(Integer.parseInt(req.getParameter("groupNum")));
+			dto.setOrderNo(Integer.parseInt(req.getParameter("orderNo")));
+			dto.setDepth(Integer.parseInt(req.getParameter("depth")));
+			dto.setParent(Integer.parseInt(req.getParameter("parent")));
+			
+			dto.setUserId(info.getUserId());
+			
+			dao.insertBoard(dto, "reply");
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		resp.sendRedirect(cp+"/qnaboard/list.do?"+query);
 	}
 
 	private void delete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

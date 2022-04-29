@@ -37,7 +37,7 @@
 }
 
 .table-list .categoryType {
-	width: 60px;
+	width: 160px;
 	color: #787878;
 }
 
@@ -231,13 +231,13 @@ $(function() {
 
 			<ul class="category">
 				<li class="on"><a href="${pageContext.request.contextPath}/qnaboard/list.do?categoryType=all">전체</a></li>
-				<li><a href="${pageContext.request.contextPath}/qnaboard/list.do?categoryType=normal">일반</a></li>
-				<li><a href="${pageContext.request.contextPath}/qnaboard/list.do?categoryType=board">게시판</a></li>
-				<li><a href="${pageContext.request.contextPath}/qnaboard/list.do?categoryType=gallery">갤러리</a></li>
-				<li><a href="${pageContext.request.contextPath}/qnaboard/list.do?categoryType=payment">주문/결제</a></li>
-				<li><a href="${pageContext.request.contextPath}/qnaboard/list.do?categoryType=return">반품/교환/환불</a></li>
-				<li><a href="${pageContext.request.contextPath}/qnaboard/list.do?categoryType=delivery">배송문의</a></li>
-				<li><a href="${pageContext.request.contextPath}/qnaboard/list.do?categoryType=servie">회원서비스</a></li>
+				<li><a href="${pageContext.request.contextPath}/qnaboard/list.do?categoryType=일반">일반</a></li>
+				<li><a href="${pageContext.request.contextPath}/qnaboard/list.do?categoryType=게시판">게시판</a></li>
+				<li><a href="${pageContext.request.contextPath}/qnaboard/list.do?categoryType=갤러리">갤러리</a></li>
+				<li><a href="${pageContext.request.contextPath}/qnaboard/list.do?categoryType=주문/결제">주문/결제</a></li>
+				<li><a href="${pageContext.request.contextPath}/qnaboard/list.do?categoryType=반품/교환/환불">반품/교환/환불</a></li>
+				<li><a href="${pageContext.request.contextPath}/qnaboard/list.do?categoryType=배송문의">배송문의</a></li>
+				<li><a href="${pageContext.request.contextPath}/qnaboard/list.do?categoryType=회원서비스">회원서비스</a></li>
 			</ul>
 
 			<table class="table">
