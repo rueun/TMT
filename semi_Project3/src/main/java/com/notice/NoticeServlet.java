@@ -2,6 +2,7 @@ package com.notice;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.List;
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.member.SessionInfo;
+import com.util.FileManager;
 import com.util.MyUploadServlet;
 import com.util.MyUtil;
 
@@ -186,7 +188,7 @@ public class NoticeServlet extends MyUploadServlet {
 			e.printStackTrace();
 		}
 	
-		forward(req, resp, "/WEB-INF/views/notice/list.jsp"); // "/" 반드시 들어가야 합니다!
+		forward(req, resp, "/WEB-INF/views/notice/list.jsp");
 		
 	}
 
@@ -230,7 +232,7 @@ public class NoticeServlet extends MyUploadServlet {
 			// 파일
 			Map<String, String[]> map = doFileUpload(req.getParts(), pathname);
 			if(map != null) { // 파일이 있으면
-				String []saveFiles = map.get("saveFilenames"); // 여기 s 잠깐 뺐었요 오류 생길 거예요
+				String []saveFiles = map.get("saveFilenames");
 				String []originalFiles = map.get("originalFilenames");
 				
 				dto.setSaveFiles(saveFiles);
@@ -271,14 +273,25 @@ public class NoticeServlet extends MyUploadServlet {
 				query += "&condition="+condition+"&keyword="+URLEncoder.encode(keyword, "utf-8");
 			}
 			
+			dao.updateHitCount(num);
+			
 			NoticeDTO dto = dao.readNotice(num);
 			if(dto == null) {
 				resp.sendRedirect(cp+"/notice/list.do?"+query);
 				return;
 			} 
 			dto.setContent(dto.getContent().replaceAll("\n", "<br>"));
+					
 			
+			NoticeDTO preReadNotice = dao.preReadNotice(num, condition, keyword);
+			NoticeDTO nextReadNotice = dao.nextReadNotice(num, condition, keyword);
+			
+			// 이걸로 가져온 걸 띄웁니다.
 			List<NoticeDTO> listFile = dao.listNoticeFile(num);
+			
+			req.setAttribute("dto", dto);
+			req.setAttribute("preReadNotice", preReadNotice);
+			req.setAttribute("nextReadNotice", nextReadNotice);
 			
 			req.setAttribute("listFile", listFile);
 			req.setAttribute("query", query);
@@ -296,25 +309,165 @@ public class NoticeServlet extends MyUploadServlet {
 	
 	// 수정하는 폼
 	protected void updateForm(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
+		HttpSession session = req.getSession();
+		SessionInfo info = (SessionInfo)session.getAttribute("member");
+		String cp = req.getContextPath();
+		
+		if(! info.getUserId().equals("admin")) {
+			resp.sendRedirect(cp+"/notice/list.do");
+			return;
+		}
+		
+		NoticeDAO dao = new NoticeDAO();
+		String page = req.getParameter("page");
+		
+		try {
+			int num = Integer.parseInt(req.getParameter("num"));
+			NoticeDTO dto = dao.readNotice(num);
+			if(dto == null) {
+				resp.sendRedirect(cp+"notice/list.do?page="+page);
+				return;
+			}
+			
+			List<NoticeDTO> listFile = dao.listNoticeFile(num);
+			
+			req.setAttribute("dto", dto);
+			req.setAttribute("listFile", listFile);
+			req.setAttribute("page", page);
+			req.setAttribute("mode", "update");
+			
+			forward(req, resp, "/WEB-INF/views/notice/write.jsp");
+			return;
+			
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		resp.sendRedirect(cp+"/notice/list.do?page="+page);
 	}
 	
 
 	// 수정 후 제출
 	protected void updateSubmit(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
+		HttpSession session = req.getSession();
+		SessionInfo info = (SessionInfo)session.getAttribute("member");
+		String cp = req.getContextPath();
+		
+		if(! info.getUserId().equals("admin")) {
+			resp.sendRedirect(cp+"/notice/list.do");
+			return;
+		}
+		
+		if(req.getMethod().equalsIgnoreCase("GET")) {
+			resp.sendRedirect(cp+"/notice/list.do");
+			return;
+		}
+		
+		NoticeDAO dao = new NoticeDAO();
+		String page = req.getParameter("page");
+		
+		try {
+			NoticeDTO dto = new NoticeDTO();
+			
+			dto.setNum(Integer.parseInt(req.getParameter("num")));
+			if(req.getParameter("notice") != null) {
+				dto.setNotice(Integer.parseInt(req.getParameter("notice")));
+			}
+			dto.setSubject(req.getParameter("subject"));
+			dto.setContent(req.getParameter("content"));
+			
+			Map<String, String[]> map = doFileUpload(req.getParts(), pathname);
+			if(map != null) {
+				String[] ss = map.get("saveFilenames");
+				String[] oo = map.get("originalFilenames");
+				dto.setSaveFiles(ss);
+				dto.setOriginalFiles(oo);
+			}
+			dao.updateNotice(dto);
+	
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		resp.sendRedirect(cp+"/notice/list.do?page="+page);
+		
 	}
 	
 	
 	// 게시글 삭제
 	protected void delete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
+		NoticeDAO dao = new NoticeDAO();
+		HttpSession session = req.getSession();
+		String cp = req.getContextPath();
+		String page = req.getParameter("page");
+		String query = "page="+page;
+		
+		try {
+			
+			int num = Integer.parseInt(req.getParameter("num"));
+			NoticeDTO dto = dao.readNotice(num);
+			if(dto == null) {
+				resp.sendRedirect(cp+"/notice/article.do?page="+page);
+				return;
+			}
+			
+			// 작성중~!
+			List<NoticeDTO> listFile = dao.listNoticeFile(num);
+			
+			req.setAttribute("dto", dto);
+			req.setAttribute("listFile", listFile);
+			req.setAttribute("page", page);
+			req.setAttribute("mode", "update");
+			
+			dao.deleteNotice(num);
+			dao.deleteNoticeFile(query, num);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		
+		
+		
 	}
-	
-	
 	// 게시글 첨부파일 삭제
 	protected void deleteFile(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
+		HttpSession session = req.getSession();
+		SessionInfo info = (SessionInfo)session.getAttribute("member");
+		
+		String cp = req.getContextPath();
+		if(! info.getUserId().equals("admin")) {
+			resp.sendRedirect(cp+"/notice/list.do");
+			return;
+		}
+		
+		NoticeDAO dao = new NoticeDAO();
+		
+		String page = req.getParameter("page");
+		
+		try {
+			int num = Integer.parseInt(req.getParameter("num"));
+			int fileNum = Integer.parseInt(req.getParameter("numFile"));
+		
+			NoticeDTO dto = dao.readNotice(fileNum);
+		
+			if (dto != null) {
+				FileManager.doFiledelete(pathname, dto.getSaveFilename());
+				
+				
+				// 파일 테이블 데이터 삭제
+				dao.deleteNoticeFile("one", fileNum);
+			}
+			
+			resp.sendRedirect(cp+"/notice/update.do?num="+num+"&page="+page);
+			return;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		resp.sendRedirect(cp+"/notice/list.do?page="+page);
+		
 	}
 	
 	
@@ -326,6 +479,27 @@ public class NoticeServlet extends MyUploadServlet {
 	
 	// 파일 다운로드
 	protected void download(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		NoticeDAO dao = new NoticeDAO();
+		boolean b = false;
+		try {
+			int fileNum = Integer.parseInt(req.getParameter("numFile"));
+			NoticeDTO dto = dao.readNotice(fileNum);
+			
+			if(dto != null) {
+				b = FileManager.doFiledownload(dto.getSaveFilename(),
+						dto.getOriginalFilename(), pathname, resp);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		if(! b) {
+			resp.setContentType("text/html;charset=utf-8");
+			PrintWriter out = resp.getWriter();
+			out.print("<script>alert('파일다운로드가 불가능합니다.');history.back();</script>");
+		}
+		
 		
 	}
 	
