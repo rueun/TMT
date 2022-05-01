@@ -391,7 +391,7 @@ public class QnABoardDAO {
 		String sql;
 		
 		try {
-			sql = " SELECT boardNum, b.userId, userName, userNickName, subject, content, reg_date, hitCount, "
+			sql = " SELECT boardNum, b.userId, userName, userNickName, categoryType, subject, content, reg_date, hitCount, "
 					+ " groupNum, depth, orderNo, parent "
 					+ " FROM QnAboard b "
 					+ " JOIN member1 m ON b.userId=m.userId "
@@ -412,6 +412,7 @@ public class QnABoardDAO {
 				dto.setUserNickName(rs.getString("userNickName"));
 				dto.setSubject(rs.getString("subject"));
 				dto.setContent(rs.getString("content"));
+				dto.setCategoryType(rs.getString("categoryType"));
 				dto.setGroupNum(rs.getInt("groupNum"));
 				dto.setDepth(rs.getInt("depth"));
 				dto.setOrderNo(rs.getInt("orderNo"));
@@ -614,5 +615,29 @@ public class QnABoardDAO {
 
 	// 게시물 삭제
 	public void deleteBoard(int boardNum) throws SQLException {
+		PreparedStatement pstmt = null;
+		String sql;
+		
+		try {
+			sql = "DELETE FROM QnAboard WHERE boardNum IN "
+					+ " (SELECT boardNum FROM QnAboard "
+					+ " START WITH boardNum = ? "
+					+ " CONNECT BY PRIOR boardNum = parent) " ;
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setInt(1, boardNum);
+			
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			if(pstmt != null) {
+				try {
+					pstmt.close();
+				} catch (SQLException e2) {
+				}
+			}
+		}
 	}
 }

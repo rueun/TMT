@@ -81,6 +81,7 @@ function sendBoard() {
         f.content.focus();
         return;
     }
+    $("select[name=categoryType]").removeAttr('disabled');
 
     f.action = "${pageContext.request.contextPath}/qnaboard/${mode}_ok.do";
     f.submit();
@@ -94,6 +95,20 @@ function sendBoard() {
 		}
 	}
 </c:if>
+	
+
+
+</script>
+
+<script type="text/javascript">
+
+<c:if test = "${mode=='reply' || 'update'}">
+	$(function(){
+		$("select[name=categoryType]").val("${dto.categoryType}").prop("selected",true);
+		$("select[name=categoryType]").attr('disabled',true);
+	});
+</c:if>
+
 </script>
 </head>
 <body>
