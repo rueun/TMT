@@ -84,7 +84,7 @@
 		<table class="table">
 			<tr>
 				<td width="100%" align="right">
-					${dataCount}10개(${page}1 /${total_page} 10페이지)
+					${dataCount}개(${page}/${total_page} 페이지)
 				</td>
 				<td align="right">&nbsp;</td>
 			</tr>
@@ -111,41 +111,23 @@
 						<td>지금</td>
 						<td>50</td>
 					</tr>
-					<tr>
-						<td>2</td>
-						<td class="fsubject">다른 제목</td>
-						<td>2</td>
-						<td>누가 썼나</td>
-						<td>언제 썼나</td>
-						<td>20</td>
-					</tr>
-					<tr>
-						<td>3</td>
-						<td class="fsubject">아무 제목</td>
-						<td>0</td>
-						<td>네가 썼지</td>
-						<td>방금 썼지</td>
-						<td>5</td>
-					</tr>
+					<c:forEach var="dto" items="${list}">
+						<tr>
+							<td><span class="fboard">${dto.listNum}</span></td>
+							<td class="left">
+								<c:forEach var="n" begin="1" end="${dto.depth}">&nbsp;&nbsp;</c:forEach>
+								<c:if test="${dto.depth!=0}">└&nbsp;</c:if>
+								<a href="${articleUrl}&boardNum=${dto.boardNum}">${dto.title}</a>
+							</td>
+							<td>댓글</td>
+							<td>${dto.userNickname}</td>
+							<td>${dto.reg_date}</td>
+							<td>${dto.hitCount}</td>
+						</tr>
+					</c:forEach>
+					
 			</tbody>
-			<!-- 
-			<tbody>
-				<c:forEach var="dto" items="${list}">
-					<tr>
-						<td><span class="fboard">${dto.listNum}</span></td>
-						<td class="left">
-							<c:forEach var="n" begin="1" end="${dto.depth}">&nbsp;&nbsp;</c:forEach>
-							<c:if test="${dto.depth!=0}">└&nbsp;</c:if>
-							<a href="${articleUrl}&boardNum=${dto.boardNum}">제목</a>
-						</td>
-						<td>댓글</td>
-						<td>작성자</td>
-						<td>등록일</td>
-						<td>조회수</td>
-					</tr>
-				</c:forEach>
-			</tbody>
-			 -->
+			
 		</table>
 		
 		<div class="page-box">
@@ -155,15 +137,15 @@
 		<table class="table">
 			<tr>
 				<td width="100">
-					<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/board/list.do';" title="새로고침">새로고침<i class="fa-solid fa-arrow-rotate-right"></i></button>
+					<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/freeBoard/list.do';" title="새로고침">새로고침<i class="fa-solid fa-arrow-rotate-right"></i></button>
 				</td>
 				<td align="center">
-					<form name="searchForm" action="${pageContext.request.contextPath}/board/list.do" method="post">
+					<form name="searchForm" action="${pageContext.request.contextPath}/freeBoard/list.do" method="post">
 						<select name="condition" class="form-select">
 							<option value="all"      ${condition=="all"?"selected='selected'":"" }>제목+내용</option>
-							<option value="userName" ${condition=="userName"?"selected='selected'":"" }>작성자</option>
+							<option value="userId" ${condition=="userId"?"selected='selected'":"" }>작성자</option>
 							<option value="reg_date"  ${condition=="reg_date"?"selected='selected'":"" }>등록일</option>
-							<option value="subject"  ${condition=="subject"?"selected='selected'":"" }>제목</option>
+							<option value="title"  ${condition=="title"?"selected='selected'":"" }>제목</option>
 							<option value="content"  ${condition=="content"?"selected='selected'":"" }>내용</option>
 						</select>
 						<input type="text" name="keyword" value="${keyword}" class="form-control">
@@ -171,7 +153,7 @@
 					</form>
 				</td>
 				<td align="right" width="100">
-					<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/board/write.do';">글 작성</button>
+					<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/freeBoard/write.do';">글올리기</button>
 				</td>
 			</tr>
 		</table>	

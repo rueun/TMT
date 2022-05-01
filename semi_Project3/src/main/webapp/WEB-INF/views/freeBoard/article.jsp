@@ -407,7 +407,7 @@ $(document).ready(function(){
 				<td width="50%">
 					<c:choose>
 						<c:when test="${sessionScope.member.userId==dto.userId}">
-							<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/sphoto/update.do?num=${dto.num}&page=${page}';">수정</button>
+							<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/freeBoard/update.do?num=${dto.num}&page=${page}';">수정</button>
 						</c:when>
 						<c:otherwise>
 							<button type="button" class="btn" disabled="disabled">수정</button>
@@ -416,7 +416,7 @@ $(document).ready(function(){
 			    	
 					<c:choose>
 			    		<c:when test="${sessionScope.member.userId==dto.userId || sessionScope.member.userId=='admin'}">
-			    			<button type="button" class="btn" onclick="deletePhoto();">삭제</button>
+			    			<button type="button" class="btn" onclick="deleteBoard();">삭제</button>
 			    		</c:when>
 			    		<c:otherwise>
 			    			<button type="button" class="btn" disabled="disabled">삭제</button>
@@ -424,7 +424,7 @@ $(document).ready(function(){
 			    	</c:choose>
 				</td>
 				<td align="right">
-					<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/sphoto/list.do?page=${page}';">목록</button>
+					<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/freeBoard/list.do?page=${page}';">목록</button>
 				</td>
 			</tr>
 		</table>
@@ -435,10 +435,6 @@ $(document).ready(function(){
 <footer>
     <jsp:include page="/WEB-INF/views/layout/footer.jsp"></jsp:include>
 </footer>
-
-<div class="dialog-photo">
-      <div class="photo-layout"></div>
-</div>
 
 <jsp:include page="/WEB-INF/views/layout/staticFooter.jsp"/>
 </body>

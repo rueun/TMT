@@ -55,10 +55,10 @@ function sendBoard() {
     const f = document.boardForm;
 	let str;
 	
-    str = f.subject.value.trim();
+    str = f.title.value.trim();
     if(!str) {
         alert("제목을 입력하세요.");
-        f.subject.focus();
+        f.title.focus();
         return;
     }
 
@@ -69,18 +69,10 @@ function sendBoard() {
         return;
     }
 
-    f.action = "${pageContext.request.contextPath}/notice/${mode}_ok.do";
+    f.action = "${pageContext.request.contextPath}/freeBoard/${mode}_ok.do";
     f.submit();
 }
-<c:if test="${mode=='update'}">
-	function deleteFile(fileNum) {
-		if(confirm('파일을 삭제하시겠습니까 ? ')) {
-			let query = "num=${dto.num}&page=${page}&fileNum="+fileNum;
-			let url = "${pageContext.request.contextPath}/notice/deleteFile.do?"+query;
-			location.href = url;
-		}
-	}
-</c:if>
+
 </script>
 </head>
 <body>
@@ -101,7 +93,7 @@ function sendBoard() {
 				<tr> 
 					<td>작성자</td>
 					<td align="left"> 
-						<p>&nbsp;&nbsp;&nbsp;작성자${sessionScope.member.userName}</p>
+						<p>&nbsp;&nbsp;&nbsp;작성자${sessionScope.member.userId}</p>
 					</td>
 				</tr>
 				
@@ -109,13 +101,7 @@ function sendBoard() {
 					<td>제&nbsp;&nbsp;&nbsp;&nbsp;목</td>
 					<td> 
 						<input type="text" name="subject" maxlength="100" placeholder="제목을 입력하세요"
-							class="form-control" value="${dto.subject}">
-					</td>
-				</tr>
-				<tr>
-					<td>파&nbsp;&nbsp;&nbsp;&nbsp;일</td>
-					<td> 
-						<input type="file" accept="image/*" name="selectFile" class="form-control" multiple="multiple">
+							class="form-control" value="${dto.title}">
 					</td>
 				</tr>
 				
@@ -125,7 +111,6 @@ function sendBoard() {
 					</td>
 				</tr>
 				
-				
 			</table>
 				
 			<table class="table">
@@ -133,7 +118,7 @@ function sendBoard() {
 					<td align="center">
 						<button type="button" class="btn" onclick="sendBoard();">${mode=="update"?"수정완료":"등록하기"}</button>
 						<button type="reset" class="btn">다시입력</button>
-						<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}';">${mode=="update"?"수정취소":"등록취소"}</button>
+						<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/freeBoard/list.do';">${mode=="update"?"수정취소":"등록취소"}</button>
 						<c:if test="${mode=='update'}">
 							<input type="hidden" name="num" value="${dto.num}">
 							<input type="hidden" name="page" value="${page}">
