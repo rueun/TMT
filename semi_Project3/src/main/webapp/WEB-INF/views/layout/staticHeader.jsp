@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resource/css/layout.css?a" type="text/css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resource/css/board.css?a" type="text/css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resource/css/paginate.css?a" type="text/css">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.1.0/css/all.css">
 
 <script type="text/javascript" src="${pageContext.request.contextPath}/resource/jquery/js/jquery.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/resource/js/util-jquery.js"></script>
