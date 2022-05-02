@@ -238,7 +238,7 @@ hr.hr {
 	<jsp:include page="/WEB-INF/views/layout/header.jsp"></jsp:include>
 </header>
 	
-<main>
+<main style="margin-top : 200px">
 	<div class="body-container" style="width: 1200px;">
 		<h4 class="h4 h4-left">
     		<a class="list-a">
@@ -256,23 +256,23 @@ hr.hr {
     	
     	<div class="list-container">
     		<ul>
+    		
+    			<!-- 질문 답변 -->
     			<li class="item">
     				<div class="item-box">
     					<a href="#" class="list-a">
     						<img alt="" src="https://humorpick.com/data/file/humor/thumb-16508705206527_400x0.jpg">
 	    					<span class="sp-subj ellipsis">
-	    						<span><b>제ㅈ다러ㅣㅈ린ㅇㄹ</b></span>
+	    						<span><b>QnA</b></span>
 		    						<span class="pull-right">
 		   							<span class="date">
-			   								22/03/23
+			   								${date }
 			   						</span>
 		   						</span>
 	    					</span>
     					</a>
 						
-						<%
-						for(int i=0; i<4; i++) {
-						%>
+						<c:forEach var="dto" items="${qnalist}">
 							<a href="#" class="ellipsis list-a">
 							<span class="wr-icon wr-new"></span>
 							
@@ -283,40 +283,36 @@ hr.hr {
 	   							</span>
 	   							<span class="view">
 	   								<img alt="" src="${pageContext.request.contextPath}/resource/images/view.png">
-	   								24223
+	   								${dto.hitCount }
 	   							</span>
 	   							<span class="date">
 	   								<img alt="" src="${pageContext.request.contextPath}/resource/images/time.png">
-	   								22/03/23
+	   								${dto.reg_date }
 	   							</span>
    							</span>
-   							<span>제ㅈ다러ㅣㅈ린sdfdasfasdsdfgsdhagfaㅇㄹ</span>
+   							<span>${dto.subject }</span>
 							</a>
-						<%
-						}
-						%>
+						</c:forEach>
 						
     				</div>
     			</li>
     			
-				
+				<!-- 자유 갤러리  -->
 				<li class="item">
     				<div class="item-box">
     					<a href="#" class="list-a">
     						<img alt="" src="https://humorpick.com/data/editor/2204/thumb-2890328460_Bwx0KXoQ_3c3e618f9ba699a23bbd1c0ef19428e3f229493b_400x0.jpg">
 	    					<span class="sp-subj ellipsis">
-	    						<span><b>제ㅈ다러ㅣㅈ린ㅇㄹ</b></span>
+	    						<span><b>자유 갤러리</b></span>
 		    						<span class="pull-right">
 		   							<span class="date">
-			   								22/03/23
+			   								${date }
 			   						</span>
 		   						</span>
 	    					</span>
     					</a>
 						
-						<%
-						for(int i=0; i<4; i++) {
-						%>
+						<c:forEach var="dto" items="${freeGalleryList}">
 							<a href="#" class="ellipsis list-a">
 							<span class="wr-icon wr-new"></span>
 							
@@ -327,18 +323,16 @@ hr.hr {
 	   							</span>
 	   							<span class="view">
 	   								<img alt="" src="${pageContext.request.contextPath}/resource/images/view.png">
-	   								24223
+	   								${dto.hitCount }
 	   							</span>
 	   							<span class="date">
 	   								<img alt="" src="${pageContext.request.contextPath}/resource/images/time.png">
-	   								22/03/23
+	   								${dto.reg_date }
 	   							</span>
    							</span>
-   							<span>제ㅈ다러ㅣㅈ린sdfdasfasdsdfgsdhagfaㅇㄹ</span>
+   							<span>${dto.subject }</span>
 							</a>
-						<%
-						}
-						%>
+						</c:forEach>
 						
     				</div>
     			</li>
