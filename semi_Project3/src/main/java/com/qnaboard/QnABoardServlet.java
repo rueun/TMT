@@ -301,7 +301,10 @@ public class QnABoardServlet extends MyServlet {
 
 			req.setAttribute("mode", "reply");
 			req.setAttribute("dto", dto);
-			req.setAttribute("query", query);
+			req.setAttribute("page", page);
+			req.setAttribute("condition", condition);
+			req.setAttribute("categoryType", categoryType);
+			req.setAttribute("keyword", keyword);
 
 			forward(req, resp, "/WEB-INF/views/qnaboard/write.jsp");
 			return;
@@ -325,7 +328,15 @@ public class QnABoardServlet extends MyServlet {
 			return;
 		}
 
-		String query = req.getParameter("query");
+		String page = req.getParameter("page");
+		String condition = req.getParameter("condition");
+		String categoryType = req.getParameter("categoryType");
+		
+		
+		String keyword = req.getParameter("keyword");
+		keyword = URLDecoder.decode(keyword, "utf-8");
+		
+		String query = "page="+page+"&condition="+condition+"&keyword="+URLEncoder.encode(keyword,"utf-8")+"&categoryType"+categoryType;
 
 		try {
 			QnABoardDTO dto = new QnABoardDTO();

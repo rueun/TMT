@@ -199,7 +199,10 @@ function sendBoard() {
 							<input type="hidden" name="orderNo" value="${dto.orderNo}">
 							<input type="hidden" name="depth" value="${dto.depth}">
 							<input type="hidden" name="parent" value="${dto.boardNum}">
-							<input type="hidden" name="query" value="${query}">
+							<input type="hidden" name="page" value="${page}">
+							<input type="hidden" name="condition" value="${condition}">
+							<input type="hidden" name="keyword" value="${keyword}">
+							<input type="hidden" name="categoryType" value="${categoryType}">
 						</c:if>
 					</td>
 				</tr>
