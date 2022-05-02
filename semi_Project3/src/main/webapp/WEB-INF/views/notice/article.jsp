@@ -143,7 +143,7 @@ function deleteNotice() {
 					<tr>
 						<td colspan="2">
 							첨부파일
-							<a href="${pageContext.request.contextPath}/notice/download.do?fileNum=${vo.numFile}">${vo.originalFilename }</a>
+							<a href="${pageContext.request.contextPath}/notice/download.do?numFile=${vo.numFile}">${vo.originalFilename }</a>
 						</td>
 					</tr>
 				</c:forEach>

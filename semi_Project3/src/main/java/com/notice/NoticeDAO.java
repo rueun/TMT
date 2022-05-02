@@ -701,7 +701,7 @@ public class NoticeDAO {
 		}
 		
 		
-		public NoticeDTO readNoticeFile (int fileNum) {
+		public NoticeDTO readNoticeFile (int numFile) {
 			NoticeDTO dto = null;
 			PreparedStatement pstmt = null;
 			ResultSet rs = null;
@@ -712,7 +712,7 @@ public class NoticeDAO {
 						+ " WHERE numFile = ? ";
 				
 				pstmt = conn.prepareStatement(sql);
-				pstmt.setInt(1, fileNum);
+				pstmt.setInt(1, numFile);
 			
 				rs = pstmt.executeQuery();
 				if(rs.next()) {

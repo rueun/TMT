@@ -413,7 +413,7 @@ public class NoticeServlet extends MyUploadServlet {
 			
 			List<NoticeDTO> listFile = dao.listNoticeFile(num);
 
-			dao.deleteNoticeFile(query, num);
+			dao.deleteNoticeFile("all", num);
 			dao.deleteNotice(num);
 
 
