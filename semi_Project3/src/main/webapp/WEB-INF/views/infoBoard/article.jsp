@@ -52,7 +52,7 @@ a {
     font-size: 0;
 }
 
-.bt_wrap a {
+.bt_wrap button {
     display: inline-block;
     min-width: 80px;
     margin-left: 10px;
@@ -62,11 +62,11 @@ a {
     font-size: 1.4rem;
 }
 
-.bt_wrap a:first-child {
+.bt_wrap button:first-child {
     margin-left: 0;
 }
 
-.bt_wrap a.on {
+.bt_wrap button.on {
     background: #000;
     color: #fff;
 }
@@ -225,6 +225,7 @@ a {
     border-bottom: 1px solid #000;
     line-height: 160%;
     font-size: 1.4rem;
+    height: 200;
 }
 
 .board_write {
@@ -295,6 +296,17 @@ a {
     resize: vertical;
 }
 </style>
+
+<script type="text/javascript">
+function deleteInfoBoard() {
+	if(confirm('게시글을 삭제 하시겠습니까?')) {
+		let query = "";
+		let url = "";
+		location.href="";
+	}
+}
+
+</script>
 </head>
 <body>
 
@@ -311,40 +323,38 @@ a {
         <div class="board_view_wrap">
             <div class="board_view">
                 <div class="title">
-                    글 제목이 들어갑니다.
+                    ${dto.subject}
                 </div>
                 <div class="info">
                     <dl>
                         <dt>번호</dt>
-                        <dd>1</dd>
+                        <dd>${dto.boardNum}</dd>
                     </dl>
                     <dl>
                         <dt>글쓴이</dt>
-                        <dd>김자바</dd>
+                        <dd>${dto.userId}</dd>
                     </dl>
                     <dl>
                         <dt>작성일</dt>
-                        <dd>2022.4.25</dd>
+                        <dd>${dto.reg_date}</dd>
                     </dl>
                     <dl>
                         <dt>조회</dt>
-                        <dd>0</dd>
+                        <dd>${dto.hitCount}</dd>
                     </dl>
                 </div>
                 <div class="cont">
-                    글 내용이 들어갑니다<br>
-                    글 내용이 들어갑니다<br>
-                    글 내용이 들어갑니다<br>
-                    글 내용이 들어갑니다<br>
-                    글 내용이 들어갑니다<br>
-                    글 내용이 들어갑니다<br>
-                    글 내용이 들어갑니다<br>
-                    글 내용이 들어갑니다
+                    ${dto.content}
                 </div>
             </div>
             <div class="bt_wrap">
-                <a href="#" class="on">목록</a>
-                <a href="#">수정</a>
+                <button type="button"onclick="sendBoard();">${mode=='update'?"수정완료":"등록하기"}</button>
+				<button type="reset" class="on">다시입력</button>
+				<button type="button" onclick="location.href='${pageContext.request.contextPath}/infoBoard/list.do';">${mode=="update"?"수정취소":"등록취소"}</button>
+					<c:if test="${mode=='update'}">
+						<input type="hidden" name="num" value="${dto.num }">
+						<input type="hidden" name="page" value="${page }">
+					</c:if>
             </div>
         </div>
     </div>

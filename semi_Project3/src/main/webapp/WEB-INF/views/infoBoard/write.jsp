@@ -52,7 +52,7 @@ a {
     font-size: 0;
 }
 
-.bt_wrap a {
+.bt_wrap button {
     display: inline-block;
     min-width: 80px;
     margin-left: 10px;
@@ -62,11 +62,11 @@ a {
     font-size: 1.4rem;
 }
 
-.bt_wrap a:first-child {
+.bt_wrap button:first-child {
     margin-left: 0;
 }
 
-.bt_wrap a.on {
+.bt_wrap button.on {
     background: #000;
     color: #fff;
 }
@@ -295,8 +295,45 @@ a {
     resize: none;
 }
 </style>
+
+<script type="text/javascript">
+function sendBoard() {
+    const f = document.boardForm;
+	let str;
+	
+    str = f.subject.value.trim();
+    if(!str) {
+        alert("제목을 입력하세요. ");
+        f.subject.focus();
+        return;
+    }
+
+    str = f.content.value.trim();
+    if(!str) {
+        alert("내용을 입력하세요. ");
+        f.content.focus();
+        return;
+    }
+
+    f.action = "${pageContext.request.contextPath}/infoBoard/${mode}_ok.do";
+    f.submit();
+}
+
+<c:if test="${mode=='update'}">
+	function deleteFile(fileNum) {
+		if(confirm("파일을 삭제하시겠습니까 ? ")) {
+			let query = "num=${dto.num}&page=${page}&fileNum="+fileNum;
+			let url = "${pageContext.request.contextPath}/infoBoard/deleteFile.do?"+query;
+			location.href = url;
+		}
+	}
+</c:if>
+
+</script>
+
 </head>
 <body>
+
 <header>
     <jsp:include page="/WEB-INF/views/layout/header.jsp"></jsp:include>
 </header>
@@ -307,43 +344,68 @@ a {
             <p>코딩에 관한 정보를 공유하는 게시판입니다.</p>
         </div>
         <div class="board_write_wrap">
+        <form name="boardForm" method="post" enctype="multipart/form-data">
             <div class="board_write">
                 <div class="title">
                     <dl>
                         <dt>제목</dt>
-                        <dd><input type="text" placeholder="제목 입력"></dd>
+                        <dd><input type="text"  name="subject" maxlength="100" class="form-control" value="${dto.subject}"></dd>
                     </dl>
                 </div>
                 <div class="info">
                     <dl>
                         <dt>글쓴이</dt>
-                        <dd><input type="text" placeholder="글쓴이 입력"></dd>
+                        <dd><p>${sessionScope.member.userNickName}</p></dd>
                     </dl>
                     <dl>
                         <dt>비밀번호</dt>
-                        <dd><input type="password" placeholder="비밀번호 입력"></dd>
+                        <dd>나중에</dd>
                     </dl>
                 </div>
                 <div class="cont">
-                    <textarea placeholder="내용 입력"></textarea>
+                    <textarea name="content" class="form-control">${dto.content }</textarea>
                 <div class="info">
                     <dl>
                         <dt>파일첨부 :</dt> 
+                        <dd><input type="file" name="selectFile" multiple="multiple"></dd>
                     </dl>
+                    <c:if test="${mode=='update'}">
+					<c:forEach var="vo" items="${listFile}">
+						<dl>
+							<dt>첨부된파일</dt>
+							<dd>
+								<p>
+									<a href="javascript:deleteFile('${vo.fileNum}');"><i class="far fa-trash-alt"></i></a>
+									${vo.originalFilename}
+								</p>
+							</dd>
+						</dl>
+					</c:forEach>
+				</c:if>
                 </div>
                 </div>
 
             </div>
             <div class="bt_wrap">
-                <a href="#" class="on">등록</a>
-                <a href="#">취소</a>
+                <button type="button"onclick="sendBoard();">${mode=='update'?"수정완료":"등록하기"}</button>
+				<button type="reset" class="on">다시입력</button>
+				<button type="button" onclick="location.href='${pageContext.request.contextPath}/infoBoard/list.do';">${mode=="update"?"수정취소":"등록취소"}</button>
+					<c:if test="${mode=='update'}">
+						<input type="hidden" name="num" value="${dto.num }">
+						<input type="hidden" name="page" value="${page }">
+					</c:if>
             </div>
+       </form>
         </div>
+       
     </div>
-</main>
+    </main>
+    
 <footer>
 	<jsp:include page="/WEB-INF/views/layout/footer.jsp"></jsp:include>
 </footer>
 
-<jsp:include page="/WEB-INF/views/layout/staticFooter.jsp"/></body>
+<jsp:include page="/WEB-INF/views/layout/staticFooter.jsp"/>
+    
+</body>
 </html>
