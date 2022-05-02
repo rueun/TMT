@@ -262,7 +262,6 @@ $(function() {
 							<td>${dto.listNum}</td>
 							<td>${dto.categoryType}</td>
 							<td class="left">
-							<span class="contentImg"><img src="${pageContext.request.contextPath }/resource/images/image.png"></span>
 							<c:forEach var="n" begin="1" end="${dto.depth }">&nbsp;&nbsp;</c:forEach> 
 							<c:if test="${dto.depth!=0}">└&nbsp;</c:if> 
 							<a href="${articleUrl}&boardNum=${dto.boardNum}">${dto.subject}</a>

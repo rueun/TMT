@@ -335,7 +335,7 @@ li {list-style: none;}
 						<c:choose>
 							<c:when test="${sessionScope.member.userId==dto.userId}">
 								<button type="button" class="btn"
-									onclick="location.href='${pageContext.request.contextPath}/qnaboard/update.do?boardNum=${dto.boardNum}&page=${page}';">수정</button>
+									onclick="location.href='${pageContext.request.contextPath}/qnaboard/update.do?boardNum=${dto.boardNum}&${query}';">수정</button>
 							</c:when>
 							<c:otherwise>
 								<button type="button" class="btn" disabled="disabled">수정</button>
