@@ -1,4 +1,4 @@
-package com.sell;
+package com.buy;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,17 +9,16 @@ import java.util.List;
 
 import com.util.DBConn;
 
-public class TradeDAO {
+public class TradebuyDAO {
 	private Connection conn = DBConn.getConnection();
 	
-	public void insertSell(TradeDTO dto) throws SQLException {
+	public void insertBuy(TradebuyDTO dto) throws SQLException {
 		PreparedStatement pstmt = null;
 		String sql;
 		
-		/////////
 		try {
-			sql = "INSERT INTO trade(tradeNum, userId, subject, content, price, imageFilename, hitCount, reg_date ) "
-					+ " VALUES (trade_seq.NEXTVAL, ?, ?, ?, ?, ?, 0, SYSDATE)";
+			sql = "INSERT INTO tradebuy(buyNum, userId, subject, content, price, imageFilename, hitCount, reg_date ) "
+					+ " VALUES (tradebuy_seq.NEXTVAL, ?, ?, ?, ?, ?, 0, SYSDATE)";
 			pstmt = conn.prepareStatement(sql);
 			
 			pstmt.setString(1, dto.getUserId());
@@ -50,7 +49,7 @@ public class TradeDAO {
 		String sql;
 		
 		try {
-			sql = "SELECT NVL(COUNT(*), 0) FROM trade";
+			sql = "SELECT NVL(COUNT(*), 0) FROM tradebuy";
 			pstmt = conn.prepareStatement(sql);
 			
 			rs = pstmt.executeQuery();
@@ -78,8 +77,8 @@ public class TradeDAO {
 		return result;
 	}
 
-	public List<TradeDTO> listTrade(int start, int end) {
-		List<TradeDTO> list = new ArrayList<TradeDTO>();
+	public List<TradebuyDTO> listTradebuy(int start, int end) {
+		List<TradebuyDTO> list = new ArrayList<TradebuyDTO>();
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		StringBuilder sb = new StringBuilder();
@@ -87,11 +86,11 @@ public class TradeDAO {
 		try {
 			sb.append(" SELECT * FROM ( ");
 			sb.append("     SELECT ROWNUM rnum, tb.* FROM ( ");
-			sb.append("         SELECT tradeNum, p.userId, subject, price, p.imageFilename, hitCount, ");
+			sb.append("         SELECT buyNum, p.userId, subject, price, p.imageFilename, hitCount, ");
 			sb.append("               TO_CHAR(reg_date, 'YYYY-MM-DD') reg_date ");
-			sb.append("         FROM trade p ");
+			sb.append("         FROM tradebuy p ");
 			sb.append("         JOIN member1 m ON p.userId = m.userId ");
-			sb.append("         ORDER BY tradeNum DESC ");
+			sb.append("         ORDER BY buyNum DESC ");
 			sb.append("     ) tb WHERE ROWNUM <= ? ");
 			sb.append(" ) WHERE rnum >= ? ");	
 			//
@@ -103,9 +102,9 @@ public class TradeDAO {
 			rs = pstmt.executeQuery();
 			
 			while (rs.next()) {
-				TradeDTO dto = new TradeDTO();
+				TradebuyDTO dto = new TradebuyDTO();
 				
-				dto.setTradeNum(rs.getInt("tradeNum"));
+				dto.setBuyNum(rs.getInt("buyNum"));
 				dto.setUserId(rs.getString("userId"));
 				dto.setSubject(rs.getString("subject"));
 				dto.setPrice(rs.getString("price"));
@@ -133,5 +132,9 @@ public class TradeDAO {
 		
 		return list;
 	}
+	
+	
+	
+	
 
 }

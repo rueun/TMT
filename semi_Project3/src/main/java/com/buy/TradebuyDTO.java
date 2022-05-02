@@ -1,7 +1,7 @@
-package com.sell;
+package com.buy;
 
-public class TradeDTO {
-	private int tradeNum;
+public class TradebuyDTO {
+	private int buyNum;
 	private String userId;
 	private String subject;
 	private String content;
@@ -10,12 +10,11 @@ public class TradeDTO {
 	private String imageFilename;
 	private String reg_date;
 	
-	
-	public int getTradeNum() {
-		return tradeNum;
+	public int getBuyNum() {
+		return buyNum;
 	}
-	public void setTradeNum(int tradeNum) {
-		this.tradeNum = tradeNum;
+	public void setBuyNum(int buyNum) {
+		this.buyNum = buyNum;
 	}
 	public String getUserId() {
 		return userId;
@@ -61,11 +60,4 @@ public class TradeDTO {
 	}
 	
 	
-	
-	
-	
-	
-	
-	
-
 }

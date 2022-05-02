@@ -108,7 +108,7 @@ function sendOk() {
 				<tr> 
 					<td>작성자</td>
 					<td> 
-						<p></p>
+						<p>${sessionScope.member.userNickName}</p>
 					</td>
 				</tr>
 				

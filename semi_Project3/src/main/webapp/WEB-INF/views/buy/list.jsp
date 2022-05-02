@@ -48,7 +48,7 @@ font-size: 24px;
 					${dataCount}개(${page}/${total_page} 페이지)
 				</td>
 				<td align="right">
-					<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/photo/write.do';">사진올리기</button>
+					<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/buy/write.do';">구매등록하기</button>
 				</td>
 			</tr>
 		</table>
@@ -56,9 +56,9 @@ font-size: 24px;
 		<div class="grid-box">
 			<c:forEach var="dto" items="${list}" varStatus="status">
 				<div class="item" title="${dto.subject}"
-					onclick="location.href='${articleUrl}&num=${dto.num}';">
-					<img src="${pageContext.request.contextPath}/uploads/photo/${dto.imageFilename}">
-					<div class="caption">
+					onclick="location.href='${articleUrl}&buyNum=${dto.buyNum}';">
+					<img src="${pageContext.request.contextPath}/uploads/buy/${dto.imageFilename}">
+					<div class="caption" style="font-style: bold">
                       <p>${dto.subject}</p>
                     </div>
 				</div>
