@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.member.SessionInfo;
+import com.util.FileManager;
 import com.util.MyUploadServlet;
 import com.util.MyUtil;
 
@@ -76,6 +77,7 @@ public class FreeGalleryServlet extends MyUploadServlet {
 
 		String cp = req.getContextPath();
 		
+		
 		try {
 			String page = req.getParameter("page");
 			int current_page = 1;
@@ -87,7 +89,7 @@ public class FreeGalleryServlet extends MyUploadServlet {
 			String condition = req.getParameter("condition");
 			String keyword = req.getParameter("keyword");
 			String category = req.getParameter("category");
-			
+			System.out.println(category);
 			if (condition == null) {
 				condition = "all";
 				keyword = "";
@@ -140,11 +142,11 @@ public class FreeGalleryServlet extends MyUploadServlet {
 			String query = "";
 			
 			if(keyword.length() == 0 && !category.equals("all")) { // 조건 x, 카테고리 설정 o
-				query = "category=" + category;
+				query += "category=" + category;
 			} else if(keyword.length() != 0 && category.equals("all")) { // 조건 o, 카테고리 x
-				query = "condition=" + condition + "&keyword=" + URLEncoder.encode(keyword, "utf-8");
+				query += "condition=" + condition + "&keyword=" + URLEncoder.encode(keyword, "utf-8");
 			} else if(keyword.length() != 0 && !category.equals("all")) { // 조건 o, 카테고리 o
-				query = "condition=" + condition + "&keyword=" + URLEncoder.encode(keyword, "utf-8") + "&category=" + category;
+				query += "condition=" + condition + "&keyword=" + URLEncoder.encode(keyword, "utf-8") + "&category=" + category;
 			}
 			
 			
@@ -224,7 +226,71 @@ public class FreeGalleryServlet extends MyUploadServlet {
 	
 	private void article(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		// 자유 갤러리 글 보기
-		forward(req, resp, "/WEB-INF/views/freeGallery/article.jsp");
+		FreeGalleryDAO dao = new FreeGalleryDAO();
+		MyUtil util = new MyUtil();
+		
+		HttpSession session = req.getSession();
+		SessionInfo info = (SessionInfo)session.getAttribute("member");
+		
+		String cp = req.getContextPath();
+		
+		String page = req.getParameter("page");
+		String query = "page=" + page;
+		
+		try {
+			int num = Integer.parseInt(req.getParameter("num"));
+			String condition = req.getParameter("condition");
+			String keyword = req.getParameter("keyword");
+			String category = req.getParameter("category");
+			
+			if (condition == null) {
+				condition = "all";
+				keyword = "";
+			}
+			keyword = URLDecoder.decode(keyword, "utf-8");
+			
+			if (category == null) {
+				category = "all";
+			}
+			
+			if(keyword.length() == 0 && !category.equals("all")) { // 조건 x, 카테고리 설정 o
+				query += "&category=" + category;
+			} else if(keyword.length() != 0 && category.equals("all")) { // 조건 o, 카테고리 x
+				query += "&condition=" + condition + "&keyword=" + URLEncoder.encode(keyword, "UTF-8");
+			} else if(keyword.length() != 0 && !category.equals("all")) { // 조건 o, 카테고리 o
+				query += "&condition=" + condition + "&keyword=" + URLEncoder.encode(keyword, "UTF-8") + "&category=" + category;
+			}
+			
+			// 조회수 증가
+			dao.updateHitCount(num);
+			
+			// 게시물 가져오기
+			FreeGalleryDTO dto = dao.readFreeGal(num);
+			if (dto == null) { // 게시물이 없으면 다시 리스트로
+				resp.sendRedirect(cp + "/freeGallery/list.do?" + query);
+				return;
+			}
+			dto.setContent(dto.getContent().replaceAll("\n", "<br>"));
+			
+			
+			// 이전글 다음글
+			FreeGalleryDTO preReadDto = dao.preReadGallery(dto.getNum(), condition, keyword, category);
+			FreeGalleryDTO nextReadDto = dao.nextReadGallery(dto.getNum(), condition, keyword, category);
+			
+			// JSP로 전달할 속성
+			req.setAttribute("dto", dto);
+			req.setAttribute("page", page);
+			req.setAttribute("query", query);
+			req.setAttribute("preReadDto", preReadDto);
+			req.setAttribute("nextReadDto", nextReadDto);
+			
+			// 포워딩
+			forward(req, resp, "/WEB-INF/views/freeGallery/article.jsp");
+			return;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		resp.sendRedirect(cp + "/freeGallery/list.do?" + query);
 	}
 	
 	private void updateForm(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -242,6 +308,69 @@ public class FreeGalleryServlet extends MyUploadServlet {
 	
 	private void delete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		// 자유 갤러리 게시글 삭제
+		FreeGalleryDAO dao = new FreeGalleryDAO();
+		HttpSession session = req.getSession();
+		SessionInfo info = (SessionInfo) session.getAttribute("member");
+
+		String cp = req.getContextPath();
+		
+		String page = req.getParameter("page");
+		String query = "page=" + page;
+		
+		try {
+			
+
+			int num = Integer.parseInt(req.getParameter("num"));
+			
+			String condition = req.getParameter("condition");
+			String keyword = req.getParameter("keyword");
+			String category = req.getParameter("category");
+			
+			if (condition == null) {
+				condition = "all";
+				keyword = "";
+			}
+			keyword = URLDecoder.decode(keyword, "utf-8");
+			
+			if (category == null) {
+				category = "all";
+			}
+			
+			if(keyword.length() == 0 && !category.equals("all")) { // 조건 x, 카테고리 설정 o
+				System.out.println("2"+query);
+				query += "&category=" + category;
+				System.out.println("3"+query);
+			} else if(keyword.length() != 0 && category.equals("all")) { // 조건 o, 카테고리 x
+				System.out.println(query);
+				query += "&condition=" + condition + "&keyword=" + URLEncoder.encode(keyword, "utf-8");
+			} else if(keyword.length() != 0 && !category.equals("all")) { // 조건 o, 카테고리 o
+				query += "&condition=" + condition + "&keyword=" + URLEncoder.encode(keyword, "utf-8") + "&category=" + category;
+				System.out.println(query);
+			}
+			
+			FreeGalleryDTO dto = dao.readFreeGal(num);
+			if (dto == null) {
+				resp.sendRedirect(cp + "/freeGallery/list.do?" + query);
+				return;
+			}
+			
+			// 서버에서 이미지 파일 지우기
+			List<FreeGalleryDTO> listFile = dao.listFreeGalFile(num);
+			for(FreeGalleryDTO vo : listFile) {
+				FileManager.doFiledelete(pathname, vo.getImageFilename());
+			}
+			
+			// freeGalFile 테이블에서 해당 게시글 번호의 모든 행 지우기
+			dao.deleteFreeGalFile("all", num);
+			
+			// freeGallery 테이블에서 게시글 지우기
+			dao.deleteFreeGal(num, info.getUserId());
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		resp.sendRedirect(cp + "/freeGallery/list.do?" + query);
 	}
 	
 	

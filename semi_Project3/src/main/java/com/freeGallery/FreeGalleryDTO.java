@@ -8,6 +8,7 @@ public class FreeGalleryDTO {
 	private String subject;
 	private String content;
 	private String reg_date;
+	
 	private int hitCount;
 	private int likeCount;
 	private int replyCount;

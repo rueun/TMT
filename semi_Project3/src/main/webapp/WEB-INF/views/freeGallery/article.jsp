@@ -113,14 +113,17 @@
 	width: 100%;
 	padding-top : 30px;
 	margin-bottom: 100px;
+	text-align: center;
 	background: #fff;
 }
 .contents > p {
+	margin: 30px 0px;
 	width: 100%;
-	text-align: center;
+	font-size: 16px;
 }
-.contents > p > img {
-	width: 100%;
+.contents > img {
+	width: 80%;
+	
 }
 
 .contents > p > button {
@@ -131,6 +134,9 @@
 	text-align: left;
 }
 
+.no_post {
+	color: #a9a9a9;
+}
 
 
 
@@ -242,12 +248,14 @@ li {list-style: none;}
 
 </style>
 <script type="text/javascript">
+
+// 게시글 삭제 함수
 <c:if test="${sessionScope.member.userId==dto.userId || sessionScope.member.userId=='admin'}">
-	function deletePhoto() {
+	function deleteFreeGallery() {
 	    if(confirm("게시글을 삭제 하시겠습니까 ? ")) {
-		    let query = "num=${dto.num}&page=${page}";
-		    let url = "${pageContext.request.contextPath}/sphoto/delete.do?" + query;
-	    	location.href = url;
+		    let query = "num=${dto.num}&${query}";
+		    let url = "${pageContext.request.contextPath}/freeGallery/delete.do?" + query;
+		    location.href = url;
 	    }
 	}
 </c:if>
@@ -337,31 +345,29 @@ function ajaxFun(url, method, query, dataType, fn) {
 		</div>
 		
 		<h1>
-       		나는야 짱구
+       		${dto.subject}
        	</h1>
        	
        	<div class="sub-info">
        		<div>
 	       		<span>작성자</span>
-	       		<span>나는 닉네임</span>
+	       		<span>${dto.userNickName}</span>
        		</div>
        		<div>
 	       		<span>작성일</span>
-	       		<span>2022-04-24</span>
+	       		<span>${dto.reg_date}</span>
        		</div>
        		<div>
 	       		<span>조회수</span>
-	       		<span>19</span>
+	       		<span>${dto.hitCount}</span>
        		</div>
 
        	</div>
 
        	<div class="contents">
+       		<img src="${pageContext.request.contextPath}/resource/images/image.png" onfocus="blur()" border="0"><br>
        		<p>
-       			<img src="${pageContext.request.contextPath}/resource/images/image.png" onfocus="blur()" border="0"><br>
-       			하임 아임 글내용 sdklfjsadjl<br>
-       			sdklfjlsajf<br>
-       			sajkldfjklwsjlsdf<br>
+       			${dto.content}
        		</p>
        		<div>
        		
@@ -370,7 +376,7 @@ function ajaxFun(url, method, query, dataType, fn) {
       			<div class="content">
         			<span class="heart"></span>
         			<span class="text">LIKE</span>
-        			<span class="numb" id="like_num">12</span>
+        			<span class="numb" id="like_num">${dto.likeCount}</span>
       			</div>
     		</div>
        	</div>
@@ -396,17 +402,27 @@ function ajaxFun(url, method, query, dataType, fn) {
 				<tr>
 					<td colspan="2" class="pre">
 						이전글 :
-						<c:if test="${not empty preReadDto}">
-							<a href="${pageContext.request.contextPath}/sphoto/article.do?num=${preReadDto.num}&page=${page}">${preReadDto.subject}</a>
-						</c:if>
+						<c:choose>
+							<c:when test="${not empty preReadDto}">
+								<a href="${pageContext.request.contextPath}/freeGallery/article.do?${query}&num=${preReadDto.num}">${preReadDto.subject}</a>
+							</c:when>
+							<c:otherwise>
+								<span class="no_post">이전 게시물이 없습니다.</span>
+							</c:otherwise>
+						</c:choose>
 					</td>
 				</tr>
 				<tr>
 					<td colspan="2">
 						다음글 :
-						<c:if test="${not empty nextReadDto}">
-							<a href="${pageContext.request.contextPath}/sphoto/article.do?num=${nextReadDto.num}&page=${page}">${nextReadDto.subject}</a>
-						</c:if>
+						<c:choose>
+							<c:when test="${not empty nextReadDto}">
+								<a href="${pageContext.request.contextPath}/freeGallery/article.do?${query}&num=${nextReadDto.num}">${nextReadDto.subject}</a>
+							</c:when>
+							<c:otherwise>
+								<span class="no_post">다음 게시물이 없습니다.</span>
+							</c:otherwise>
+						</c:choose>
 					</td>
 				</tr>
 			</tbody>
@@ -417,17 +433,23 @@ function ajaxFun(url, method, query, dataType, fn) {
 				<td width="50%">
 					<c:choose>
 						<c:when test="${sessionScope.member.userId==dto.userId}">
-							<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/sphoto/update.do?num=${dto.num}&page=${page}';">수정</button>
-							<button type="button" class="btn" onclick="deletePhoto();">삭제</button>
+							<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/freeGallery/update.do?num=${dto.num}&page=${page}';">수정</button>
 						</c:when>
 						<c:otherwise>
 							<button type="button" class="btn" disabled="disabled">수정</button>
+						</c:otherwise>
+					</c:choose>
+					<c:choose>
+                   		<c:when test="${sessionScope.member.userId==dto.userId || sessionScope.member.userId=='admin'}">
+							<button type="button" class="btn" onclick="deleteFreeGallery();">삭제</button>
+						</c:when>
+						<c:otherwise>
 							<button type="button" class="btn" disabled="disabled">삭제</button>
 						</c:otherwise>
 					</c:choose>
 				</td>
 				<td align="right">
-					<button type="button" class="btn" onclick="">목록</button>
+					<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/freeGallery/list.do?${query}';">목록</button>
 				</td>
 			</tr>
 		</table>

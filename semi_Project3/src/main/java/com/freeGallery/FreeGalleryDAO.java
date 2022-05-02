@@ -216,12 +216,14 @@ public class FreeGalleryDAO {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		String sql;
-
+		System.out.println(condition);
+		System.out.println(keyword);
+		System.out.println(category);
 		try {
 			sql = "SELECT NVL(COUNT(*), 0) FROM freegallery f JOIN member1 m ON f.userId = m.userId ";
 			sql += "  WHERE category = ? ";
 			if (condition.equals("all")) {
-				sql += "  AND INSTR(subject, ?) >= 1 OR INSTR(content, ?) >= 1 ";
+				sql += "  AND (INSTR(subject, ?) >= 1 OR INSTR(content, ?) >= 1) ";
 			} else if (condition.equals("reg_date")) {
 				keyword = keyword.replaceAll("(\\-|\\/|\\.)", "");
 				sql += "  AND TO_CHAR(reg_date, 'YYYYMMDD') = ? ";
@@ -260,7 +262,7 @@ public class FreeGalleryDAO {
 				}
 			}
 		}
-
+		System.out.println(result);
 		return result;
 	}
 	
@@ -556,7 +558,7 @@ public class FreeGalleryDAO {
 			sb.append("         )fgr ON f.num = fgr.num ");
 			sb.append("     	WHERE category = ? ");
 			if (condition.equals("all")) {
-				sb.append("     AND INSTR(subject, ?) >= 1 OR INSTR(content, ?) >= 1 ");
+				sb.append("     AND (INSTR(subject, ?) >= 1 OR INSTR(content, ?) >= 1) ");
 			} else if (condition.equals("reg_date")) {
 				keyword = keyword.replaceAll("(\\-|\\/|\\.)", "");
 				sb.append("     AND TO_CHAR(reg_date, 'YYYYMMDD') = ?");
@@ -703,6 +705,239 @@ public class FreeGalleryDAO {
 		return dto;
 	}
 	
+	// 이전글
+	public FreeGalleryDTO preReadGallery(int num, String condition, String keyword, String category) {
+		FreeGalleryDTO dto = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		StringBuilder sb = new StringBuilder();
+
+		try {
+			if(keyword.length() == 0 && !category.equals("all")) { // 조건 x, 카테고리 설정 o
+				sb.append(" SELECT * FROM ( ");
+				sb.append("    SELECT num, subject ");
+				sb.append("    FROM FreeGallery f ");
+				sb.append("    JOIN member1 m ON f.userId = f.userId ");
+				sb.append("    WHERE ( num > ? ) AND category = ? ");
+				sb.append("    ORDER BY num ASC ");
+				sb.append(" ) WHERE ROWNUM = 1 ");
+
+				pstmt = conn.prepareStatement(sb.toString());
+				
+				pstmt.setInt(1, num);
+				pstmt.setString(2, category);
+				
+
+			} else if(keyword != null && keyword.length() != 0 && category.equals("all")) { // 조건 o, 카테고리 x
+				sb.append(" SELECT * FROM ( ");
+				sb.append("    SELECT num, subject ");
+				sb.append("    FROM FreeGallery f ");
+				sb.append("    JOIN member1 m ON f.userId = f.userId ");
+				sb.append("    WHERE ( num > ? ) ");
+				if (condition.equals("all")) {
+					sb.append("   AND ( INSTR(subject, ?) >= 1 OR INSTR(content, ?) >= 1 ) ");
+				} else if (condition.equals("reg_date")) {
+					keyword = keyword.replaceAll("(\\-|\\/|\\.)", "");
+					sb.append("   AND ( TO_CHAR(reg_date, 'YYYYMMDD') = ? ) ");
+				} else {
+					sb.append("   AND ( INSTR(" + condition + ", ?) >= 1 ) ");
+				}
+				sb.append("     ORDER BY num ASC ");
+				sb.append(" ) WHERE ROWNUM = 1 ");
+
+				pstmt = conn.prepareStatement(sb.toString());
+				
+				pstmt.setInt(1, num);
+				pstmt.setString(2, keyword);
+				if (condition.equals("all")) {
+					pstmt.setString(3, keyword);
+				}
+			} else if(keyword.length() != 0 && !category.equals("all")) { // 조건 o, 카테고리 o
+				sb.append(" SELECT * FROM ( ");
+				sb.append("    SELECT num, subject ");
+				sb.append("    FROM FreeGallery f ");
+				sb.append("    JOIN member1 m ON f.userId = f.userId ");
+				sb.append("    WHERE ( num > ? ) AND category = ? ");
+				if (condition.equals("all")) {
+					sb.append("   AND ( INSTR(subject, ?) >= 1 OR INSTR(content, ?) >= 1 ) ");
+				} else if (condition.equals("reg_date")) {
+					keyword = keyword.replaceAll("(\\-|\\/|\\.)", "");
+					sb.append("   AND ( TO_CHAR(reg_date, 'YYYYMMDD') = ? ) ");
+				} else {
+					sb.append("   AND ( INSTR(" + condition + ", ?) >= 1 ) ");
+				}
+				sb.append("     ORDER BY num ASC ");
+				sb.append(" ) WHERE ROWNUM = 1 ");
+
+				pstmt = conn.prepareStatement(sb.toString());
+				
+				pstmt.setInt(1, num);
+				pstmt.setString(2, category);
+				pstmt.setString(3, keyword);
+				if (condition.equals("all")) {
+					pstmt.setString(4, keyword);
+				}
+			} else { // 조건 x, 카테고리 x
+				sb.append(" SELECT * FROM ( ");
+				sb.append("     SELECT num, subject FROM freeGallery ");
+				sb.append("     WHERE num > ? ");
+				sb.append("     ORDER BY num ASC ");
+				sb.append(" ) WHERE ROWNUM = 1 ");
+				
+				pstmt = conn.prepareStatement(sb.toString());
+				
+				pstmt.setInt(1, num);
+			}
+			
+			rs = pstmt.executeQuery();
+
+			if (rs.next()) {
+				dto = new FreeGalleryDTO();
+				
+				dto.setNum(rs.getInt("num"));
+				dto.setSubject(rs.getString("subject"));
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+				}
+			}
+
+			if (pstmt != null) {
+				try {
+					pstmt.close();
+				} catch (SQLException e) {
+				}
+			}
+		}
+
+		return dto;
+	}
+	
+	
+	// 다음글
+	public FreeGalleryDTO nextReadGallery(int num, String condition, String keyword, String category) {
+		FreeGalleryDTO dto = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		StringBuilder sb = new StringBuilder();
+
+		try {
+			if(keyword.length() == 0 && !category.equals("all")) { // 조건 x, 카테고리 설정 o
+				sb.append(" SELECT * FROM ( ");
+				sb.append("    SELECT num, subject ");
+				sb.append("    FROM FreeGallery f ");
+				sb.append("    JOIN member1 m ON f.userId = f.userId ");
+				sb.append("    WHERE ( num < ? ) AND category = ? ");
+				sb.append("    ORDER BY num ASC ");
+				sb.append(" ) WHERE ROWNUM = 1 ");
+
+				pstmt = conn.prepareStatement(sb.toString());
+				
+				pstmt.setInt(1, num);
+				pstmt.setString(2, category);
+				
+
+			} else if(keyword != null && keyword.length() != 0 && category.equals("all")) { // 조건 o, 카테고리 x
+				sb.append(" SELECT * FROM ( ");
+				sb.append("    SELECT num, subject ");
+				sb.append("    FROM FreeGallery f ");
+				sb.append("    JOIN member1 m ON f.userId = f.userId ");
+				sb.append("    WHERE ( num < ? ) ");
+				if (condition.equals("all")) {
+					sb.append("   AND ( INSTR(subject, ?) >= 1 OR INSTR(content, ?) >= 1 ) ");
+				} else if (condition.equals("reg_date")) {
+					keyword = keyword.replaceAll("(\\-|\\/|\\.)", "");
+					sb.append("   AND ( TO_CHAR(reg_date, 'YYYYMMDD') = ? ) ");
+				} else {
+					sb.append("   AND ( INSTR(" + condition + ", ?) >= 1 ) ");
+				}
+				sb.append("     ORDER BY num ASC ");
+				sb.append(" ) WHERE ROWNUM = 1 ");
+
+				pstmt = conn.prepareStatement(sb.toString());
+				
+				pstmt.setInt(1, num);
+				pstmt.setString(2, keyword);
+				if (condition.equals("all")) {
+					pstmt.setString(3, keyword);
+				}
+			} else if(keyword.length() != 0 && !category.equals("all")) { // 조건 o, 카테고리 o
+				sb.append(" SELECT * FROM ( ");
+				sb.append("    SELECT num, subject ");
+				sb.append("    FROM FreeGallery f ");
+				sb.append("    JOIN member1 m ON f.userId = f.userId ");
+				sb.append("    WHERE ( num < ? ) AND category = ? ");
+				if (condition.equals("all")) {
+					sb.append("   AND ( INSTR(subject, ?) >= 1 OR INSTR(content, ?) >= 1 ) ");
+				} else if (condition.equals("reg_date")) {
+					keyword = keyword.replaceAll("(\\-|\\/|\\.)", "");
+					sb.append("   AND ( TO_CHAR(reg_date, 'YYYYMMDD') = ? ) ");
+				} else {
+					sb.append("   AND ( INSTR(" + condition + ", ?) >= 1 ) ");
+				}
+				sb.append("     ORDER BY num ASC ");
+				sb.append(" ) WHERE ROWNUM = 1 ");
+
+				pstmt = conn.prepareStatement(sb.toString());
+				
+				pstmt.setInt(1, num);
+				pstmt.setString(2, category);
+				pstmt.setString(3, keyword);
+				if (condition.equals("all")) {
+					pstmt.setString(4, keyword);
+				}
+			} else { // 조건 x, 카테고리 x
+				sb.append(" SELECT * FROM ( ");
+				sb.append("     SELECT num, subject FROM freeGallery ");
+				sb.append("     WHERE num < ? ");
+				sb.append("     ORDER BY num ASC ");
+				sb.append(" ) WHERE ROWNUM = 1 ");
+				
+				pstmt = conn.prepareStatement(sb.toString());
+				
+				pstmt.setInt(1, num);
+			}
+			
+			rs = pstmt.executeQuery();
+
+			if (rs.next()) {
+				dto = new FreeGalleryDTO();
+				
+				dto.setNum(rs.getInt("num"));
+				dto.setSubject(rs.getString("subject"));
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+				}
+			}
+
+			if (pstmt != null) {
+				try {
+					pstmt.close();
+				} catch (SQLException e) {
+				}
+			}
+		}
+
+		return dto;
+	}
+	
+	
+	
+	
+	
 	
 	// 해당 게시물 파일 리스트 보기
 	public List<FreeGalleryDTO> listPhotoFile(int num) {
@@ -789,8 +1024,118 @@ public class FreeGalleryDAO {
 		
 		return result;
 	}
+
+	// 게시물 삭제
+	public void deleteFreeGal(int num, String userId) throws SQLException {
+		PreparedStatement pstmt = null;
+		String sql;
+		
+		try {
+			if (userId.equals("admin")) {
+				sql = "DELETE FROM freeGallery WHERE num=?";
+				pstmt = conn.prepareStatement(sql);
+				
+				pstmt.setInt(1, num);
+				
+				pstmt.executeUpdate();
+			} else {
+				sql = "DELETE FROM freeGallery WHERE num=? AND userId=?";
+				
+				pstmt = conn.prepareStatement(sql);
+				
+				pstmt.setInt(1, num);
+				pstmt.setString(2, userId);
+				
+				pstmt.executeUpdate();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			if (pstmt != null) {
+				try {
+					pstmt.close();
+				} catch (SQLException e) {
+				}
+			}
+		}
+	}
 	
+	// 게시물 파일 리스트
+	public List<FreeGalleryDTO> listFreeGalFile(int num) {
+		List<FreeGalleryDTO> list = new ArrayList<>();
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql;
+
+		try {
+			sql = "SELECT fileNum, num, savefilename FROM freeGalFile WHERE num = ?";
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setInt(1, num);
+			
+			rs = pstmt.executeQuery();
+
+			while (rs.next()) {
+				FreeGalleryDTO dto = new FreeGalleryDTO();
+
+				dto.setFileNum(rs.getInt("fileNum"));
+				dto.setNum(rs.getInt("num"));
+				dto.setImageFilename(rs.getString("savefilename"));
+				
+				list.add(dto);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+				}
+			}
+
+			if (pstmt != null) {
+				try {
+					pstmt.close();
+				} catch (SQLException e) {
+				}
+			}
+		}
+
+		return list;
+	}
+
 	
+	// freeGalFile 테이블에서 file 이름 지우기
+	public void deleteFreeGalFile(String mode, int num) throws SQLException {
+		PreparedStatement pstmt = null;
+		String sql;
+
+		try {
+			if (mode.equals("all")) {
+				sql = "DELETE FROM freeGalFile WHERE num = ?";
+			} else {
+				sql = "DELETE FROM freeGalFile WHERE fileNum = ?";
+			}
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setInt(1, num);
+
+			pstmt.executeUpdate();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			if (pstmt != null) {
+				try {
+					pstmt.close();
+				} catch (SQLException e2) {
+				}
+			}
+		}
+	}
 	
 	
 }

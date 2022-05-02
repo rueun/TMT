@@ -81,6 +81,7 @@ function sendBoard() {
         f.content.focus();
         return;
     }
+    $("select[name=categoryType]").removeAttr('disabled');
 
     f.action = "${pageContext.request.contextPath}/qnaboard/${mode}_ok.do";
     f.submit();
@@ -94,6 +95,20 @@ function sendBoard() {
 		}
 	}
 </c:if>
+	
+
+
+</script>
+
+<script type="text/javascript">
+
+<c:if test = "${mode=='reply' || 'update'}">
+	$(function(){
+		$("select[name=categoryType]").val("${dto.categoryType}").prop("selected",true);
+		$("select[name=categoryType]").attr('disabled',true);
+	});
+</c:if>
+
 </script>
 </head>
 <body>
@@ -114,13 +129,13 @@ function sendBoard() {
 					<td>카&nbsp;테&nbsp;고&nbsp;리</td>
 					<td> 
 						<select name="categoryType" class="form-select">
-							<option value="normal">일반</option>
-							<option value="board">게시판</option>
-							<option value="gallery">갤러리</option>
-							<option value="payment">주문/결제</option>
-							<option value="return">반품/교환/환불</option>
-							<option value="delivery">배송문의</option>
-							<option value="service">회원서비스</option>
+							<option value="일반">일반</option>
+							<option value="게시판">게시판</option>
+							<option value="갤러리">갤러리</option>
+							<option value="주문/결제">주문/결제</option>
+							<option value="반품/교환/환불">반품/교환/환불</option>
+							<option value="배송문의">배송문의</option>
+							<option value="회원서비스">회원서비스</option>
 						</select>
 					</td>
 				</tr>
@@ -177,6 +192,17 @@ function sendBoard() {
 						<c:if test="${mode=='update'}">
 							<input type="hidden" name="num" value="${dto.num}">
 							<input type="hidden" name="page" value="${page}">
+							<input type="hidden" name="query" value="${query}">
+						</c:if>
+						<c:if test="${mode=='reply'}">
+							<input type="hidden" name="groupNum" value="${dto.groupNum}">
+							<input type="hidden" name="orderNo" value="${dto.orderNo}">
+							<input type="hidden" name="depth" value="${dto.depth}">
+							<input type="hidden" name="parent" value="${dto.boardNum}">
+							<input type="hidden" name="page" value="${page}">
+							<input type="hidden" name="condition" value="${condition}">
+							<input type="hidden" name="keyword" value="${keyword}">
+							<input type="hidden" name="categoryType" value="${categoryType}">
 						</c:if>
 					</td>
 				</tr>

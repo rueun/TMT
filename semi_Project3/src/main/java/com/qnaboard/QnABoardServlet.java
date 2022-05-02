@@ -123,10 +123,9 @@ public class QnABoardServlet extends MyServlet {
 				n++;
 			}
 
-			String query = "categoryType="+categoryType;
+			String query = "categoryType=" + categoryType;
 			if (keyword.length() != 0) {
-				query += "&condition=" + condition + "&keyword="
-						+ URLEncoder.encode(keyword, "utf-8");
+				query += "&condition=" + condition + "&keyword=" + URLEncoder.encode(keyword, "utf-8");
 			}
 
 			// 페이징 처리
@@ -165,98 +164,100 @@ public class QnABoardServlet extends MyServlet {
 
 	private void writeSubmit(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		// 글 저장
-				QnABoardDAO dao = new QnABoardDAO();
+		QnABoardDAO dao = new QnABoardDAO();
 
-				HttpSession session = req.getSession();
-				SessionInfo info = (SessionInfo) session.getAttribute("member");
-				
-				String cp = req.getContextPath();
-				if(req.getMethod().equalsIgnoreCase("GET")) {
-					resp.sendRedirect(cp + "/qnaboard/list.do");
-					return;
-				}
-				
-				try {
-					QnABoardDTO dto = new QnABoardDTO();
+		HttpSession session = req.getSession();
+		SessionInfo info = (SessionInfo) session.getAttribute("member");
 
-					// userId는 세션에 저장된 정보
-					dto.setUserId(info.getUserId());
+		String cp = req.getContextPath();
+		if (req.getMethod().equalsIgnoreCase("GET")) {
+			resp.sendRedirect(cp + "/qnaboard/list.do");
+			return;
+		}
 
-					// 파라미터
-					dto.setCategoryType(req.getParameter("categoryType"));
-					dto.setSubject(req.getParameter("subject"));
-					dto.setContent(req.getParameter("content"));
+		try {
+			QnABoardDTO dto = new QnABoardDTO();
 
-					dao.insertBoard(dto, "write");
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+			// userId는 세션에 저장된 정보
+			dto.setUserId(info.getUserId());
 
-				resp.sendRedirect(cp + "/qnaboard/list.do");
+			// 파라미터
+			dto.setCategoryType(req.getParameter("categoryType"));
+			dto.setSubject(req.getParameter("subject"));
+			dto.setContent(req.getParameter("content"));
+
+			dao.insertBoard(dto, "write");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		resp.sendRedirect(cp + "/qnaboard/list.do");
 	}
 
 	private void article(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		// 글보기
 		QnABoardDAO dao = new QnABoardDAO();
 		MyUtil util = new MyUtil();
-		
+
 		String cp = req.getContextPath();
 		String page = req.getParameter("page");
-		
+
 		String query = "page=" + page;
-		
+
 		try {
 			int boardNum = Integer.parseInt(req.getParameter("boardNum"));
 			String condition = req.getParameter("condition");
 			String keyword = req.getParameter("keyword");
 			String categoryType = req.getParameter("categoryType");
-			
+
 			if (condition == null) {
 				condition = "all";
 				keyword = "";
 			}
-			if(categoryType == null) {
+			if (categoryType == null) {
 				categoryType = "all";
 			}
-			
+
 			keyword = URLDecoder.decode(keyword, "utf-8");
-			
-			if(keyword.length() != 0 || !categoryType.equals("all")) {
-				query += "&condition=" + condition + "&keyword=" + URLEncoder.encode(keyword, "UTF-8")+"&categoryType="+categoryType;
+
+			if (keyword.length() != 0 || !categoryType.equals("all")) {
+				query += "&condition=" + condition + "&keyword=" + URLEncoder.encode(keyword, "UTF-8")
+						+ "&categoryType=" + categoryType;
 			}
-			
+
 			// 조회수 증가
 			dao.updateHitCount(boardNum);
-			
+
 			// 게시물 가져오기
 			QnABoardDTO dto = dao.readBoard(boardNum);
-			if(dto == null) {
+			if (dto == null) {
 				resp.sendRedirect(cp + "/board/list.do?" + query);
 				return;
 			}
 			dto.setContent(util.htmlSymbols(dto.getContent()));
-			
+
 			// 이전글 다음글
-			QnABoardDTO preReadDto = dao.preReadBoard(dto.getGroupNum(), dto.getOrderNo(), condition, keyword, categoryType);
-			QnABoardDTO nextReadDto = dao.nextReadBoard(dto.getGroupNum(), dto.getOrderNo(), condition, keyword, categoryType);
-			
+			QnABoardDTO preReadDto = dao.preReadBoard(dto.getGroupNum(), dto.getOrderNo(), condition, keyword,
+					categoryType);
+			QnABoardDTO nextReadDto = dao.nextReadBoard(dto.getGroupNum(), dto.getOrderNo(), condition, keyword,
+					categoryType);
+
 			// JSP 로 전달할 속성
 			req.setAttribute("dto", dto);
 			req.setAttribute("page", page);
 			req.setAttribute("query", query);
 			req.setAttribute("preReadDto", preReadDto);
 			req.setAttribute("nextReadDto", nextReadDto);
-			
+
 			// 포워딩
 			forward(req, resp, "/WEB-INF/views/qnaboard/article.jsp");
 			return;
-			
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-		resp.sendRedirect(cp+"/qnaboard/list.do?"+query);
+
+		resp.sendRedirect(cp + "/qnaboard/list.do?" + query);
 	}
 
 	private void updateForm(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -266,11 +267,146 @@ public class QnABoardServlet extends MyServlet {
 	}
 
 	private void replyForm(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		// 답변 폼
+		QnABoardDAO dao = new QnABoardDAO();
+
+		String cp = req.getContextPath();
+
+		String page = req.getParameter("page");
+		String condition = req.getParameter("condition");
+		String keyword = req.getParameter("keyword");
+		String categoryType = req.getParameter("categoryType");
+		if (categoryType == null) {
+			categoryType = "all";
+		}
+		String query = "";
+		if (keyword != null) {
+			query = "page=" + page + "&condition=" + condition + "&keyword=" + keyword + "&categoryType="
+					+ categoryType;
+		} else {
+			query = "page=" + page + "&condition=" + condition + "&keyword=" + "&categoryType=" + categoryType;
+		}
+
+		try {
+			int boardNum = Integer.parseInt(req.getParameter("boardNum"));
+
+			QnABoardDTO dto = dao.readBoard(boardNum);
+			if (dto == null) {
+				resp.sendRedirect(cp + "/qnaboard/list.do?" + query);
+				return;
+			}
+
+			String s = "[" + dto.getSubject() + "] 에 대한 답변입니다. \n";
+			dto.setContent(s);
+
+			req.setAttribute("mode", "reply");
+			req.setAttribute("dto", dto);
+			req.setAttribute("page", page);
+			req.setAttribute("condition", condition);
+			req.setAttribute("categoryType", categoryType);
+			req.setAttribute("keyword", keyword);
+
+			forward(req, resp, "/WEB-INF/views/qnaboard/write.jsp");
+			return;
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		resp.sendRedirect(cp + "/qnaboard/list.do?" + query);
 	}
 
 	private void replySubmit(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		// 답변 완료
+		QnABoardDAO dao = new QnABoardDAO();
+
+		HttpSession session = req.getSession();
+		SessionInfo info = (SessionInfo) session.getAttribute("member");
+
+		String cp = req.getContextPath();
+		if (req.getMethod().equalsIgnoreCase("GET")) {
+			resp.sendRedirect(cp + "/qnaboard/list.do");
+			return;
+		}
+
+		String page = req.getParameter("page");
+		String condition = req.getParameter("condition");
+		String categoryType = req.getParameter("categoryType");
+		
+		
+		String keyword = req.getParameter("keyword");
+		keyword = URLDecoder.decode(keyword, "utf-8");
+		
+		String query = "page="+page+"&condition="+condition+"&keyword="+URLEncoder.encode(keyword,"utf-8")+"&categoryType"+categoryType;
+
+		try {
+			QnABoardDTO dto = new QnABoardDTO();
+
+			dto.setSubject(req.getParameter("subject"));
+			dto.setContent(req.getParameter("content"));
+			dto.setCategoryType(req.getParameter("categoryType"));
+			dto.setGroupNum(Integer.parseInt(req.getParameter("groupNum")));
+			dto.setOrderNo(Integer.parseInt(req.getParameter("orderNo")));
+			dto.setDepth(Integer.parseInt(req.getParameter("depth")));
+			dto.setParent(Integer.parseInt(req.getParameter("parent")));
+
+			dto.setUserId(info.getUserId());
+
+			dao.insertBoard(dto, "reply");
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		resp.sendRedirect(cp + "/qnaboard/list.do?" + query);
 	}
 
 	private void delete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		// 삭제
+		QnABoardDAO dao = new QnABoardDAO();
+
+		HttpSession session = req.getSession();
+		SessionInfo info = (SessionInfo) session.getAttribute("member");
+
+		String cp = req.getContextPath();
+
+		String page = req.getParameter("page");
+		String categoryType = req.getParameter("categoryType");
+		if(categoryType == null) {
+			categoryType = "all";
+		}
+		String query = "page=" + page + "&categoryType="+categoryType;
+
+		try {
+			int boardNum = Integer.parseInt(req.getParameter("boardNum"));
+			String condition = req.getParameter("condition");
+			String keyword = req.getParameter("keyword");
+			if (condition == null) {
+				condition = "all";
+				keyword = "";
+			}
+			keyword = URLDecoder.decode(keyword, "utf-8");
+
+			if (keyword.length() != 0) {
+				query += "&condition=" + condition + "&keyword=" + URLEncoder.encode(keyword, "UTF-8");
+			}
+
+			QnABoardDTO dto = dao.readBoard(boardNum);
+
+			if (dto == null) {
+				resp.sendRedirect(cp + "/qnaboard/list.do?" + query);
+				return;
+			}
+
+			// 게시물을 올린 사용자나 admin이 아니면
+			if (!dto.getUserId().equals(info.getUserId()) && !info.getUserId().equals("admin")) {
+				resp.sendRedirect(cp + "/qnaboard/list.do?" + query);
+				return;
+			}
+
+			dao.deleteBoard(boardNum);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		resp.sendRedirect(cp + "/qnaboard/list.do?" + query);
 	}
 }

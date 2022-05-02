@@ -37,7 +37,7 @@
 }
 
 .table-list .categoryType {
-	width: 60px;
+	width: 160px;
 	color: #787878;
 }
 
@@ -100,24 +100,13 @@
 	border-bottom: 3px solid #424951;
 }
 
+
 /* 카테고리 */
-ul li, ol li {
-	list-style: none
-}
 
-.category {
-	border-left: 1px solid #e7e7e7;
-	border-bottom: 1px solid
-}
-
-.category li {
-	display: table-cell
-}
-
-.category li.on {
-	position: relative
-}
-
+ul li, ol li {list-style: none}
+.category {border-left: 1px solid #e7e7e7;border-bottom: 1px solid}
+.category li {display: table-cell}
+.category li.on {position:relative}
 .category li.on:before {
 	position: absolute;
 	content: '';
@@ -127,54 +116,51 @@ ul li, ol li {
 	bottom: -1px;
 	left: 0px
 }
-
-.category li a {
+.category li span {
 	text-decoration: none;
-	cursor: pointer;
-	color: #666;
+    cursor: pointer;
+    color: #666;
+    
 	display: block;
 	position: relative;
 	border-top: 1px solid #e7e7e7;
 	text-align: center;
 	padding: 9px 20px
+	
 }
-
-.category li a:after {
-	content: '';
-	display: block;
-	position: absolute;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	width: 1px;
-	background: #e6e3df
+.category li span:after { 
+	content:''; 
+	display:block; 
+	position:absolute; 
+	top:0; 
+	right:0; 
+	bottom:0; 
+	width:1px; 
+	background:#e6e3df
 }
-
-.category li.on a, .category li:hover a {
-	border-bottom-color: transparent;
-	border-top: 1px solid #444
+.category li.on span, .category li:hover span {
+	border-bottom-color:transparent; 
+	border-top:1px solid #444;
 }
-
-.category li.on a:after, .category li:hover a:after {
-	content: '';
-	display: block;
-	position: absolute;
-	top: 0;
-	right: 0;
-	bottom: -1px;
-	width: 1px;
-	background: #444
+.category li.on span:after, .category li:hover span:after { 
+	content:''; 
+	display:block; 
+	position:absolute; 
+	top:0; 
+	right:0; 
+	bottom:-1px; 
+	width:1px; 
+	background:#444
 }
-
-.category li.on a:before, .category li:hover a:before {
-	content: '';
-	display: block;
-	position: absolute;
-	top: 0;
-	left: 0;
-	bottom: -1px;
-	width: 1px;
-	background: #444
+.category li.on span:before, .category li:hover span:before { 
+	content:''; 
+	display:block; 
+	position:absolute; 
+	top:0; 
+	left:0;
+	bottom:-1px; 
+	width:1px; 
+	background:#444
 }
 </style>
 <script type="text/javascript">
@@ -189,21 +175,32 @@ $(function() {
 	$("ul.category li").removeClass("on");
 	switch($('input[name=categoryType]').val()) {
 		case "all" : $("ul.category li:nth-child(1)").addClass("on"); break;
-		case "normal" :  $("ul.category li:nth-child(2)").addClass("on"); break;
-		case "board" : $("ul.category li:nth-child(3)").addClass("on"); break;
-		case "gallery" : $("ul.category li:nth-child(4)").addClass("on"); break;
-		case "payment" : $("ul.category li:nth-child(5)").addClass("on"); break;
-		case "return" : $("ul.category li:nth-child(6)").addClass("on"); break;
-		case "delivery" : $("ul.category li:nth-child(7)").addClass("on"); break;
-		case "service" : $("ul.category li:nth-child(8)").addClass("on"); break;
+		case "일반" :  $("ul.category li:nth-child(2)").addClass("on"); break;
+		case "게시판" : $("ul.category li:nth-child(3)").addClass("on"); break;
+		case "갤러리" : $("ul.category li:nth-child(4)").addClass("on"); break;
+		case "주문/결제" : $("ul.category li:nth-child(5)").addClass("on"); break;
+		case "반품/교환/환불" : $("ul.category li:nth-child(6)").addClass("on"); break;
+		case "배송문의" : $("ul.category li:nth-child(7)").addClass("on"); break;
+		case "회원서비스" : $("ul.category li:nth-child(8)").addClass("on"); break;
 	}
 	
 	
+	// li 태그는 value 값이 int 형만 가능
 	$("ul.category li").click(function() {
 		$("ul.category li").removeClass("on");
 		$(this).addClass("on");
-		var category = $(this).val();
-		$('input[name=category]').val(category);
+		var category = "";
+		switch($(this).val()) {
+			case 0 : category = "all"; break;
+			case 1 : category = "일반"; break;
+			case 2 : category = "게시판"; break;
+			case 3 : category = "갤러리"; break;
+			case 4 : category = "주문/결제"; break;
+			case 5 : category = "반품/교환/환불"; break;
+			case 6 : category = "배송문의"; break;
+			case 7 : category = "회원서비스"; break;
+		}
+		$('input[name=categoryType]').val(category);
 		$('form[name=searchForm] .btn').trigger("click");
 	});
 	
@@ -230,14 +227,14 @@ $(function() {
 
 
 			<ul class="category">
-				<li class="on"><a href="${pageContext.request.contextPath}/qnaboard/list.do?categoryType=all">전체</a></li>
-				<li><a href="${pageContext.request.contextPath}/qnaboard/list.do?categoryType=normal">일반</a></li>
-				<li><a href="${pageContext.request.contextPath}/qnaboard/list.do?categoryType=board">게시판</a></li>
-				<li><a href="${pageContext.request.contextPath}/qnaboard/list.do?categoryType=gallery">갤러리</a></li>
-				<li><a href="${pageContext.request.contextPath}/qnaboard/list.do?categoryType=payment">주문/결제</a></li>
-				<li><a href="${pageContext.request.contextPath}/qnaboard/list.do?categoryType=return">반품/교환/환불</a></li>
-				<li><a href="${pageContext.request.contextPath}/qnaboard/list.do?categoryType=delivery">배송문의</a></li>
-				<li><a href="${pageContext.request.contextPath}/qnaboard/list.do?categoryType=servie">회원서비스</a></li>
+				<li value="0"><span >전체</span></li>
+				<li value="1"><span >일반</span></li>
+				<li value="2"><span >게시판</span></li>
+				<li value="3"><span >갤러리</span></li>
+				<li value="4"><span >주문/결제</span></li>
+				<li value="5"><span>반품/교환/환불</span></li>
+				<li value="6"><span>배송문의</span></li>
+				<li value="7"><span>회원서비스</span></li>
 			</ul>
 
 			<table class="table">
@@ -289,7 +286,7 @@ $(function() {
 				<tr>
 					<td width="100">
 						<button type="button" class="btn"
-							onclick="location.href='${pageContext.request.contextPath}/board/list.do';"
+							onclick="location.href='${pageContext.request.contextPath}/qnaboard/list.do';"
 							title="새로고침">
 							새로고침<i class="fa-solid fa-arrow-rotate-right"></i>
 						</button>
