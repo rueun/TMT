@@ -38,28 +38,6 @@
 	padding: 10px;
 }
 
-.img-box {
-	max-width: 700px;
-	padding: 5px;
-	box-sizing: border-box;
-	border: 1px solid #ccc;
-	display: flex; /* 자손요소를 flexbox로 변경 */
-	flex-direction: row; /* 정방향 수평나열 */
-	flex-wrap: nowrap;
-	overflow-x: auto;
-}
-.img-box img {
-	width: 100px; height: 100px;
-	margin-right: 5px;
-	flex: 0 0 auto;
-	cursor: pointer;
-}
-
-.photo-layout img {
-	width: 570px; height: 450px;
-}
-
-
 .sub-info {
 	width: 100%;
 	padding: 16px;
@@ -213,26 +191,14 @@ li {list-style: none;}
 <script type="text/javascript">
 <c:if test="${sessionScope.member.userId==dto.userId || sessionScope.member.userId=='admin'}">
 	function deletePhoto() {
-	    if(confirm("게시글을 삭제 하시겠습니까 ? ")) {
+	    if(confirm("글을 삭제하시겠습니까 ? ")) {
 		    let query = "num=${dto.num}&page=${page}";
-		    let url = "${pageContext.request.contextPath}/sphoto/delete.do?" + query;
+		    let url = "${pageContext.request.contextPath}/freeBoard/delete.do?" + query;
 	    	location.href = url;
 	    }
 	}
 </c:if>
 
-function imageViewer(img) {
-	const viewer = $(".photo-layout");
-	let s="<img src='"+img+"'>";
-	viewer.html(s);
-	
-	$(".dialog-photo").dialog({
-		title:"이미지",
-		width: 600,
-		height: 530,
-		modal: true
-	});
-}
 
 $(document).ready(function(){
     $('.content').click(function(){
@@ -249,9 +215,6 @@ $(document).ready(function(){
       	$('.text').toggleClass("heart-active")
      	$('.numb').toggleClass("heart-active")
      	$('.heart').toggleClass("heart-active")
-     	
-     	
-    	
     });
 });
 
@@ -271,31 +234,29 @@ $(document).ready(function(){
 		</div>
 		
 		<h2>
-       		제목 제목
+       		${dto.title}
        	</h2>
        	
        	<div class="sub-info">
        		<div>
-	       		<span>작성자</span>
-	       		<span>닉네임</span>
+	       		<span>작성자 : ${dto.userId}</span>
+	       		<span>${dto.userId}</span>
        		</div>
        		<div>
-	       		<span>작성일</span>
-	       		<span>2022-04-24</span>
+	       		<span>작성일 : </span>
+	       		<span>${dto.reg_date}</span>
        		</div>
        		<div>
-	       		<span>조회수</span>
-	       		<span>19</span>
+	       		<span>조회수 : </span>
+	       		<span>${dto.hitCount}</span>
        		</div>
 
        	</div>
 
        	<div class="contents">
        		<p>
-       			<span>글 내용을 지금 여기다 길게 써봤자 소용 없으니까 대충</span>
-       			<br>
-       			<span>글 내용을 지금 여기다 길게 써봤자 소용 없으니까 대충</span>
-       			<br>
+       			<span>${dto.content}</span>
+       			<span>내용이 나와야 함</span>
        		</p>
        		<div>
        		
@@ -321,7 +282,7 @@ $(document).ready(function(){
         					<span class="tit_nickname">금</span>
         					<span class="txt_date">2022-12-31 12:23</span>
         					<span class="txt_reply">
-        						가능한 기본 설정[=디폴트]은 그냥 유지 합니다.
+        						기본
         						<br>
         						대래대래댇댇댓글
         						<br>
@@ -348,7 +309,7 @@ $(document).ready(function(){
         					<span class="tit_nickname">링</span>
         					<span class="txt_date">2022-12-31 12:23</span>
         					<span class="txt_reply">
-        						가능한 기본 설정[=디폴트]은 그냥 유지 합니다.
+        						설정
         						<br>
         						트리가드 너
         					</span>
