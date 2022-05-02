@@ -173,7 +173,7 @@ function searchList() {
 <script type="text/javascript">
 $(function() {
 	$("ul.category li").removeClass("on");
-	switch($('input[name=categoryType]').val()) {
+	switch($('input[name=categoryType]').val()) {  
 		case "all" : $("ul.category li:nth-child(1)").addClass("on"); break;
 		case "일반" :  $("ul.category li:nth-child(2)").addClass("on"); break;
 		case "게시판" : $("ul.category li:nth-child(3)").addClass("on"); break;
