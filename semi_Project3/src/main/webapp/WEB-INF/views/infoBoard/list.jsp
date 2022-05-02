@@ -1,5 +1,7 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page contentType="text/html; charset=UTF-8" %>
+<%@ page trimDirectiveWhitespaces="true" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -50,7 +52,7 @@ a {
     font-size: 0;
 }
 
-.bt_wrap a {
+.bt_wrap button {
     display: inline-block;
     min-width: 80px;
     margin-left: 10px;
@@ -60,11 +62,11 @@ a {
     font-size: 1.4rem;
 }
 
-.bt_wrap a:first-child {
+.bt_wrap button:first-child {
     margin-left: 0;
 }
 
-.bt_wrap a.on {
+.bt_wrap button.on {
     background: #000;
     color: #fff;
 }
@@ -290,19 +292,23 @@ a {
     padding: 15px;
     box-sizing: border-box;
     border: 0;
-    resize: vertical;
+    resize: none;
 }
 
 </style>
-
+<script type="text/javascript">
+function searchList() {
+	const f = document.searchForm;
+	f.submit();
+}
+</script>
 </head>
 <body>
 
 <header>
     <jsp:include page="/WEB-INF/views/layout/header.jsp"></jsp:include>
 </header>
-	
-<main>
+	<main>
 <div class="board_wrap">
         <div class="board_title">
             <strong>정보게시판</strong>
@@ -317,42 +323,21 @@ a {
                     <div class="date">작성일</div>
                     <div class="count">조회</div>
                 </div>
+                <c:forEach var="dto" items="${list}">
                 <div>
-                    <div class="num">5</div>
-                    <div class="title"><a href="view.html">글 제목이 들어갑니다.</a></div>
-                    <div class="writer">김자바</div>
-                    <div class="date">2022.4.24</div>
-                    <div class="count">0</div>
-                </div>
-                <div>
-                    <div class="num">4</div>
-                    <div class="title"><a href="view.html">글 제목이 들어갑니다.</a></div>
-                    <div class="writer">김자바</div>
-                    <div class="date">2022.4.24</div>
-                    <div class="count">0</div>
-                </div>
-                <div>
-                    <div class="num">3</div>
-                    <div class="title"><a href="view.html">글 제목이 들어갑니다.</a></div>
-                    <div class="writer">김자바</div>
-                    <div class="date">2022.4.24</div>
-                    <div class="count">0</div>
-                </div>
-                <div>
-                    <div class="num">2</div>
-                    <div class="title"><a href="view.html">글 제목이 들어갑니다.</a></div>
-                    <div class="writer">김자바</div>
-                    <div class="date">2022.4.24</div>
-                    <div class="count">0</div>
-                </div>
-                <div>
-                    <div class="num">1</div>
-                    <div class="title"><a href="view.html">글 제목이 들어갑니다.</a></div>
-                    <div class="writer">김자바</div>
-                    <div class="date">2022.4.24</div>
-                    <div class="count">0</div>
-                </div>
+                    <div class="num">${dto.boardNum}</div>
+                    <div class="title"><a href="${articleUrl}&num=${dto.num}">${dto.subject}</a></div>
+                    <div class="writer">${dto.userId}</div>
+                    <div class="date">${dto.reg_date}</div>
+                    <div class="count">${dto.hitCount}</div>
+                </div> 
+                </c:forEach>
             </div>
+            
+            <div class="page-box">
+				${dataCount == 0 ? "등록된 게시물이 없습니다." : paging }
+			</div>
+            
             <div class="board_page">
                 <a href="#" class="bt first">≪</a>
                 <a href="#" class="bt prev">＜</a>
@@ -365,70 +350,12 @@ a {
                 <a href="#" class="bt last">≫</a>
             </div>
             <div class="bt_wrap">
-                <a href="write.html" class="on">등록</a>
+                <button type="button" class="on" onclick="location.href='${pageContext.request.contextPath}/infoBoard/write.do';">글올리기</button>
                 <!--<a href="#">수정</a>-->
             </div>
         </div>
     </div>
-<!--  
-    <div class="body-container">
-        <div class="row" style="padding-top: 15px; padding-bottom: 50px;">
-        
-        	<h3 style="text-align: center; padding: 25px; font-size: 30px;"> 정보게시판 </h3>
-        
-            <table class="table table-striped" style="text-align: center; border: 1px solid #dddddd">
-            	<thead>
-            		<tr>
-            			<th style="background-color: #eeeeee; text-align: center;">번호</th>
-            			<th style="background-color: #eeeeee; text-align: center;">제목</th>
-            			<th style="background-color: #eeeeee; text-align: center;">작성자</th>
-            			<th style="background-color: #eeeeee; text-align: center;">작성일</th>
-            		</tr>
-            	</thead>
-            	<tbody>
-            		<tr>
-            			<td>1</td>
-            			<td>안녕하세요</td>
-            			<td>홍길동</td>
-            			<td>2018-02-13</td>
-            		</tr>
-            		<tr>
-            			<td>2</td>
-            			<td>안녕하세요</td>
-            			<td>홍길동</td>
-            			<td>2018-02-13</td>
-            		</tr>
-            		<tr>
-            			<td>3</td>
-            			<td>안녕하세요</td>
-            			<td>홍길동</td>
-            			<td>2018-02-13</td>
-            		</tr>
-            		<tr>
-            			<td>4</td>
-            			<td>안녕하세요</td>
-            			<td>홍길동</td>
-            			<td>2018-02-13</td>
-            		</tr>
-            		<tr>
-            			<td>5</td>
-            			<td>안녕하세요</td>
-            			<td>홍길동</td>
-            			<td>2018-02-13</td>
-            		</tr>
-            		<tr>
-            			<td>6</td>
-            			<td>안녕하세요</td>
-            			<td>홍길동</td>
-            			<td>2018-02-13</td>
-            		</tr>
-            		
-            	</tbody>
-            
-            </table>
-        </div>
-    </div>
--->
+
 </main>
 <footer>
 	<jsp:include page="/WEB-INF/views/layout/footer.jsp"></jsp:include>

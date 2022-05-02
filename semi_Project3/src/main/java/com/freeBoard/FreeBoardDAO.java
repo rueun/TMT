@@ -138,7 +138,7 @@ public class FreeBoardDAO {
 		try {
 			sb.append("select * from ( ");
 			sb.append(" select rownum rnum, tb.* FROM ( ");
-			sb.append("  select f.num, userId, title, hitCount, TO_CHAR(reg_date, 'YYYY-MM-DD') reg_date, ");
+			sb.append("  select f.num, f.userId, title, hitCount, TO_CHAR(reg_date, 'YYYY-MM-DD') reg_date, ");
 			sb.append("   NVL(replyCount, 0) replyCount FROM freeBoard f");
 			sb.append("    join member1 m ON f.userId = m.userId ");
 			sb.append("     left outer join ( ");
@@ -197,14 +197,14 @@ public class FreeBoardDAO {
 		
 		try {
 			sb.append("select * from ( ");
-			sb.append("     select rownum rnum, tb.* FROM ( ");
-			sb.append("         select f.num, userId, title, hitCount, TO_CHAR(reg_date, 'YYYY-MM-DD') reg_date, ");
-			sb.append("               NVL(replyCount, 0) replyCount FROM freeboard f");
-			sb.append("         join member1 m ON f.userId = m.userId ");
-			sb.append("         left outer join ( ");
-			sb.append("             select num, COUNT(*) replyCount FROM freeBoardReply ");
-			sb.append("             GROUP BY num");
-			sb.append("         ) fbr ON f.num = fbr.num");
+			sb.append(" select rownum rnum, tb.* FROM ( ");
+			sb.append("  select f.num, f.userId, title, hitCount, TO_CHAR(reg_date, 'YYYY-MM-DD') reg_date, ");
+			sb.append("   NVL(replyCount, 0) replyCount FROM freeBoard f");
+			sb.append("    join member1 m ON f.userId = m.userId ");
+			sb.append("     left outer join ( ");
+			sb.append("      select num, COUNT(*) replyCount FROM freeBoardReply ");
+			sb.append("      GROUP BY num");
+			sb.append("   ) fbr ON f.num = fbr.num");
 			if (condition.equals("all")) {
 				sb.append("     WHERE INSTR(title, ?) >= 1 OR INSTR(content, ?) >= 1 ");
 			} else if (condition.equals("reg_date")) {
@@ -265,5 +265,188 @@ public class FreeBoardDAO {
 		return list;
 	}
 	
+	public void updateHitCount(int num) throws SQLException {
+		PreparedStatement pstmt = null;
+		String sql;
+
+		try {
+			sql = "UPDATE freeBoard SET hitCount=hitCount+1 WHERE num=?";
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setInt(1, num);
+			
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			if (pstmt != null) {
+				try {
+					pstmt.close();
+				} catch (SQLException e2) {
+				}
+			}
+		}
+
+	}
+	
+	public FreeBoardDTO readfBoard(int num) {
+		FreeBoardDTO dto = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql;
+		
+		try {
+			sql = "SELECT f.num, f.userId, title, content, reg_date, hitCount, "
+					+ "    NVL(boardLikeCount, 0) boardLikeCount "
+					+ " FROM freeBoard f "
+					+ " JOIN member1 m ON f.userId=m.userId "
+					+ " LEFT OUTER JOIN ("
+					+ "      SELECT num, COUNT(*) boardLikeCount FROM freeBoardLike"
+					+ "      GROUP BY num"
+					+ " ) c ON f.num = c.num"
+					+ " WHERE f.num = ? ";
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setInt(1, num);
+
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()) {
+				dto = new FreeBoardDTO();
+				
+				dto.setNum(rs.getInt("num"));
+				dto.setUserId(rs.getString("userId"));
+				dto.setTitle(rs.getString("title"));
+				dto.setContent(rs.getString("content"));
+				dto.setHitCount(rs.getInt("hitCount"));
+				dto.setReg_date(rs.getString("reg_date"));
+				
+				
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+				}
+			}
+
+			if (pstmt != null) {
+				try {
+					pstmt.close();
+				} catch (SQLException e) {
+				}
+			}
+		}
+
+		return dto;
+	}
+	
+	public void updatefBoard(FreeBoardDTO dto) throws SQLException {
+		PreparedStatement pstmt = null;
+		String sql;
+		
+		try {
+			sql = "UPDATE freeBoard SET title=?, content=? WHERE num=? AND userId=?";
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setString(1, dto.getTitle());
+			pstmt.setString(2, dto.getContent());
+			pstmt.setInt(3, dto.getNum());
+			pstmt.setString(4, dto.getUserId());
+			
+			pstmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			if (pstmt != null) {
+				try {
+					pstmt.close();
+				} catch (SQLException e) {
+				}
+			}
+		}
+	}
+	
+	public void deletefBoard(int num, String userId) throws SQLException {
+		PreparedStatement pstmt = null;
+		String sql;
+		
+		try {
+			if(userId.equals("admin")) {
+				sql = "DELETE FROM freeboard WHERE num=?";
+				pstmt = conn.prepareStatement(sql);
+				
+				pstmt.setInt(1, num);
+				
+				pstmt.executeUpdate();
+			} else {
+				sql = "DELETE FROM freeboard WHERE num=? AND userId=?";
+				
+				pstmt = conn.prepareStatement(sql);
+				
+				pstmt.setInt(1, num);
+				pstmt.setString(2, userId);
+				
+				pstmt.executeUpdate();
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			if (pstmt != null) {
+				try {
+					pstmt.close();
+				} catch (SQLException e) {
+				}
+			}
+		}
+	}
+	
+	public int dataCountReply(int num) {
+		int result = 0;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql;
+		
+		try {
+			sql = "SELECT NVL(COUNT(*), 0) FROM freeboardReply WHERE num=? AND answer=0";
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setInt(1, num);
+			
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()) {
+				result = rs.getInt(1);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+				}
+			}
+				
+			if(pstmt != null) {
+				try {
+					pstmt.close();
+				} catch (SQLException e) {
+				}
+			}
+		}
+		
+		return result;
+	}
 	
 }

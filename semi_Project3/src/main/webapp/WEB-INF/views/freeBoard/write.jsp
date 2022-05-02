@@ -87,20 +87,20 @@ function sendBoard() {
 			<h3><i class="fas fa-clipboard-list"></i> 소통 공간 </h3>
 		</div>
         
-		<form name="boardForm" method="post" enctype="multipart/form-data">
+		<form name="boardForm" method="post" >
 			<table class="table table-border table-form">
 			
 				<tr> 
 					<td>작성자</td>
 					<td align="left"> 
-						<p>&nbsp;&nbsp;&nbsp;작성자${sessionScope.member.userId}</p>
+						<p>&nbsp;&nbsp;&nbsp;${sessionScope.member.userId}</p>
 					</td>
 				</tr>
 				
 				<tr> 
 					<td>제&nbsp;&nbsp;&nbsp;&nbsp;목</td>
 					<td> 
-						<input type="text" name="subject" maxlength="100" placeholder="제목을 입력하세요"
+						<input type="text" name="title" maxlength="100" placeholder="제목을 입력하세요"
 							class="form-control" value="${dto.title}">
 					</td>
 				</tr>

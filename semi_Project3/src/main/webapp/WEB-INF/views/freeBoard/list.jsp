@@ -103,29 +103,18 @@
 			</thead>
 			
 			<tbody>
-					<tr>
-						<td><span class="fboard">1</span></td>
-						<td class="fsubject">제목만 왼쪽으로 가게 하려면?</td>
-						<td>1</td>
-						<td>바로 너</td>
-						<td>지금</td>
-						<td>50</td>
-					</tr>
 					<c:forEach var="dto" items="${list}">
 						<tr>
 							<td><span class="fboard">${dto.listNum}</span></td>
-							<td class="left">
-								<c:forEach var="n" begin="1" end="${dto.depth}">&nbsp;&nbsp;</c:forEach>
-								<c:if test="${dto.depth!=0}">└&nbsp;</c:if>
-								<a href="${articleUrl}&boardNum=${dto.boardNum}">${dto.title}</a>
+							<td class="fsubject">
+								<a href="${articleUrl}&num=${dto.num}">${dto.title}</a>
 							</td>
-							<td>댓글</td>
-							<td>${dto.userNickname}</td>
+							<td>${dto.replyCount}</td>
+							<td>${dto.userId}</td>
 							<td>${dto.reg_date}</td>
 							<td>${dto.hitCount}</td>
 						</tr>
 					</c:forEach>
-					
 			</tbody>
 			
 		</table>
@@ -142,11 +131,11 @@
 				<td align="center">
 					<form name="searchForm" action="${pageContext.request.contextPath}/freeBoard/list.do" method="post">
 						<select name="condition" class="form-select">
-							<option value="all"      ${condition=="all"?"selected='selected'":"" }>제목+내용</option>
+							<option value="all" ${condition=="all"?"selected='selected'":"" }>제목+내용</option>
 							<option value="userId" ${condition=="userId"?"selected='selected'":"" }>작성자</option>
-							<option value="reg_date"  ${condition=="reg_date"?"selected='selected'":"" }>등록일</option>
-							<option value="title"  ${condition=="title"?"selected='selected'":"" }>제목</option>
-							<option value="content"  ${condition=="content"?"selected='selected'":"" }>내용</option>
+							<option value="reg_date" ${condition=="reg_date"?"selected='selected'":"" }>등록일</option>
+							<option value="title" ${condition=="title"?"selected='selected'":"" }>제목</option>
+							<option value="content" ${condition=="content"?"selected='selected'":"" }>내용</option>
 						</select>
 						<input type="text" name="keyword" value="${keyword}" class="form-control">
 						<button type="button" class="btn" onclick="searchList();">검색</button>

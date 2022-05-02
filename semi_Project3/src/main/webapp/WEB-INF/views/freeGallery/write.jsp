@@ -75,6 +75,23 @@
 	cursor: pointer;
 }
 
+
+.img-box {
+	max-width: 600px;
+	padding: 5px;
+	box-sizing: border-box;
+	display: flex; /* 자손요소를 flexbox로 변경 */
+	flex-direction: row; /* 정방향 수평나열 */
+	flex-wrap: nowrap;
+	overflow-x: auto;
+}
+.img-box img {
+	width: 37px; height: 37px;
+	margin-right: 5px;
+	flex: 0 0 auto;
+	cursor: pointer;
+}
+
 </style>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -122,11 +139,13 @@ function sendOk() {
 // 업데이트 모드일 때 이미지 삭제
 <c:if test="${mode=='update'}">
 	function deleteFile(fileNum) {
-		if(confirm('이미지를 삭제하시겠습니까 ? ')) {
-			let query = "num=${dto.num}&page=${page}&fileNum="+fileNum;
-			let url = "${pageContext.request.contextPath}/freeGallery/deleteFile.do?"+query;
-			location.href = url;
+		if(! confirm("이미지를 삭제 하시겠습니까 ?")) {
+			return;
 		}
+		
+		let query = "num=${dto.num}&fileNum=" + fileNum + "&page=${page}";
+		let url = "${pageContext.request.contextPath}/freeGallery/deleteFile.do?" + query;
+		location.href = url;
 	}
 </c:if>
 
@@ -138,10 +157,7 @@ $(function() {
 	
 	// 파일 선택창에서 수정이 발생했을 때
 	$("form input[name=selectFile]").change(function() {
-		$(".img-grid").empty();
-		let $add = $("<img>", {class:"item img-add"});
-		$add.attr("src", "${pageContext.request.contextPath}/resource/images/add_photo.png");
-		$(".img-grid").append($add);
+		
 		
 		if(! this.files){
 			return false;
@@ -212,15 +228,15 @@ $(function() {
 					<td>카&nbsp;테&nbsp;고&nbsp;리</td>
 					<td> 
 						<select name="category" class="form-select">
-							<option value="">분류</option>
-							<option value="daily">일상</option>
-							<option value="food">음식</option>
-							<option value="family">아이/가족</option>
-							<option value="animal">동물</option>
-							<option value="landscape">풍경</option>
-							<option value="nightscape">아경</option>
-							<option value="travel">여행</option>
-							<option value="authentication">인증</option>
+							<option value="" >분류</option>
+							<option value="daily" ${dto.category == "daily"?"selected='selected'":""}>일상</option>
+							<option value="food" ${dto.category == "food"?"selected='selected'":""}>음식</option>
+							<option value="family" ${dto.category == "family"?"selected='selected'":""}>아이/가족</option>
+							<option value="animal" ${dto.category == "animal"?"selected='selected'":""}>동물</option>
+							<option value="landscape" ${dto.category == "landscape"?"selected='selected'":""}>풍경</option>
+							<option value="nightscape" ${dto.category == "nightscape"?"selected='selected'":""}>아경</option>
+							<option value="travel" ${dto.category == "travel"?"selected='selected'":""}>여행</option>
+							<option value="authentication" ${dto.category == "authentication"?"selected='selected'":""}>인증</option>
 						</select>
 					</td>
 				</tr>
@@ -236,13 +252,13 @@ $(function() {
 					<td>제&nbsp;&nbsp;&nbsp;&nbsp;목</td>
 					<td> 
 						<input type="text" name="subject" maxlength="100" placeholder="제목을 입력하세요"
-							class="form-control" value="">
+							class="form-control" value="${dto.subject}">
 					</td>
 				</tr>
 				
 				<tr> 
 					<td colspan="2"> 
-						<textarea name="content" class="form-control" placeholder="내용을 입력하세요"></textarea>
+						<textarea name="content" class="form-control" placeholder="내용을 입력하세요">${dto.content}</textarea>
 					</td>
 				</tr>
 				
@@ -250,27 +266,19 @@ $(function() {
 					<td>파&nbsp;&nbsp;&nbsp;&nbsp;일</td>
 					<td> 
 						<div class="form">
-							<div class="img-grid"><img class="item img-add" src="${pageContext.request.contextPath}/resource/images/add_photo.png"></div>
+							<div class="img-grid"><img class="item img-add" src="${pageContext.request.contextPath}/resource/images/add_photo.png">
+							<c:if test="${mode=='update'}">
+								<c:forEach var="vo" items="${listFile}">
+									<img class="item" src="${pageContext.request.contextPath}/uploads/freeGallery/${vo.imageFilename}"
+										onclick="deleteFile('${vo.fileNum}');">
+								</c:forEach>
+							</c:if>
+							</div>
 							<input type="file" name="selectFile" accept="image/*" multiple="multiple" style="display: none;">
 						</div>
 					</td>
 				</tr>
-				
-				<c:if test="${mode=='update'}">
-					<c:forEach var="vo" items="${listFile}">
-						<tr>
-							<td>등록 이미지</td>
-							<td>
-								<div class="img-box">
-									<c:forEach var="vo" items="${listFile}">
-										<img src="${pageContext.request.contextPath}/uploads/freeGallery/${vo.imageFilename}"
-											onclick="deleteFile('${vo.fileNum}');">
-									</c:forEach>
-								</div>
-							</td>
-						</tr>
-					</c:forEach>
-				</c:if>
+
 			</table>
 				
 			<table class="table">

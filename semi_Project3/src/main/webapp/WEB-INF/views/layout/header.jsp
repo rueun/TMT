@@ -38,7 +38,7 @@
 		</li>
 		<li><a href="#">커뮤니티</a>
 			<ul>
-				<li><a href="#">소통공간</a></li>
+				<li><a href="${pageContext.request.contextPath}/freeBoard/list.do">소통공간</a></li>
 				<li><a href="#">커뮤니티 갤러리</a></li>
 			</ul>			
 		</li>
