@@ -190,7 +190,7 @@ $(function() {
 		$("ul.category li").removeClass("on");
 		$(this).addClass("on");
 		var category = "";
-		switch($(this).val()) {
+		switch($(this).val()) { 
 			case 0 : category = "all"; break;
 			case 1 : category = "일반"; break;
 			case 2 : category = "게시판"; break;
