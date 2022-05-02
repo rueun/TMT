@@ -89,7 +89,7 @@ function sendBoard() {
 <c:if test="${mode=='update'}">
 	function deleteFile(fileNum) {
 		if(confirm('파일을 삭제하시겠습니까 ? ')) {
-			let query = "num=${dto.num}&page=${page}&fileNum="+fileNum;
+			let query = "num=${dto.boardNum}&page=${page}&fileNum="+fileNum;
 			let url = "${pageContext.request.contextPath}/notice/deleteFile.do?"+query;
 			location.href = url;
 		}
@@ -102,7 +102,13 @@ function sendBoard() {
 
 <script type="text/javascript">
 
-<c:if test = "${mode=='reply' || 'update'}">
+<c:if test = "${mode=='update' }">
+	$(function(){
+		$("select[name=categoryType]").val("${dto.categoryType}").prop("selected",true);
+		$("select[name=categoryType]").attr('disabled',true);
+	});
+</c:if>
+<c:if test = "${mode=='reply' }">
 	$(function(){
 		$("select[name=categoryType]").val("${dto.categoryType}").prop("selected",true);
 		$("select[name=categoryType]").attr('disabled',true);
@@ -190,9 +196,13 @@ function sendBoard() {
 						<button type="reset" class="btn">다시입력</button>
 						<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/qnaboard/list.do';">${mode=="update"?"수정취소":"등록취소"}</button>
 						<c:if test="${mode=='update'}">
-							<input type="hidden" name="num" value="${dto.num}">
+							<input type="hidden" name="boardNum" value="${dto.boardNum}">
 							<input type="hidden" name="page" value="${page}">
-							<input type="hidden" name="query" value="${query}">
+							<input type="hidden" name="parent" value="${dto.boardNum}">
+							<input type="hidden" name="page" value="${page}">
+							<input type="hidden" name="condition" value="${condition}">
+							<input type="hidden" name="keyword" value="${keyword}">
+							<input type="hidden" name="categoryType" value="${categoryType}">
 						</c:if>
 						<c:if test="${mode=='reply'}">
 							<input type="hidden" name="groupNum" value="${dto.groupNum}">

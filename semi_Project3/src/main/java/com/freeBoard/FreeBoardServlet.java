@@ -176,19 +176,140 @@ public class FreeBoardServlet extends MyServlet {
 	}
 	
 	private void article(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		FreeBoardDAO dao = new FreeBoardDAO();
+		MyUtil util = new MyUtil();
 		
+		String cp = req.getContextPath();
+
+		String page = req.getParameter("page");
+		String query = "page=" + page;
+		
+		try {
+			int num = Integer.parseInt(req.getParameter("num"));
+			String condition = req.getParameter("condition");
+			String keyword = req.getParameter("keyword");
+			if (condition == null) {
+				condition = "all";
+				keyword = "";
+			}
+			keyword = URLDecoder.decode(keyword, "utf-8");
+
+			if (keyword.length() != 0) {
+				query += "&condition=" + condition + "&keyword=" + URLEncoder.encode(keyword, "UTF-8");
+			}
+			
+			dao.updateHitCount(num);
+			
+			FreeBoardDTO dto = dao.readfBoard(num);
+			if(dto == null) {
+				resp.sendRedirect(cp + "/freeBoard/list.do?" + query);
+				return;
+			}
+			dto.setContent(util.htmlSymbols(dto.getContent()));
+			
+			
+			
+			forward(req, resp, "/WEB-INF/views/freeBoard/article.jsp");
+			return;
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		resp.sendRedirect(cp + "/freeBoard/list.do?" + query);
 	}
 	
 	private void updateForm(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		FreeBoardDAO dao = new FreeBoardDAO();
 		
+
+		String cp = req.getContextPath();
+
+		String page = req.getParameter("page");
+		
+		try {
+			int num = Integer.parseInt(req.getParameter("num"));
+			FreeBoardDTO dto = dao.readfBoard(num);
+			
+			if(dto == null) {
+				resp.sendRedirect(cp + "/freeBoard/list.do?page=" + page);
+				return;
+			}
+			
+			req.setAttribute("dto", dto);
+			req.setAttribute("page", page);
+			req.setAttribute("mode", "update");
+			
+			forward(req, resp, "/WEB-INF/views/freeBoard/write.jsp");
+			return;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		resp.sendRedirect(cp + "/freeBoard/list.do?page=" + page);
 	}
 	
 	private void updateSubmit(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		FreeBoardDAO dao = new FreeBoardDAO();
+		HttpSession session = req.getSession();
+		SessionInfo info = (SessionInfo) session.getAttribute("member");
+		String cp = req.getContextPath();
 		
+		if (req.getMethod().equalsIgnoreCase("GET")) {
+			resp.sendRedirect(cp + "/freeBoard/list.do");
+			return;
+		}
+
+		String page = req.getParameter("page");
+		
+		try {
+			FreeBoardDTO dto = new FreeBoardDTO();
+			
+			dto.setNum(Integer.parseInt(req.getParameter("num")));
+			dto.setTitle(req.getParameter("subject"));
+			dto.setContent(req.getParameter("content"));
+			
+			dto.setUserId(info.getUserId());
+			dao.updatefBoard(dto);
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		resp.sendRedirect(cp + "/freeBoard/list.do?page=" + page);
 	}
 	
 	private void delete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		FreeBoardDAO dao = new FreeBoardDAO();
+		HttpSession session = req.getSession();
+		SessionInfo info = (SessionInfo) session.getAttribute("member");
+		String cp = req.getContextPath();
 		
+		String page = req.getParameter("page");
+		String query = "page=" + page;
+		
+		try {
+			int num = Integer.parseInt(req.getParameter("num"));
+			String condition = req.getParameter("condition");
+			String keyword = req.getParameter("keyword");
+			if (condition == null) {
+				condition = "all";
+				keyword = "";
+			}
+			keyword = URLDecoder.decode(keyword, "utf-8");
+
+			if (keyword.length() != 0) {
+				query += "&condition=" + condition + "&keyword=" + URLEncoder.encode(keyword, "UTF-8");
+			}
+			
+			dao.deletefBoard(num, info.getUserId());
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		resp.sendRedirect(cp + "/freeBoard/list.do?" + query);
 	}
 	
 

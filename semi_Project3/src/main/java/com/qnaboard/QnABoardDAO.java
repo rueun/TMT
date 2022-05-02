@@ -128,15 +128,16 @@ public class QnABoardDAO {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
-			if (pstmt != null) {
-				try {
-					pstmt.close();
-				} catch (SQLException e) {
-				}
-			}
 			if (rs != null) {
 				try {
 					rs.close();
+				} catch (SQLException e) {
+				}
+			}
+			
+			if (pstmt != null) {
+				try {
+					pstmt.close();
 				} catch (SQLException e) {
 				}
 			}
@@ -150,7 +151,7 @@ public class QnABoardDAO {
 		int result = 0;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		StringBuilder sb = new StringBuilder();
+		StringBuffer sb = new StringBuffer();
 
 		try {
 			sb.append("SELECT NVL(COUNT(*), 0) FROM QnAboard b JOIN member1 m ON b.userId = m.userId ");
@@ -211,7 +212,7 @@ public class QnABoardDAO {
 		List<QnABoardDTO> list = new ArrayList<QnABoardDTO>();
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		StringBuilder sb = new StringBuilder();
+		StringBuffer sb = new StringBuffer();
 
 		try {
 			sb.append(" SELECT * FROM ( ");
@@ -275,69 +276,75 @@ public class QnABoardDAO {
 		List<QnABoardDTO> list = new ArrayList<QnABoardDTO>();
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		StringBuilder sb = new StringBuilder();
+		StringBuffer sb = new StringBuffer();
 
 		try {
-			sb.append(" SELECT * FROM ( ");
-			sb.append("     SELECT ROWNUM rnum, tb.* FROM ( ");
-			sb.append("         SELECT boardNum, b.userId, userName, userNickName, categoryType, ");
-			sb.append("               subject, groupNum, orderNo, depth, hitCount, ");
-			sb.append("               TO_CHAR(reg_date, 'YYYY-MM-DD') reg_date ");
-			sb.append("         FROM QnAboard b ");
-			sb.append("         JOIN member1 m ON b.userId = m.userId ");
-			if (keyword.length() != 0) {
-				if (condition.equals("all")) {
-					sb.append("     WHERE ( INSTR(subject, ?) >= 1 OR INSTR(content, ?) >= 1 ) ");
-				} else if (condition.equals("reg_date")) {
-					keyword = keyword.replaceAll("(\\-|\\/|\\.)", "");
-					sb.append("     WHERE TO_CHAR(reg_date, 'YYYYMMDD') = ?");
-				} else {
-					sb.append("     WHERE INSTR(" + condition + ", ?) >= 1 ");
+			
+				sb.append(" SELECT * FROM ( ");
+				sb.append("     SELECT ROWNUM rnum, tb.* FROM ( ");
+				sb.append("         SELECT boardNum, b.userId, userName, userNickName, categoryType, ");
+				sb.append("               subject, groupNum, orderNo, depth, hitCount, ");
+				sb.append("               TO_CHAR(reg_date, 'YYYY-MM-DD') reg_date ");
+				sb.append("         FROM QnAboard b ");
+				sb.append("         JOIN member1 m ON b.userId = m.userId ");
+				if (keyword.length() != 0) {
+					if (condition.equals("all")) {
+						sb.append("     WHERE ( INSTR(subject, ?) >= 1 OR INSTR(content, ?) >= 1 ) ");
+					} else if (condition.equals("reg_date")) {
+						keyword = keyword.replaceAll("(\\-|\\/|\\.)", "");
+						sb.append("     WHERE TO_CHAR(reg_date, 'YYYYMMDD') = ?");
+					} else {
+						sb.append("     WHERE INSTR(" + condition + ", ?) >= 1 ");
+					}
 				}
-			}
-			if (keyword.length() != 0 && !categoryType.equals("all")) {
-				sb.append(" AND categoryType='" + categoryType + "' ");
-			} else if (keyword.length() == 0 && !categoryType.equals("all")) {
-				sb.append(" WHERE categoryType='" + categoryType + "' ");
-			}
-			sb.append("         ORDER BY groupNum DESC, orderNo ASC ");
-			sb.append("     ) tb WHERE ROWNUM <= ? ");
-			sb.append(" ) WHERE rnum >= ? ");
+				if (keyword.length() != 0 && !categoryType.equals("all")) {
+					sb.append(" AND categoryType='" + categoryType + "' ");
+				} else if (keyword.length() == 0 && !categoryType.equals("all")) {
+					sb.append(" WHERE categoryType='" + categoryType + "' ");
+				}
+				sb.append("         ORDER BY groupNum DESC, orderNo ASC ");
+				sb.append("     ) tb WHERE ROWNUM <= ? ");
+				sb.append(" ) WHERE rnum >= ? ");
 
-			pstmt = conn.prepareStatement(sb.toString());
-			if (keyword.length() != 0 && condition.equals("all")) {
-				pstmt.setString(1, keyword);
-				pstmt.setString(2, keyword);
-				pstmt.setInt(3, end);
-				pstmt.setInt(4, start);
-			} else if (keyword.length() != 0 && !condition.equals("all")) {
-				pstmt.setString(1, keyword);
-				pstmt.setInt(2, end);
-				pstmt.setInt(3, start);
-			} else if (keyword.length() == 0) {
-				pstmt.setInt(1, end);
-				pstmt.setInt(2, start);
-			}
+				System.out.println(sb.toString());
+				
+				pstmt = conn.prepareStatement(sb.toString());
+				
+				if (keyword.length() != 0 && condition.equals("all")) {
+					pstmt.setString(1, keyword);
+					pstmt.setString(2, keyword);
+					pstmt.setInt(3, end);
+					pstmt.setInt(4, start);
+				} else if (keyword.length() != 0 && !condition.equals("all")) {
+					pstmt.setString(1, keyword);
+					pstmt.setInt(2, end);
+					pstmt.setInt(3, start);
+				} else if (keyword.length() == 0) {
+					pstmt.setInt(1, end);
+					pstmt.setInt(2, start);
+				}
 
-			rs = pstmt.executeQuery();
+				rs = pstmt.executeQuery();
 
-			while (rs.next()) {
-				QnABoardDTO dto = new QnABoardDTO();
+				while (rs.next()) {
+					QnABoardDTO dto = new QnABoardDTO();
 
-				dto.setBoardNum(rs.getInt("boardNum"));
-				dto.setUserId(rs.getString("userId"));
-				dto.setUserName(rs.getString("userName"));
-				dto.setUserNickName(rs.getString("userNickName"));
-				dto.setCategoryType(rs.getString("categoryType"));
-				dto.setSubject(rs.getString("subject"));
-				dto.setGroupNum(rs.getInt("groupNum"));
-				dto.setDepth(rs.getInt("depth"));
-				dto.setOrderNo(rs.getInt("orderNo"));
-				dto.setHitCount(rs.getInt("hitCount"));
-				dto.setReg_date(rs.getString("reg_date"));
+					dto.setBoardNum(rs.getInt("boardNum"));
+					dto.setUserId(rs.getString("userId"));
+					dto.setUserName(rs.getString("userName"));
+					dto.setUserNickName(rs.getString("userNickName"));
+					dto.setCategoryType(rs.getString("categoryType"));
+					dto.setSubject(rs.getString("subject"));
+					dto.setGroupNum(rs.getInt("groupNum"));
+					dto.setDepth(rs.getInt("depth"));
+					dto.setOrderNo(rs.getInt("orderNo"));
+					dto.setHitCount(rs.getInt("hitCount"));
+					dto.setReg_date(rs.getString("reg_date"));
 
-				list.add(dto);
-			}
+					list.add(dto);
+				}
+				
+		
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -611,6 +618,31 @@ public class QnABoardDAO {
 
 	// 게시물 수정
 	public void updateBoard(QnABoardDTO dto) throws SQLException {
+		PreparedStatement pstmt = null;
+		String sql;
+		
+		try {
+			sql = "UPDATE QnAboard SET subject =?, content=? WHERE boardNum =? AND userId = ? ";
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setString(1, dto.getSubject());
+			pstmt.setString(2, dto.getContent());
+			pstmt.setInt(3, dto.getBoardNum());
+			pstmt.setString(4, dto.getUserId());
+			
+			pstmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			if(pstmt != null) {
+				try {
+					pstmt.close();
+				} catch (SQLException e2) {
+				}
+			}
+		}
 	}
 
 	// 게시물 삭제
