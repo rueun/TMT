@@ -12,6 +12,42 @@
 <jsp:include page="/WEB-INF/views/layout/staticHeader.jsp"/>
 <style type="text/css">
 
+.page-box {
+	clear: both;
+	padding: 20px 0;
+	text-align: center;
+}
+.paginate {
+	clear: both;
+	text-align: center;
+	white-space: nowrap;
+	font-size: 14px;	
+}
+.paginate a {
+	border: 1px solid #ccc;
+	color: #000;
+	font-weight: 600;
+	text-decoration: none;
+	padding: 3px 7px;
+	margin-left: 3px;
+	vertical-align: middle;
+}
+.paginate a:hover, .paginate a:active {
+	color: #FF5E00;
+}
+.paginate span {
+	border: 1px solid #FFBB00;
+	color: #FF5E00;
+	font-weight: 600;
+	padding: 3px 7px;
+	margin-left: 3px;
+	vertical-align: middle;
+}
+.paginate :first-child {
+	margin-left: 0;
+}
+
+
 .body-container {
     margin: 0 auto 15px;
     width: 700px;

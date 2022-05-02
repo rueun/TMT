@@ -63,8 +63,6 @@ public class NoticeServlet extends MyUploadServlet {
 			delete(req, resp);
 		} else if(uri.indexOf("deleteFile.do") != -1) {
 			deleteFile(req, resp);
-		} else if(uri.indexOf("deleteList.do") != -1) {
-			deleteList(req, resp);
 		} else if(uri.indexOf("download.do") != -1) {
 			download(req, resp);
 		}
@@ -413,21 +411,17 @@ public class NoticeServlet extends MyUploadServlet {
 				return;
 			}
 			
-			// 작성중~!
 			List<NoticeDTO> listFile = dao.listNoticeFile(num);
-			
-			req.setAttribute("dto", dto);
-			req.setAttribute("listFile", listFile);
-			req.setAttribute("page", page);
-			req.setAttribute("mode", "update");
-			
-			dao.deleteNotice(num);
+
 			dao.deleteNoticeFile(query, num);
+			dao.deleteNotice(num);
+
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
-		
+		resp.sendRedirect(cp+"/notice/list.do?page="+page);
 		
 		
 	}
@@ -471,19 +465,13 @@ public class NoticeServlet extends MyUploadServlet {
 	}
 	
 	
-	// 게시글 리스트 삭제
-	protected void deleteList(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
-	}
-	
-	
 	// 파일 다운로드
 	protected void download(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		NoticeDAO dao = new NoticeDAO();
 		boolean b = false;
 		try {
 			int fileNum = Integer.parseInt(req.getParameter("numFile"));
-			NoticeDTO dto = dao.readNotice(fileNum);
+			NoticeDTO dto = dao.readNoticeFile(fileNum);
 			
 			if(dto != null) {
 				b = FileManager.doFiledownload(dto.getSaveFilename(),
