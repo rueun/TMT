@@ -11,6 +11,30 @@
 <jsp:include page="/WEB-INF/views/layout/staticHeader.jsp"/>
 
 <style type="text/css">
+.body-container {
+    margin: 0 auto 15px;
+    width: 900px;
+    min-height: 450px;
+}
+
+.body-title {
+    color: #424951;
+    padding-top: 25px;
+    padding-bottom: 5px;
+    margin: 0 0 25px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.body-title h3 {
+    font-size: 23px;
+    min-width: 300px;
+    font-family: "Malgun Gothic", "맑은 고딕", NanumGothic, 나눔고딕, 돋움, sans-serif;
+    font-weight: bold;
+    margin: 0 0 -5px 0;
+    padding-bottom: 5px;
+    display: inline-block;
+    border-bottom: 3px solid #424951;
+}
 .table-form td {
 	padding: 7px 0;
 }
@@ -37,8 +61,13 @@
 .msg-box {
 	text-align: center; color: blue;
 }
+.profile {
+	width: 100px;
+	height: 100px;
+}
 </style>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script type="text/javascript">
 function memberOk() {
 	const f = document.memberForm;
@@ -139,6 +168,47 @@ function changeEmail() {
         f.email1.focus();
     }
 }
+
+//이미지 파일 선택
+$(function() {
+	$("body").on("click", ".profile", function() {
+		$("form input[name=selectFile]").trigger("click");
+		
+	});
+	
+	// 파일 선택창에서 수정이 발생했을 때
+	$("form input[name=selectFile]").change(function() {
+		
+		if(! this.files){
+			return false;
+		}
+		const fileArr = Array.from(this.files); // 유사배열을 배열로 변환
+		
+		fileArr.forEach((file, index)=>{
+			const reader = new FileReader();
+			$profile = $(".profile");
+			$profile.attr("data-filename", file.name);
+			reader.onload = e => {
+				$profile.attr("src", e.target.result);
+			};
+			reader.readAsDataURL(file);
+		});
+		$('.profileReset').css('display', 'block');
+	});
+	
+	$("body").on("click", ".profileReset", function() {
+		$('form input[name=selectFile]').val(''); // 파일 초기화
+		$profile.attr("src", "${pageContext.request.contextPath}/resource/images/add_photo.png");
+		$profile.removeAttr("data-filename");
+		$('.profileReset').css('display', 'none');
+	});
+	
+	$("body").on("click", "form button[type=reset]", function() {
+		$(".profileReset").trigger("click");
+		
+	});
+	
+});
 </script>
 </head>
 <body>
@@ -153,8 +223,18 @@ function changeEmail() {
             <h3><i class="fas fa-user"></i> ${title} </h3>
         </div>
         
-		<form name="memberForm" method="post">
+		<form name="memberForm" method="post" enctype="multipart/form-data">
 		<table class="table table-border table-form">
+			<tr>
+				<td>프&nbsp;로&nbsp;필<br>사&nbsp;진</td>
+				<td>
+					<img class="profile" name="userprofile" src="${pageContext.request.contextPath}/resource/images/add_photo.png">
+					<input type="file" name="selectFile" accept="image/*" style="display: none;" >
+					<div>
+						<input type="button" class="btn profileReset" value="기본 이미지" style="display: none;">
+					</div>
+				</td>
+			</tr>
 			<tr>
 				<td>아&nbsp;이&nbsp;디</td>
 				<td>
@@ -294,7 +374,9 @@ function changeEmail() {
 				    <button type="button" class="btn" name="btnOk" onclick="memberOk();"> ${mode=="member"?"회원가입":"정보수정"} </button>
 				    <button type="reset" class="btn"> 다시입력 </button>
 				    <button type="button" class="btn" 
-				    	onclick="javascript:location.href='${pageContext.request.contextPath}/';"> ${mode=="member"?"가입취소":"수정취소"} </button>
+				    	onclick="javascript:location.href='${pageContext.request.contextPath}/';"> ${mode=="member"?"가입취소":"수정취소"}
+				    </button>
+				    
 				</td>
 			</tr>
 			

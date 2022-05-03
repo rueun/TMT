@@ -1405,7 +1405,7 @@ public class FreeGalleryDAO {
 		try {
 			sb.append(" SELECT * FROM ( ");
 			sb.append("     SELECT ROWNUM rnum, tb.* FROM ( ");
-			sb.append("         SELECT r.replyNum, r.userId, userNickName, num, content, r.reg_date, ");
+			sb.append("         SELECT r.replyNum, r.userId, userNickName, imagefilename, num, content, r.reg_date, ");
 			sb.append("                NVL(answerCount, 0) answerCount, ");
 			sb.append("                NVL(likeCount, 0) likeCount, ");
 			sb.append("                NVL(disLikeCount, 0) disLikeCount ");
@@ -1442,6 +1442,7 @@ public class FreeGalleryDAO {
 				dto.setNum(rs.getInt("num"));
 				dto.setUserId(rs.getString("userId"));
 				dto.setUserNickName(rs.getString("userNickName"));
+				dto.setImageFileName(rs.getString("imagefilename"));
 				dto.setContent(rs.getString("content"));
 				dto.setReg_date(rs.getString("reg_date"));
 				dto.setAnswerCount(rs.getInt("answerCount"));
@@ -1563,7 +1564,7 @@ public class FreeGalleryDAO {
 		StringBuilder sb=new StringBuilder();
 		
 		try {
-			sb.append(" SELECT replyNum, num, r.userId, userNickName, content, reg_date, answer ");
+			sb.append(" SELECT replyNum, num, r.userId, userNickName, imagefilename, content, reg_date, answer ");
 			sb.append(" FROM freeGalReply r ");
 			sb.append(" JOIN member1 m ON r.userId=m.userId ");
 			sb.append(" WHERE answer=? ");
@@ -1581,6 +1582,7 @@ public class FreeGalleryDAO {
 				dto.setNum(rs.getInt("num"));
 				dto.setUserId(rs.getString("userId"));
 				dto.setUserNickName(rs.getString("userNickName"));
+				dto.setImageFileName(rs.getString("imagefilename"));
 				dto.setContent(rs.getString("content"));
 				dto.setReg_date(rs.getString("reg_date"));
 				dto.setAnswer(rs.getInt("answer"));
