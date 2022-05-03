@@ -3,6 +3,7 @@ package com.buy;
 public class TradebuyDTO {
 	private int buyNum;
 	private String userId;
+	private String userNickName;
 	private String subject;
 	private String content;
 	private int hitCount;
@@ -57,6 +58,12 @@ public class TradebuyDTO {
 	}
 	public void setReg_date(String reg_date) {
 		this.reg_date = reg_date;
+	}
+	public String getUserNickName() {
+		return userNickName;
+	}
+	public void setUserNickName(String userNickName) {
+		this.userNickName = userNickName;
 	}
 	
 	

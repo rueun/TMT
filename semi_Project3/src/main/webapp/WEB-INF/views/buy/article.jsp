@@ -24,8 +24,8 @@ font-size: 24px;
 <c:if test="${sessionScope.member.userId==dto.userId || sessionScope.member.userId=='admin'}">
 	function deletePhoto() {
 	    if(confirm("게시글을 삭제 하시 겠습니까 ? ")) {
-		    let query = "num=${dto.num}&page=${page}";
-		    let url = "${pageContext.request.contextPath}/photo/delete.do?" + query;
+		    let query = "buyNum=${dto.buyNum}&page=${page}";
+		    let url = "${pageContext.request.contextPath}/buy/delete.do?" + query;
 	    	location.href = url;
 	    }
 	}
@@ -56,7 +56,7 @@ font-size: 24px;
 			<tbody>
 				<tr>
 					<td width="50%">
-						이름 : ${dto.userName}
+						작성자 : ${dto.userNickName}
 					</td>
 					<td align="right">
 						${dto.reg_date}
@@ -66,11 +66,14 @@ font-size: 24px;
 					<td colspan="2" width="50%">
 						가격 : ${dto.price}
 					</td>
+					<td align="right">
+						조회수 : ${dto.hitCount}
+					</td>
 				</tr>
 				
 				<tr style="border-bottom: none;">
 					<td colspan="2" style="padding-bottom: 0;">
-						<img src="${pageContext.request.contextPath}/uploads/photo/${dto.imageFilename}" class="img">
+						<img src="${pageContext.request.contextPath}/uploads/buy/${dto.imageFilename}" class="img">
 					</td>
 				</tr>
 	
@@ -87,7 +90,7 @@ font-size: 24px;
 				<td width="50%">
 					<c:choose>
 						<c:when test="${sessionScope.member.userId==dto.userId}">
-							<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/photo/update.do?num=${dto.num}&page=${page}';">수정</button>
+							<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/buy/update.do?buyNum=${dto.buyNum}&page=${page}';">수정</button>
 						</c:when>
 						<c:otherwise>
 							<button type="button" class="btn" disabled="disabled">수정</button>
@@ -104,7 +107,7 @@ font-size: 24px;
 			    	</c:choose>
 				</td>
 				<td align="right">
-					<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/photo/list.do?page=${page}';">리스트</button>
+					<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/buy/list.do?page=${page}';">리스트</button>
 				</td>
 			</tr>
 		</table>
