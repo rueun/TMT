@@ -38,11 +38,11 @@ public void insertInfoBoard(InfoBoardDTO dto) throws SQLException {
 		
 		
 		// 테이블에 게시물 추가 -> num의 값은 위에서 저장했기에 그 값을 넣어준다.
-		sql = "INSERT INTO infoboard (num, userId, subject, content, hitCount, reg_date) "
+		sql = "INSERT INTO infoboard (boardNum, userId, subject, content, hitCount, reg_date) "
 				+ " VALUES (?, ?, ?, ?, 0, SYSDATE)";
 		pstmt = conn.prepareStatement(sql);
 		
-		pstmt.setInt(1, dto.getNum());
+		pstmt.setInt(1, dto.getBoardNum());
 		pstmt.setString(2, dto.getUserId());
 		pstmt.setString(3, dto.getSubject());
 		pstmt.setString(4, dto.getContent());
@@ -192,10 +192,10 @@ public List<InfoBoardDTO> listInfoBoard(int start, int end) {
 	try {
 		sb.append(" SELECT * FROM ( ");
 		sb.append("    SELECT ROWNUM rnum, tb.* FROM ( ");
-		sb.append("       SELECT num, subject, userName, hitCount, ");
+		sb.append("       SELECT boardNum, subject, userName, hitCount, ");
 		sb.append("          reg_date FROM infoboard n ");
 		sb.append("          JOIN member1 m ON n.userId = m.userId ");
-		sb.append("          ORDER BY num DESC ");
+		sb.append("          ORDER BY boardNum DESC ");
 		sb.append("       )tb WHERE ROWNUM <= ? ");
 		sb.append("   )WHERE rnum >= ? ");
 		
@@ -206,7 +206,7 @@ public List<InfoBoardDTO> listInfoBoard(int start, int end) {
 		rs = pstmt.executeQuery();
 		while(rs.next()) {
 			InfoBoardDTO dto = new InfoBoardDTO();
-			dto.setNum(rs.getInt("num"));
+			dto.setNum(rs.getInt("boardNum"));
 			dto.setSubject(rs.getString("subject"));
 			dto.setUserName(rs.getString("userName"));
 			dto.setHitCount(rs.getInt("hitCount"));
@@ -245,7 +245,7 @@ public List<InfoBoardDTO> listInfoBoard(int start, int end, String condition, St
 	try {
 		sb.append(" SELECT * FROM ( ");
 		sb.append("    SELECT ROWNUM rnum, tb.* FROM ( ");
-		sb.append("       SELECT num, subject, userName, hitCount, ");
+		sb.append("       SELECT boardNum, subject, userName, hitCount, ");
 		sb.append("          reg_date FROM infoboard n ");
 		sb.append("          JOIN member1 m ON n.userId = m.userId ");
 		
@@ -264,7 +264,7 @@ public List<InfoBoardDTO> listInfoBoard(int start, int end, String condition, St
 		else {
 			sb.append(" WHERE INSTR(" + condition + ", ?) >= 1 ");
 		}
-		sb.append("          ORDER BY num DESC ");
+		sb.append("          ORDER BY boardNum DESC ");
 		sb.append("       )tb WHERE ROWNUM <= ? ");
 		sb.append("   )WHERE rnum >= ? ");
 			
@@ -286,7 +286,7 @@ public List<InfoBoardDTO> listInfoBoard(int start, int end, String condition, St
 		rs = pstmt.executeQuery();
 		while(rs.next()) {
 			InfoBoardDTO dto = new InfoBoardDTO();
-			dto.setNum(rs.getInt("num"));
+			dto.setNum(rs.getInt("boardNum"));
 			dto.setSubject(rs.getString("subject"));
 			dto.setUserName(rs.getString("userName"));
 			dto.setHitCount(rs.getInt("hitCount"));
@@ -316,26 +316,26 @@ public List<InfoBoardDTO> listInfoBoard(int start, int end, String condition, St
 	return list;
 }
 
-public InfoBoardDTO readInfoBoard(int num) {
+public InfoBoardDTO readInfoBoard(int boardNum) {
 	InfoBoardDTO dto = null;
 	PreparedStatement pstmt = null;
 	ResultSet rs = null;
 	String sql;
 	
 	try {
-		sql = "SELECT num, n.userId, UserName, subject, content, hitCount, reg_date "
+		sql = "SELECT boardNum, n.userId, UserName, subject, content, hitCount, reg_date "
 				+ " FROM infoboard n "
 				+ " JOIN member1 m ON n.userId = m.userId "
-				+ " WHERE num = ? ";
+				+ " WHERE boardNum = ? ";
 		pstmt = conn.prepareStatement(sql);
-		pstmt.setInt(1, num);
+		pstmt.setInt(1, boardNum);
 		
 		rs = pstmt.executeQuery();
 		
 		if(rs.next()) {
 			dto = new InfoBoardDTO();
 			
-			dto.setNum(rs.getInt("num"));
+			dto.setNum(rs.getInt("boardNum"));
 			dto.setUserId(rs.getString("UserId"));
 			dto.setUserName(rs.getString("UserName"));
 			dto.setSubject(rs.getString("subject"));
@@ -367,14 +367,14 @@ public InfoBoardDTO readInfoBoard(int num) {
 }
 
 //조회수
-public void updateHitCount(int num) throws Exception {
+public void updateHitCount(int boardNum) throws Exception {
 		PreparedStatement pstmt = null;
 		String sql;
 		
 		try {
-			sql = "UPDATE infoboard SET hitCount=hitCount+1 WHERE num=?";
+			sql = "UPDATE infoboard SET hitCount=hitCount+1 WHERE boardNum=?";
 			pstmt = conn.prepareStatement(sql);
-			pstmt.setInt(1, num);
+			pstmt.setInt(1, boardNum);
 			pstmt.executeUpdate();
 			
 		} catch (Exception e) {
@@ -391,7 +391,7 @@ public void updateHitCount(int num) throws Exception {
 }
 
 //해당 게시물의 모든 첨부파일 리스트 가져오기
-	public List<InfoBoardDTO> listInfoFile(int num) {
+	public List<InfoBoardDTO> listInfoFile(int boardNum) {
 		List<InfoBoardDTO> list = new ArrayList<InfoBoardDTO>();
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -399,9 +399,9 @@ public void updateHitCount(int num) throws Exception {
 		
 		try {
 			sql = "SELECT fileNum, saveFilename, originalFilename FROM infofile "
-					+ " WHERE num = ?";
+					+ " WHERE boardNum = ?";
 			pstmt = conn.prepareStatement(sql);
-			pstmt.setInt(1, num);
+			pstmt.setInt(1, boardNum);
 			
 			rs=pstmt.executeQuery();
 			while(rs.next()) {
@@ -441,7 +441,7 @@ public void updateHitCount(int num) throws Exception {
 		String sql;
 		
 		try {
-			sql = "SELECT fileNum, num, saveFilename, originalFilename FROM infoile "
+			sql = "SELECT fileNum, boardNum, saveFilename, originalFilename FROM infoile "
 					+ " WHERE fileNum = ?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setInt(1, fileNum);
@@ -451,7 +451,7 @@ public void updateHitCount(int num) throws Exception {
 				dto = new InfoBoardDTO();
 				
 				dto.setFileNum(rs.getInt("fileNum"));
-				dto.setNum(rs.getInt("num"));
+				dto.setNum(rs.getInt("boardNum"));
 				dto.setSaveFilename(rs.getString("saveFilename"));
 				dto.setOriginalFilename(rs.getString("originalFilename"));
 			}
@@ -497,7 +497,7 @@ public void updateHitCount(int num) throws Exception {
 			
 			// 추가할 첨부파일이 존재하는 경우
 			if(dto.getSaveFiles() != null) {
-				sql = "INSERT INTO infoile(fileNum, num, saveFilename, originalFilename) "
+				sql = "INSERT INTO infofile(fileNum, num, saveFilename, originalFilename) "
 						+ " VALUES(infofile_seq.NEXTVAL, ?, ?, ?)";
 				
 				for(int i=0; i<dto.getSaveFiles().length; i++) {

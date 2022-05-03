@@ -264,7 +264,7 @@ public class InfoServlet extends MyUploadServlet {
 			
 			InfoBoardDTO dto = dao.readInfoBoard(num);
 			if(dto == null) {
-				resp.sendRedirect(cp+"/notice/list.do?"+query);
+				resp.sendRedirect(cp+"/infoBoard/list.do?"+query);
 			}
 			dto.setContent(dto.getContent().replaceAll("\n", "<br>"));
 			
