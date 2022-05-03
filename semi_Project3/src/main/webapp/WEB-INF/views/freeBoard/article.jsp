@@ -38,6 +38,31 @@
 	padding: 10px;
 }
 
+.body-container {
+    margin: 0 auto 15px;
+    width: 900px;
+    min-height: 450px;
+}
+
+.body-title {
+    color: #424951;
+    padding-top: 25px;
+    padding-bottom: 5px;
+    margin: 0 0 25px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.body-title h3 {
+    font-size: 23px;
+    min-width: 300px;
+    font-family: "Malgun Gothic", "맑은 고딕", NanumGothic, 나눔고딕, 돋움, sans-serif;
+    font-weight: bold;
+    margin: 0 0 -5px 0;
+    padding-bottom: 5px;
+    display: inline-block;
+    border-bottom: 3px solid #424951;
+}
+
 .sub-info {
 	width: 100%;
 	padding: 16px;
@@ -192,7 +217,7 @@ li {list-style: none;}
 <c:if test="${sessionScope.member.userId==dto.userId || sessionScope.member.userId=='admin'}">
 	function deletePhoto() {
 	    if(confirm("글을 삭제하시겠습니까 ? ")) {
-		    let query = "num=${dto.num}&page=${page}";
+		    let query = "num=${dto.num}&${query}";
 		    let url = "${pageContext.request.contextPath}/freeBoard/delete.do?" + query;
 	    	location.href = url;
 	    }
@@ -226,38 +251,35 @@ $(document).ready(function(){
 <header>
 	<jsp:include page="/WEB-INF/views/layout/header.jsp"></jsp:include>
 </header>
-	
+
 <main>
 	<div class="body-container" style="width: 900px; margin: auto;">
-		<div class="boardname">
-			<h3> 소통 공간 </h3>
+		<div class="body-title">
+			<h3><i class="boardname"></i> 소통 공간 </h3>
 		</div>
 		
-		<h2>
+		<h1>
        		${dto.title}
-       	</h2>
+       	</h1>
        	
        	<div class="sub-info">
        		<div>
-	       		<span>작성자 : ${dto.userId}</span>
+	       		<span>작성자</span>
 	       		<span>${dto.userId}</span>
        		</div>
        		<div>
-	       		<span>작성일 : </span>
+	       		<span>작성일</span>
 	       		<span>${dto.reg_date}</span>
        		</div>
        		<div>
-	       		<span>조회수 : </span>
+	       		<span>조회수</span>
 	       		<span>${dto.hitCount}</span>
        		</div>
 
        	</div>
 
        	<div class="contents">
-       		<p>
-       			<span>${dto.content}</span>
-       			<span>내용이 나와야 함</span>
-       		</p>
+       		<p>${dto.content}</p>
        		<div>
        		
        		</div>
@@ -269,7 +291,6 @@ $(document).ready(function(){
       			</div>
     		</div>
        	</div>
-        
         <div class="area_reply">
         	<strong class="tit_reply"><span id="commentCount9543_0">2</span> Comments</strong>
         	<div class="entry_comment">

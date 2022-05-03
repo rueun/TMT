@@ -14,6 +14,7 @@ public class FreeBoardDTO {
 	private int orderNo;
 	private int depth;
 	private int parent;
+	private int likeCount;
 	private int replyCount;
 	
 	public int getListNum() {
@@ -99,6 +100,12 @@ public class FreeBoardDTO {
 	}
 	public void setTitle(String title) {
 		this.title = title;
+	}
+	public int getLikeCount() {
+		return likeCount;
+	}
+	public void setLikeCount(int likeCount) {
+		this.likeCount = likeCount;
 	}
 	
 	

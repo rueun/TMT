@@ -25,13 +25,13 @@ public class FreeBoardServlet extends MyServlet {
 		
 		String uri = req.getRequestURI();
 		
-		HttpSession session = req.getSession();
-		SessionInfo info = (SessionInfo)session.getAttribute("member");
-		
-		if (info == null) {
-			forward(req, resp, "/WEB-INF/views/member/login.jsp");
-			return;
-		}
+//		HttpSession session = req.getSession();
+//		SessionInfo info = (SessionInfo)session.getAttribute("member");
+//		
+//		if (info == null) {
+//			forward(req, resp, "/WEB-INF/views/member/login.jsp");
+//			return;
+//		}
 		
 		if(uri.indexOf("list.do") != -1) {
 			list(req, resp);
@@ -179,6 +179,7 @@ public class FreeBoardServlet extends MyServlet {
 		FreeBoardDAO dao = new FreeBoardDAO();
 		MyUtil util = new MyUtil();
 		
+		
 		String cp = req.getContextPath();
 
 		String page = req.getParameter("page");
@@ -207,6 +208,9 @@ public class FreeBoardServlet extends MyServlet {
 			}
 			dto.setContent(util.htmlSymbols(dto.getContent()));
 			
+			req.setAttribute("dto", dto);
+			req.setAttribute("page", page);
+			req.setAttribute("query", query);
 			
 			
 			forward(req, resp, "/WEB-INF/views/freeBoard/article.jsp");

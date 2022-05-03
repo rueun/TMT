@@ -320,8 +320,8 @@ public class FreeBoardDAO {
 				dto.setUserId(rs.getString("userId"));
 				dto.setTitle(rs.getString("title"));
 				dto.setContent(rs.getString("content"));
-				dto.setHitCount(rs.getInt("hitCount"));
 				dto.setReg_date(rs.getString("reg_date"));
+				dto.setHitCount(rs.getInt("hitCount"));
 				
 				
 			}
