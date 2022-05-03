@@ -93,6 +93,12 @@ public class MainServlet extends MyServlet{
 			// 포워딩할 JSP에 전달할 속성
 			req.setAttribute("listTradebuy", listTradebuy);
 			
+			// 팝니다 이미지 가져오기
+			List<TradeDTO> listTradeImage = null;
+			listTradeImage = dao.listTradeImage();
+			// 포워딩할 JSP에 전달할 속성
+			req.setAttribute("listTradeImage", listTradeImage);
+			
 			// 팝니다 게시물 가져오기
 			List<TradeDTO> listTrade = null;
 			listTrade = dao.listTrade();

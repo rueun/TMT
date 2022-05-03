@@ -401,6 +401,61 @@ public class MainDAO {
 		return list;
 	}
 	
+	// 팝니다 이미지 리스트
+	public List<TradeDTO> listTradeImage() {
+		List<TradeDTO> list = new ArrayList<TradeDTO>();
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		StringBuilder sb = new StringBuilder();
+		
+		try {
+			sb.append(" SELECT * FROM ( ");
+			sb.append("     SELECT ROWNUM rnum, tb.* FROM ( ");
+			sb.append("         SELECT tradeNum, p.userId, subject, price, p.imageFilename, hitCount, ");
+			sb.append("               TO_CHAR(reg_date, 'YYYY-MM-DD') reg_date ");
+			sb.append("         FROM trade p ");
+			sb.append("         JOIN member1 m ON p.userId = m.userId ");
+			sb.append("         ORDER BY hitCount DESC ");
+			sb.append("     ) tb WHERE ROWNUM <= 4 ");
+			sb.append(" ) WHERE rnum >= 1 ");	
+			//
+			pstmt = conn.prepareStatement(sb.toString());
+			
+			
+			rs = pstmt.executeQuery();
+			
+			while (rs.next()) {
+				TradeDTO dto = new TradeDTO();
+				
+				dto.setTradeNum(rs.getInt("tradeNum"));
+				dto.setUserId(rs.getString("userId"));
+				dto.setSubject(rs.getString("subject"));
+				dto.setPrice(rs.getString("price"));
+				dto.setImageFilename(rs.getString("imageFilename"));
+				dto.setReg_date(rs.getString("reg_date"));
+				
+				list.add(dto);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+				}
+			}
+			if(pstmt != null) {
+				try {
+					pstmt.close();
+				} catch (SQLException e) {
+				}
+			}
+		}
+		
+		return list;
+	}
+	
 	// 팝니다 리스트
 	public List<TradeDTO> listTrade() {
 		List<TradeDTO> list = new ArrayList<TradeDTO>();
@@ -429,6 +484,7 @@ public class MainDAO {
 				
 				dto.setTradeNum(rs.getInt("tradeNum"));
 				dto.setUserId(rs.getString("userId"));
+				dto.setHitCount(rs.getInt("hitCount"));
 				dto.setSubject(rs.getString("subject"));
 				dto.setPrice(rs.getString("price"));
 				dto.setImageFilename(rs.getString("imageFilename"));
@@ -485,6 +541,7 @@ public class MainDAO {
 				dto.setBuyNum(rs.getInt("buyNum"));
 				dto.setUserId(rs.getString("userId"));
 				dto.setSubject(rs.getString("subject"));
+				dto.setHitCount(rs.getInt("hitCount"));
 				dto.setPrice(rs.getString("price"));
 				dto.setImageFilename(rs.getString("imageFilename"));
 				dto.setReg_date(rs.getString("reg_date"));

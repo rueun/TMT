@@ -148,7 +148,6 @@ hr.hr {
 
 .list-container {
 	width: 100%;
-	height: 430px;
 }
 
 
@@ -240,6 +239,84 @@ hr.hr {
 	
 <main style="margin-top : 200px">
 	<div class="body-container" style="width: 1200px;">
+		
+		<h4 class="h4 h4-left">
+    		<a class="list-a">
+    			<img src="https://humorpick.com/thema/Miso-Simple/img/menu_best.png" alt="베스트" width="20px" title="">
+    			<b class="main-font">갤러리 랭킹</b>
+    		</a>
+    	</h4>
+    	<div class="more">
+			<a href="">
+				<img src="https://humorpick.com/thema/Miso-Simple/img/more.png" alt="더보기" width="24px" title="">
+			</a>
+		</div>
+		
+		<hr class="hr hr-both">
+		<div class="list-container">
+    		<ul>
+    			
+    			<!-- 갤러리 랭킹 1 -->
+    			<li class="item">
+    				<div class="item-box">
+    					<c:forEach var="image" items="${imageListFreeGallery}" begin="0" end="0">
+    					<a href="${pageContext.request.contextPath }/freeGallery/article.do?num=${image.num}" class="list-a">
+    						<img src="${pageContext.request.contextPath}/uploads/freeGallery/${image.imageFilename}" >
+	    					<span class="sp-subj ellipsis">
+	    						<span><b>1등 ${image.subject }</b></span>
+		    						<span class="pull-right">
+		   							<span class="date">
+			   								조회수  ${image.hitCount}
+			   						</span>
+		   						</span>
+	    					</span>
+    					</a>
+    					</c:forEach>
+    				</div>
+    			</li>
+    			
+				<!-- 갤러리 랭킹 2  -->
+				<li class="item">
+    				<div class="item-box">
+    					<c:forEach var="image" items="${imageListFreeGallery}" begin="1" end="1">
+    					<a href="${pageContext.request.contextPath }/freeGallery/article.do?num=${image.num}" class="list-a">
+    						<img src="${pageContext.request.contextPath}/uploads/freeGallery/${image.imageFilename}" >
+	    					<span class="sp-subj ellipsis">
+	    						<span><b>2등 ${image.subject }</b></span>
+		    						<span class="pull-right">
+		   							<span class="date">
+			   								조회수  ${image.hitCount}
+			   						</span>
+		   						</span>
+	    					</span>
+    					</a>
+    					</c:forEach>
+    				</div>
+    			</li>
+				
+				<!--  갤러리 랭킹 3 -->
+				<li class="item">
+    				<div class="item-box">
+    					<c:forEach var="image" items="${imageListFreeGallery}" begin="2" end="2">
+    					<a href="${pageContext.request.contextPath }/freeGallery/article.do?num=${image.num}" class="list-a">
+    						<img src="${pageContext.request.contextPath}/uploads/freeGallery/${image.imageFilename}" >
+	    					<span class="sp-subj ellipsis">
+	    						<span><b>3등 ${image.subject }</b></span>
+		    						<span class="pull-right">
+		   							<span class="date">
+			   								조회수  ${image.hitCount}
+			   						</span>
+		   						</span>
+	    					</span>
+    					</a>
+    					</c:forEach>
+    				</div>
+    			</li>
+    		</ul>
+    	</div>
+    	
+    	
+    	<!-- 최신게시글 -->
 		<h4 class="h4 h4-left">
     		<a class="list-a">
     			<img src="https://humorpick.com/thema/Miso-Simple/img/menu_best.png" alt="베스트" width="20px" title="">
@@ -257,13 +334,10 @@ hr.hr {
     	<div class="list-container">
     		<ul>
     		
-    			<!-- 질문 답변 -->
+    			<!-- QnA -->
     			<li class="item">
     				<div class="item-box">
-    					<a href="#" class="list-a">
-    						<c:forEach var="image" items="${imageListFreeGallery}" begin="0" end="0">
-    						<img src="${pageContext.request.contextPath}/uploads/freeGallery/${image.imageFilename}" >
-    						</c:forEach>
+    					<a href="${pageContext.request.contextPath }/qnaboard/list.do" class="list-a">
 	    					<span class="sp-subj ellipsis">
 	    						<span><b>QnA</b></span>
 		    						<span class="pull-right">
@@ -275,7 +349,7 @@ hr.hr {
     					</a>
 						
 						<c:forEach var="dto" items="${qnalist}">
-							<a href="#" class="ellipsis list-a">
+							<a href="${pageContext.request.contextPath }/qnaboard/article.do?boardNum=${dto.boardNum}&page=1" class="ellipsis list-a">
 							<span class="wr-icon wr-new"></span>
 							
 							<span class="pull-right">
@@ -302,10 +376,7 @@ hr.hr {
 				<!-- 자유 갤러리  -->
 				<li class="item">
     				<div class="item-box">
-    					<a href="#" class="list-a">
-    						<c:forEach var="image" items="${imageListFreeGallery}" begin="1" end="1">
-    						<img src="${pageContext.request.contextPath}/uploads/freeGallery/${image.imageFilename}" >
-    						</c:forEach>
+    					<a href="${pageContext.request.contextPath }/freeGallery/list.do" class="list-a">
 	    					<span class="sp-subj ellipsis">
 	    						<span><b>자유 갤러리</b></span>
 		    						<span class="pull-right">
@@ -317,7 +388,7 @@ hr.hr {
     					</a>
 						
 						<c:forEach var="dto" items="${freeGalleryList}">
-							<a href="#" class="ellipsis list-a">
+							<a href="${pageContext.request.contextPath }/freeGallery/article.do?num=${dto.num}" class="ellipsis list-a">
 							<span class="wr-icon wr-new"></span>
 							
 							<span class="pull-right">
@@ -344,10 +415,7 @@ hr.hr {
 				<!--  공지사항 -->
 				<li class="item">
     				<div class="item-box">
-    					<a href="#" class="list-a">
-    						<c:forEach var="image" items="${imageListFreeGallery}" begin="2" end="2">
-    						<img src="${pageContext.request.contextPath}/uploads/freeGallery/${image.imageFilename}" >
-    						</c:forEach>
+    					<a href="${pageContext.request.contextPath }/notice/list.do" class="list-a">
 	    					<span class="sp-subj ellipsis">
 	    						<span><b>공지사항</b></span>
 		    						<span class="pull-right">
@@ -359,14 +427,10 @@ hr.hr {
     					</a>
 						
 						<c:forEach var="dto" items="${noticeList}">
-							<a href="#" class="ellipsis list-a">
+							<a href="${pageContext.request.contextPath }/notice/article.do?num=${dto.num}" class="ellipsis list-a">
 							<span class="wr-icon wr-new"></span>
 							
 							<span class="pull-right">
-								<span class="count">
-									<img alt="" src="${pageContext.request.contextPath}/resource/images/answer.png">
-	   								{dto.replyCount}
-	   							</span>
 	   							<span class="view">
 	   								<img alt="" src="${pageContext.request.contextPath}/resource/images/view.png">
 	   								${dto.hitCount }
@@ -390,7 +454,7 @@ hr.hr {
     			<!-- 소통 공간 -->
     			<li class="item">
     				<div class="item-box">
-    					<a href="#" class="list-a">
+    					<a href="${pageContext.request.contextPath }/freeBoard/list.do" class="list-a">
 	    					<span class="sp-subj ellipsis">
 	    						<span><b>소통공간</b></span>
 		    						<span class="pull-right">
@@ -402,7 +466,7 @@ hr.hr {
     					</a>
 						
 						<c:forEach var="dto" items="${freeBoardList}">
-							<a href="#" class="ellipsis list-a">
+							<a href="${pageContext.request.contextPath }/freeBoard/article.do?num=${dto.num}" class="ellipsis list-a">
 							<span class="wr-icon wr-new"></span>
 							
 							<span class="pull-right">
@@ -429,7 +493,7 @@ hr.hr {
 				<!-- 정보게시판  -->
 				<li class="item">
     				<div class="item-box">
-    					<a href="#" class="list-a">
+    					<a href="${pageContext.request.contextPath }/infoBoard/list.do" class="list-a">
 	    					<span class="sp-subj ellipsis">
 	    						<span><b>정보게시판</b></span>
 		    						<span class="pull-right">
@@ -441,14 +505,10 @@ hr.hr {
     					</a>
 						
 						<c:forEach var="dto" items="${infoBoardList}">
-							<a href="#" class="ellipsis list-a">
+							<a href="${pageContext.request.contextPath }/infoBoard/article.do?num=${dto.num}" class="ellipsis list-a">
 							<span class="wr-icon wr-new"></span>
 							
 							<span class="pull-right">
-								<span class="count">
-									<img alt="" src="${pageContext.request.contextPath}/resource/images/answer.png">
-	   								{dto.replyCount }
-	   							</span>
 	   							<span class="view">
 	   								<img alt="" src="${pageContext.request.contextPath}/resource/images/view.png">
 	   								${dto.hitCount }
@@ -466,42 +526,7 @@ hr.hr {
     			</li>
 				
 				
-				<li class="item">
-    				<div class="item-box">
-    					<a href="#" class="list-a">
-	    					<span class="sp-subj ellipsis">
-	    						<span><b>공지사항</b></span>
-		    						<span class="pull-right">
-		   							<span class="date">
-										${date}
-			   						</span>
-		   						</span>
-	    					</span>
-    					</a>
-						
-						<c:forEach var="dto" items="${noticeList}">
-							<a href="#" class="ellipsis list-a">
-							<span class="wr-icon wr-new"></span>
-							
-							<span class="pull-right">
-								<span class="count">
-									<img alt="" src="${pageContext.request.contextPath}/resource/images/answer.png">
-	   								{dto.replyCount}
-	   							</span>
-	   							<span class="view">
-	   								<img alt="" src="${pageContext.request.contextPath}/resource/images/view.png">
-	   								${dto.hitCount }
-	   							</span>
-	   							<span class="date">
-	   								<img alt="" src="${pageContext.request.contextPath}/resource/images/time.png">
-	   								${dto.reg_date }
-	   							</span>
-   							</span>
-   							<span>${dto.subject }</span>
-							</a>
-						</c:forEach>
-    				</div>
-    			</li>
+				
     		</ul>
     	</div>
     	
@@ -510,7 +535,7 @@ hr.hr {
 		<div class="row row-20">
 			<div class="col-md-8 col-20">
 				<h4 class="h4 h4-left">
-		    		<a class="list-a">
+		    		<a href="${pageContext.request.contextPath }/sell/list.do" class="list-a">
 		    			<img src="${pageContext.request.contextPath}/resource/images/main_sell_buy.png" alt="베스트" width="20px" title="">
 		    			<b class="main-font">장터(팝니다)</b>
 		    		</a>
@@ -529,44 +554,32 @@ hr.hr {
     			<li class="item">
     				<div class="item-box">
     					<div class="row row-10">
-    						<div class="col-xs-6 col-10">
-    							<a href="#" class="list-a">
-    								<span class="img-box img-bg">
-    									<img alt="" src="https://humorpick.com/data/file/celeb/thumb-16509008516211_400x0.jpg">
-    								</span>
-    								<span class="sp-subj ellipsis">
-    									<span class="pull-right"></span>
-    									<span class="title">히히히히힣ㄴㅇ러ㅣㅏㄴ이러ㅏ머ㅣ</span>
-    								</span>
-    							</a>
-    						</div>
     						
+    						<c:forEach var="image" items="${listTradeImage }" begin="0" end="1">
     						<div class="col-xs-6 col-10">
-    							<a href="#" class="list-a">
+    							<a href="${pageContext.request.contextPath }/sell/article.do?tradeNum=${image.tradeNum}" class="list-a">
     								<span class="img-box img-bg">
-    									<img alt="" src="https://humorpick.com/data/file/celeb/thumb-16509008516211_400x0.jpg">
-    								</span>
+    									<img src="${pageContext.request.contextPath}/uploads/sell/${image.imageFilename}" >
+    								</span>  
     								<span class="sp-subj ellipsis">
     									<span class="pull-right"></span>
-    									<span class="title">히히히히힣ㄴㅇ러ㅣㅏㄴ이러ㅏ머ㅣ</span>
+    									<span class="title">${image.subject }</span>
     								</span>
     							</a>
     						</div>
+    						</c:forEach>
+    						
     					
     					</div>
 						
 						<c:forEach var="dto" items="${listTrade }" begin="0" end="4">			
-							<a href="#" class="ellipsis list-a">
+							<a href="${pageContext.request.contextPath }/sell/article.do?tradeNum=${dto.tradeNum}" class="ellipsis list-a">
 							<span class="wr-icon wr-new"></span>
 							
 							<span class="pull-right">
-								<span class="count">
-									<img alt="" src="${pageContext.request.contextPath}/resource/images/answer.png">
-	   								{dto.replyCount}
-	   							</span>
 	   							<span class="view">
 	   								<img alt="" src="${pageContext.request.contextPath}/resource/images/view.png">
-	   								{dto.hitCount}
+	   								${dto.hitCount}
 	   							</span>
 	   							<span class="date">
 	   								<img alt="" src="${pageContext.request.contextPath}/resource/images/time.png">
@@ -583,43 +596,31 @@ hr.hr {
 				<li class="item">
     				<div class="item-box">
     					<div class="row row-10">
+    						<c:forEach var="image" items="${listTradeImage }" begin="2" end="3">
     						<div class="col-xs-6 col-10">
-    							<a href="#" class="list-a">
+    							<a href="${pageContext.request.contextPath }/sell/article.do?tradeNum=${image.tradeNum}" class="list-a">
     								<span class="img-box img-bg">
-    									<img alt="" src="https://humorpick.com/data/file/celeb/thumb-16509008516211_400x0.jpg">
+    									<img src="${pageContext.request.contextPath}/uploads/sell/${image.imageFilename}" >
     								</span>
     								<span class="sp-subj ellipsis">
     									<span class="pull-right"></span>
-    									<span class="title">히히히히힣ㄴㅇ러ㅣㅏㄴ이러ㅏ머ㅣ</span>
+    									<span class="title">${image.subject }</span>
     								</span>
     							</a>
     						</div>
+    						</c:forEach>
     						
-    						<div class="col-xs-6 col-10">
-    							<a href="#" class="list-a">
-    								<span class="img-box img-bg">
-    									<img alt="" src="https://humorpick.com/data/file/celeb/thumb-16509008516211_400x0.jpg">
-    								</span>
-    								<span class="sp-subj ellipsis">
-    									<span class="pull-right"></span>
-    									<span class="title">히히히히힣ㄴㅇ러ㅣㅏㄴ이러ㅏ머ㅣ</span>
-    								</span>
-    							</a>
-    						</div>
+    						
     					
     					</div>
 						<c:forEach var="dto" items="${listTrade }" begin="5" end="9">
-							<a href="#" class="ellipsis list-a">
+							<a href="${pageContext.request.contextPath }/sell/article.do?tradeNum=${dto.tradeNum}" class="ellipsis list-a">
 							<span class="wr-icon wr-new"></span>
 							
 							<span class="pull-right">
-								<span class="count">
-									<img alt="" src="${pageContext.request.contextPath}/resource/images/answer.png">
-	   								{dto.replyCount}
-	   							</span>
 	   							<span class="view">
 	   								<img alt="" src="${pageContext.request.contextPath}/resource/images/view.png">
-	   								{dto.hitCount}
+	   								${dto.hitCount}
 	   							</span>
 	   							<span class="date">
 	   								<img alt="" src="${pageContext.request.contextPath}/resource/images/time.png">
@@ -641,7 +642,7 @@ hr.hr {
 			<!-- 삽니다 -->
 			<div class="col-md-4 col-20">
 				<h4 class="h4 h4-left">
-		    		<a class="list-a">
+		    		<a href="${pageContext.request.contextPath }/buy/list.do" class="list-a">
 		    			<img src="${pageContext.request.contextPath}/resource/images/main_sell_buy.png" alt="베스트" width="20px" title="">
 		    			<b class="main-font">장터(삽니다)</b>
 		    		</a>
@@ -661,16 +662,12 @@ hr.hr {
     					<a class="list-a">
     					</a>
 						<c:forEach var="dto" items="${listTradebuy}">
-							<a href="#" class="ellipsis list-a only-list">
+							<a href="${pageContext.request.contextPath }/buy/article.do?buyNum=${dto.buyNum}" class="ellipsis list-a only-list">
 							
 							<span class="pull-right">
-								<span class="count">
-									<img alt="" src="${pageContext.request.contextPath}/resource/images/answer.png">
-	   								{dto.replyCount }
-	   							</span>
 	   							<span class="view">
 	   								<img alt="" src="${pageContext.request.contextPath}/resource/images/view.png">
-	   								{dto.hitCount }
+	   								${dto.hitCount }
 	   							</span>
 	   							<span class="date">
 	   								<img alt="" src="${pageContext.request.contextPath}/resource/images/time.png">

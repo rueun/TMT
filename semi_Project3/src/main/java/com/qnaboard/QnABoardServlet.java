@@ -27,7 +27,8 @@ public class QnABoardServlet extends MyServlet {
 
 		String uri = req.getRequestURI();
 
-		// 세션 정보
+		// 세션 정보 LoginFilter 에서 처리
+		/*
 		HttpSession session = req.getSession();
 		SessionInfo info = (SessionInfo) session.getAttribute("member");
 
@@ -35,7 +36,9 @@ public class QnABoardServlet extends MyServlet {
 			forward(req, resp, "/WEB-INF/views/member/login.jsp");
 			return;
 		}
-
+		*/
+		
+		
 		// uri에 따른 작업 구분
 		if (uri.indexOf("list.do") != -1) {
 			list(req, resp);
