@@ -14,6 +14,7 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
 import com.member.SessionInfo;
+import com.util.FileManager;
 import com.util.MyUploadServlet;
 import com.util.MyUtil;
 
@@ -75,7 +76,7 @@ public class TradeServlet extends MyUploadServlet {
 			
 			int dataCount = dao.dataCount();
 			
-			int rows = 12;
+			int rows = 15;
 			int total_page = util.pageCount(rows, dataCount);
 			if(current_page > total_page) {
 				current_page = total_page;
@@ -150,16 +151,150 @@ public class TradeServlet extends MyUploadServlet {
 	}
 
 	protected void article(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		
+		TradeDAO dao = new TradeDAO();
+		
+		String cp = req.getContextPath();
+		String page = req.getParameter("page");
+		
+		try {
+			int tradeNum = Integer.parseInt(req.getParameter("tradeNum"));
+			
+			dao.updateHitCount(tradeNum);
+
+			TradeDTO dto = dao.readTrade(tradeNum);
+			if (dto == null) {
+				resp.sendRedirect(cp + "/sell/list.do?page=" + page);
+				return;
+			}
+
+			dto.setContent(dto.getContent().replaceAll("\n", "<br>"));
+
+			req.setAttribute("dto", dto);
+			req.setAttribute("page", page);
+
+			forward(req, resp, "/WEB-INF/views/sell/article.jsp");
+			return;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		resp.sendRedirect(cp + "/sell/list.do?page=" + page);
 	}
 	
 
 	protected void updateForm(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		TradeDAO dao = new TradeDAO();
+		
+		HttpSession session = req.getSession();
+		SessionInfo info = (SessionInfo) session.getAttribute("member");
+
+		String cp = req.getContextPath();
+		String page = req.getParameter("page");
+		
+		try {
+			int tradeNum = Integer.parseInt(req.getParameter("tradeNum"));
+			TradeDTO dto = dao.readTrade(tradeNum);
+
+			if (dto == null) {
+				resp.sendRedirect(cp + "/sell/list.do?page=" + page);
+				return;
+			}
+
+			// 게시물을 올린 사용자가 아니면
+			if (!dto.getUserId().equals(info.getUserId())) {
+				resp.sendRedirect(cp + "/sell/list.do?page=" + page);
+				return;
+			}
+
+			req.setAttribute("dto", dto);
+			req.setAttribute("page", page);
+
+			req.setAttribute("mode", "update");
+
+			forward(req, resp, "/WEB-INF/views/sell/write.jsp");
+			return;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		resp.sendRedirect(cp + "/sell/list.do?page=" + page);
 	}
 
 	protected void updateSubmit(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	TradeDAO dao = new TradeDAO();
+	
+	String cp = req.getContextPath();
+	if (req.getMethod().equalsIgnoreCase("GET")) {
+		resp.sendRedirect(cp + "/sell/list.do");
+		return;
 	}
 
+	String page = req.getParameter("page");
+
+	try {
+		TradeDTO dto = new TradeDTO();
+		
+		dto.setTradeNum(Integer.parseInt(req.getParameter("tradeNum")));
+		dto.setSubject(req.getParameter("subject"));
+		dto.setPrice(req.getParameter("price"));
+		dto.setContent(req.getParameter("content"));
+
+		String imageFilename = req.getParameter("imageFilename");
+		dto.setImageFilename(imageFilename);
+
+		Part p = req.getPart("selectFile");
+		Map<String, String> map = doFileUpload(p, pathname);
+		if (map != null) { // 이미지 파일을 업로드 한 경우
+			String filename = map.get("saveFilename");
+			// 기존 이미지 파일 지우기
+			FileManager.doFiledelete(pathname, imageFilename);
+			dto.setImageFilename(filename);
+		}
+
+		dao.updatetrade(dto);
+		
+		resp.sendRedirect(cp + "/sell/article.do?tradeNum="+dto.getTradeNum()+"&page=" + page);
+		return;
+	} catch (Exception e) {
+		e.printStackTrace();
+	}
+	resp.sendRedirect(cp + "/sell/list.do?page=" + page);
+
+}
+
 	protected void delete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		TradeDAO dao = new TradeDAO();
+		
+		HttpSession session = req.getSession();
+		SessionInfo info = (SessionInfo) session.getAttribute("member");
+
+		String cp = req.getContextPath();
+		String page = req.getParameter("page");
+		
+		try {
+			int tradeNum = Integer.parseInt(req.getParameter("tradeNum"));
+			
+			TradeDTO dto = dao.readTrade(tradeNum);
+			if (dto == null) {
+				resp.sendRedirect(cp + "/sell/list.do?page=" + page);
+				return;
+			}
+			
+			if (!dto.getUserId().equals(info.getUserId()) && !info.getUserId().equals("admin")) {
+				resp.sendRedirect(cp + "/sell/list.do?page=" + page);
+				return;
+			}
+			
+			FileManager.doFiledelete(pathname, dto.getImageFilename());
+			
+			dao.deleteTrade(tradeNum);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		resp.sendRedirect(cp + "/sell/list.do?page=" + page);
+	
 	}
 	
 }

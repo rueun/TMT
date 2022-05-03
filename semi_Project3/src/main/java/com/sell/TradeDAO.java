@@ -134,4 +134,137 @@ public class TradeDAO {
 		return list;
 	}
 
+	public TradeDTO readTrade(int tradeNum) {
+		TradeDTO dto = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql;
+
+		try {
+			sql = "SELECT tradeNum, p.userId, userNickName, subject, price, content, p.imageFilename,  hitCount, reg_date  "
+					+ " FROM trade p "
+					+ " JOIN member1 m ON p.userId=m.userId  "
+					+ " WHERE tradeNum = ? ";
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setInt(1, tradeNum);
+			
+			rs = pstmt.executeQuery();
+
+			if (rs.next()) {
+				dto = new TradeDTO();
+				
+				dto.setTradeNum(rs.getInt("tradeNum"));
+				dto.setUserId(rs.getString("userId"));
+				dto.setUserNickName(rs.getString("userNickName"));
+				dto.setSubject(rs.getString("subject"));
+				dto.setPrice(rs.getString("price"));
+				dto.setContent(rs.getString("content"));
+				dto.setHitCount(rs.getInt("hitCount"));
+				dto.setImageFilename(rs.getString("imageFilename"));
+				dto.setReg_date(rs.getString("reg_date"));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+				}
+			}
+
+			if (pstmt != null) {
+				try {
+					pstmt.close();
+				} catch (SQLException e) {
+				}
+			}
+		}
+
+		return dto;
+	}
+	
+	// 조화수증가
+	public void updateHitCount(int tradeNum) throws SQLException {
+		PreparedStatement pstmt = null;
+		String sql;
+
+		try {
+			sql = "UPDATE trade SET hitCount=hitCount+1 WHERE tradeNum=?";
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setInt(1, tradeNum);
+			
+			pstmt.executeUpdate();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			if (pstmt != null) {
+				try {
+					pstmt.close();
+				} catch (SQLException e) {
+				}
+			}
+		}
+
+	}
+
+	public void updatetrade(TradeDTO dto) throws SQLException {
+		PreparedStatement pstmt = null;
+		String sql;
+
+		try {
+			sql = "UPDATE trade SET subject=?, content=?, price=?, imageFilename=? WHERE tradeNum=?";
+			pstmt = conn.prepareStatement(sql);
+
+			pstmt.setString(1, dto.getSubject());
+			pstmt.setString(2, dto.getContent());
+			pstmt.setString(3, dto.getPrice());
+			pstmt.setString(4, dto.getImageFilename());
+			pstmt.setInt(5, dto.getTradeNum());
+			
+
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			if (pstmt != null) {
+				try {
+					pstmt.close();
+				} catch (SQLException e) {
+				}
+			}
+		}
+
+	}
+
+	public void deleteTrade(int tradeNum) throws SQLException {
+		PreparedStatement pstmt = null;
+		String sql;
+		
+		try {
+			sql = "DELETE FROM trade WHERE tradeNum=?";
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setInt(1, tradeNum);
+			
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			if (pstmt != null) {
+				try {
+					pstmt.close();
+				} catch (SQLException e) {
+				}
+			}
+		}
+	}
+	
+
 }

@@ -73,7 +73,7 @@ public class TradebuyServlet extends MyUploadServlet{
 			
 			int dataCount = dao.dataCount();
 			
-			int rows = 12;
+			int rows = 15;
 			int total_page = util.pageCount(rows, dataCount);
 			if(current_page > total_page) {
 				current_page = total_page;
