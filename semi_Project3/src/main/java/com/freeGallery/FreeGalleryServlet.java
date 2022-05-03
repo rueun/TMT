@@ -37,15 +37,8 @@ public class FreeGalleryServlet extends MyUploadServlet {
 		req.setCharacterEncoding("utf-8");
 
 		String uri = req.getRequestURI();
-		String cp = req.getContextPath();
-
-		HttpSession session = req.getSession();
-		SessionInfo info = (SessionInfo) session.getAttribute("member");
-		if (info == null) { // 로그인되지 않은 경우
-			resp.sendRedirect(cp + "/member/login.do");
-			return;
-		}
 		
+		HttpSession session = req.getSession();
 		// 이미지를 저장할 경로(pathname)
 		String root = session.getServletContext().getRealPath("/");
 		pathname = root + "uploads" + File.separator + "freeGallery";
@@ -664,7 +657,6 @@ public class FreeGalleryServlet extends MyUploadServlet {
 		String state = "false";
 		
 		try {
-			System.out.println(req.getParameter("replyNum"));
 			int replyNum = Integer.parseInt(req.getParameter("replyNum"));
 			dao.deleteReply(replyNum, info.getUserId());
 			
@@ -677,7 +669,6 @@ public class FreeGalleryServlet extends MyUploadServlet {
 		job.put("state", state);
 
 		resp.setContentType("text/html;charset=utf-8");
-
 		PrintWriter out = resp.getWriter();
 		out.print(job.toString());
 	}
@@ -685,12 +676,85 @@ public class FreeGalleryServlet extends MyUploadServlet {
 	// 댓글 좋아요 / 싫어요 저장 - AJAX:JSON
 	private void insertReplyLike(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
+		FreeGalleryDAO dao = new FreeGalleryDAO();
 
+		HttpSession session = req.getSession();
+		SessionInfo info = (SessionInfo) session.getAttribute("member");
+		
+		String state = "false";
+		int likeCount = 0;
+		int disLikeCount = 0;
+		
+		try {
+			int replyNum = Integer.parseInt(req.getParameter("replyNum"));
+			int replyLike = Integer.parseInt(req.getParameter("replyLike"));
+
+			ReplyDTO dto = new ReplyDTO();
+
+			dto.setReplyNum(replyNum);
+			dto.setUserId(info.getUserId());
+			dto.setReplyLike(replyLike);
+			
+			dao.insertReplyLike(dto);
+
+			Map<String, Integer> map = dao.countReplyLike(replyNum);
+
+			if (map.containsKey("likeCount")) {
+				likeCount = map.get("likeCount");
+			}
+
+			if (map.containsKey("disLikeCount")) {
+				disLikeCount = map.get("disLikeCount");
+			}
+
+			state = "true";
+		} catch (SQLException e) {
+			if(e.getErrorCode() == 1) {
+				state = "liked";
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		JSONObject job = new JSONObject();
+		job.put("state", state);
+		job.put("likeCount", likeCount);
+		job.put("disLikeCount", disLikeCount);
+
+		resp.setContentType("text/html;charset=utf-8");
+		PrintWriter out = resp.getWriter();
+		out.print(job.toString());
 	}
 
 	// 댓글 좋아요 / 싫어요 개수 - AJAX:JSON
 	private void countReplyLike(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		FreeGalleryDAO dao = new FreeGalleryDAO();
 
+		int likeCount = 0;
+		int disLikeCount = 0;
+
+		try {
+			int replyNum = Integer.parseInt(req.getParameter("replyNum"));
+			Map<String, Integer> map = dao.countReplyLike(replyNum);
+
+			if (map.containsKey("likeCount")) {
+				likeCount = map.get("likeCount");
+			}
+
+			if (map.containsKey("disLikeCount")) {
+				disLikeCount = map.get("disLikeCount");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		JSONObject job = new JSONObject();
+		job.put("likeCount", likeCount);
+		job.put("disLikeCount", disLikeCount);
+
+		resp.setContentType("text/html;charset=utf-8");
+		PrintWriter out = resp.getWriter();
+		out.print(job.toString());
 	}
 
 	// 답글 저장 - AJAX:JSON , 답글 주소를 insertReply.do로 설정 하면 필요 없음
@@ -729,7 +793,7 @@ public class FreeGalleryServlet extends MyUploadServlet {
 	// 리플 답글 삭제 - AJAX:JSON
 	private void deleteReplyAnswer(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-
+		deleteReply(req, resp);
 	}
 
 	// 리플의 답글 개수 - AJAX:JSON

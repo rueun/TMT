@@ -178,7 +178,7 @@ li {list-style: none;}
     position: relative;
     padding: 10px 0 5px 0;
     border-bottom: 1px solid #efefef;
-    min-height: 53px;
+    min-height: 65px;
 }
 
 .area_reply .list_reply .reply-answer li .area_more .reply_layer {
@@ -457,7 +457,7 @@ $(function() {
 // 댓글 삭제
 $(function() {
 	$("body").on("click", ".deleteReply", function() {
-		if(! confirm('게시물을 삭제하시겠습니까 ? ')) {
+		if(! confirm('댓글을 삭제하시겠습니까 ? ')) {
 			return false;
 		}
 		
@@ -474,6 +474,46 @@ $(function() {
 		ajaxFun(url, "post", query, "html", fn);
 	});
 });
+
+// 댓글 좋아요 / 싫어요
+$(function(){
+	// 댓글 좋아요 / 싫어요 등록
+	$("body").on("click", ".btnSendReplyLike", function(){
+		let replyNum = $(this).attr("data-replyNum");
+		let replyLike = $(this).attr("data-replyLike");
+		const $btn = $(this);
+		
+		let msg = "해당 댓글이 마음에 들지 않으십니까 ?";
+		if(replyLike === "1") {
+			msg="해당 댓글에 공감하십니까 ?";
+		}
+		
+		if(! confirm(msg)) {
+			return false;
+		}
+		
+		let url = "${pageContext.request.contextPath}/freeGallery/insertReplyLike.do";
+		let query = "replyNum=" + replyNum + "&replyLike=" + replyLike;
+		
+		const fn = function(data){
+			let state = data.state;
+			if(state === "true") {
+				let likeCount = data.likeCount;
+				let disLikeCount = data.disLikeCount;
+				
+				$btn.parent("span").children().eq(0).find("span").html(likeCount);
+				$btn.parent("span").children().eq(1).find("span").html(disLikeCount);
+			} else if(state === "liked") {
+				alert("댓글 공감/비공감은 한 번만 가능합니다.");
+			} else {
+				alert("게시물 공감 여부 처리가 실패했습니다.");
+			}
+		};
+		
+		ajaxFun(url, "post", query, "json", fn);
+	});
+});
+
 
 
 // 댓글별 답글 리스트
@@ -502,7 +542,7 @@ function countReplyAnswer(answer) {
 	ajaxFun(url, "get", query, "json", fn);
 }
 
-// 답글 버튼
+// 답글 버튼(댓글별 답글 등록폼 및 답글리스트)
 $(function() {
    $("body").on("click", ".btnReplyAnswerLayout", function() {
       const $div = $(this).closest("div").next();
@@ -558,6 +598,29 @@ $(function() {
       
       ajaxFun(url, "post", query, "json", fn);
    });
+});
+
+
+// 댓글별 답글 삭제
+$(function(){
+	$("body").on("click", ".deleteReplyAnswer", function(){
+		if(! confirm("댓글을 삭제하시겠습니까 ? ")) {
+		    return false;
+		}
+		
+		let replyNum = $(this).attr("data-replyNum");
+		let answer = $(this).attr("data-answer");
+		
+		let url = "${pageContext.request.contextPath}/freeGallery/deleteReply.do";
+		let query = "replyNum=" + replyNum;
+		
+		const fn = function(data){
+			listReplyAnswer(answer);
+			countReplyAnswer(answer);
+		};
+		
+		ajaxFun(url, "post", query, "json", fn);
+	});
 });
 </script>
 </head>

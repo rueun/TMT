@@ -6,6 +6,7 @@
 
 <c:forEach var="vo" items="${listReplyAnswer}">
 	<li class="rp_general">
+		<div class='answer-left'>└</div>
 		<span class="ico_skin thumb_profile">
 			<img src="${pageContext.request.contextPath}/resource/images/image.png" width="48" height="48" class="img_profile" alt="프로필사진">
 		</span>
@@ -22,7 +23,7 @@
 					<div class="layer_body">
 						<c:choose>
 			               	<c:when test="${sessionScope.member.userId == vo.userId || sessionScope.member.userId == 'admin' }">
-			                  	<span class="link_reply deleteReplyAnswer" data-replyNum='${vo.replyNum}' data-pageNo='${vo.answer}'>삭제</span>
+			                  	<span class="link_reply deleteReplyAnswer" data-replyNum='${vo.replyNum}' data-answer='${vo.answer}'>삭제</span>
 			               	</c:when>
 			               	<c:otherwise>
 			                  	<span class="link_reply notifyReplyAnswer">신고</span>

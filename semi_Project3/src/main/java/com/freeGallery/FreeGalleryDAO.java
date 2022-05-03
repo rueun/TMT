@@ -1346,11 +1346,12 @@ public class FreeGalleryDAO {
 			e.printStackTrace();
 			throw e;
 		} finally {
-			if(pstmt != null)
+			if(pstmt != null) {
 				try {
 					pstmt.close();
 				} catch (SQLException e) {
 				}
+			}
 		}
 		
 	}
