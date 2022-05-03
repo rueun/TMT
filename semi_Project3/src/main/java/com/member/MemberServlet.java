@@ -1,25 +1,38 @@
 package com.member;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Map;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
 
-import com.util.MyServlet;
+import com.util.MyUploadServlet;
 
+@MultipartConfig
 @WebServlet("/member/*")
-public class MemberServlet extends MyServlet{
+public class MemberServlet extends MyUploadServlet{
 	private static final long serialVersionUID = 1L;
-
+	
+	private String pathname;
+	
 	@Override
 	protected void process(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		req.setCharacterEncoding("utf-8");
 
 		String uri = req.getRequestURI();
+		
+		// 이미지를 저장할 경로(pathname)
+		HttpSession session = req.getSession();
+		String root = session.getServletContext().getRealPath("/");
+		pathname = root + "uploads" + File.separator + "profile";
+		
 		
 		// uri에 따른 작업 구분
 		if (uri.indexOf("login.do") != -1) {
@@ -145,8 +158,20 @@ public class MemberServlet extends MyServlet{
 			dto.setPost(req.getParameter("zip"));
 			dto.setAddr1(req.getParameter("addr1"));
 			dto.setAddr2(req.getParameter("addr2"));
-
+			
+			String filename = null;
+			Part p = req.getPart("selectFile");
+			Map<String, String> map = doFileUpload(p, pathname);
+			if (map != null) {
+				filename = map.get("saveFilename");
+			}
+			System.out.println(filename);
+			if (filename != null) { // 프로필 이름을 지정했다면
+				dto.setImageFileName(filename);
+			}
+			
 			dao.insertMember(dto);
+			
 			resp.sendRedirect(cp + "/");
 			return;
 		} catch (SQLException e) {

@@ -122,14 +122,14 @@ function sendOk() {
         return;
     }
     
-    /*
+    
     let mode = "${mode}";
     if( (mode === "write") && (!f.selectFile.value) ) {
         alert("한 개 이상의 이미지를 등록해주세요.");
         f.selectFile.focus();
         return;
     }
-    */
+    
     
 
     f.action = "${pageContext.request.contextPath}/freeGallery/${mode}_ok.do";

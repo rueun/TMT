@@ -27,9 +27,7 @@ import com.util.MyUtil;
 @WebServlet("/freeGallery/*")
 public class FreeGalleryServlet extends MyUploadServlet {
 	private static final long serialVersionUID = 1L;
-	
 	private String pathname;
-	
 	
 	
 	@Override
@@ -232,7 +230,7 @@ public class FreeGalleryServlet extends MyUploadServlet {
 			dto.setSubject(req.getParameter("subject"));
 			dto.setContent(req.getParameter("content"));
 			
-			// 나중에 이미지 파일도 insert하기
+			// 파일 insert
 			Map<String, String[]> map = doFileUpload(req.getParts(), pathname);
 			if (map != null) {
 				String[] saveFiles = map.get("saveFilenames");

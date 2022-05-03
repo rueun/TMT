@@ -3,12 +3,18 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
-
 <c:forEach var="vo" items="${listReplyAnswer}">
 	<li class="rp_general">
 		<div class='answer-left'>└</div>
 		<span class="ico_skin thumb_profile">
-			<img src="${pageContext.request.contextPath}/resource/images/image.png" width="48" height="48" class="img_profile" alt="프로필사진">
+			<c:choose>
+				<c:when test="${vo.getImageFileName() == null}">
+					<img src="${pageContext.request.contextPath}/resource/images/basic_profile.png" width="48" height="48" class="img_profile" alt="프로필사진">
+				</c:when>
+				<c:otherwise>
+					<img src="${pageContext.request.contextPath}/uploads/profile/${vo.imageFileName}" width="48" height="48" class="img_profile" alt="프로필사진">
+				</c:otherwise>
+			</c:choose>
 		</span>
 		<span class="reply_content">
 			<span class="tit_nickname">${vo.userNickName}</span>

@@ -63,13 +63,15 @@ public class MemberDAO {
 		try {
 			conn.setAutoCommit(false);
 			
-			sql = "INSERT INTO member1(userId, userPwd, userName, userNickname, register_date, modify_date, enabled) VALUES (?, ?, ?, ?, SYSDATE, SYSDATE, 1)";
+			sql = "INSERT INTO member1(userId, userPwd, userName, userNickname, ImageFileName, register_date, modify_date, enabled) VALUES (?, ?, ?, ?, ?, SYSDATE, SYSDATE, 1)";
 			pstmt = conn.prepareStatement(sql);
 			
 			pstmt.setString(1, dto.getUserId());
 			pstmt.setString(2, dto.getUserPwd());
 			pstmt.setString(3, dto.getUserName());
 			pstmt.setString(4, dto.getUserNickName());
+			pstmt.setString(5, dto.getImageFileName());
+		
 			
 			pstmt.executeUpdate();
 			

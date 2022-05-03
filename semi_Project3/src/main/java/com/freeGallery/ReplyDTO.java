@@ -5,6 +5,7 @@ public class ReplyDTO {
 	private int num;
 	private String userId;
 	private String userNickName;
+	private String imageFileName;
 	private String content;
 	private String reg_date;
 	private int answer;
@@ -78,5 +79,11 @@ public class ReplyDTO {
 	}
 	public void setDisLikeCount(int disLikeCount) {
 		this.disLikeCount = disLikeCount;
+	}
+	public String getImageFileName() {
+		return imageFileName;
+	}
+	public void setImageFileName(String imageFileName) {
+		this.imageFileName = imageFileName;
 	}
 }

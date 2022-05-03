@@ -9,7 +9,14 @@
 		<c:forEach var="vo" items="${listReply}">
 			<li class="rp_general">
 				<span class="ico_skin thumb_profile">
-					<img src="${pageContext.request.contextPath}/resource/images/image.png" width="48" height="48" class="img_profile" alt="프로필사진">
+					<c:choose>
+						<c:when test="${vo.getImageFileName() == null}">
+							<img src="${pageContext.request.contextPath}/resource/images/basic_profile.png" width="48" height="48" class="img_profile" alt="프로필사진">
+					</c:when>
+					<c:otherwise>
+						<img src="${pageContext.request.contextPath}/uploads/profile/${vo.imageFileName}" width="48" height="48" class="img_profile" alt="프로필사진">
+					</c:otherwise>
+			</c:choose>
 				</span>
 				<span class="reply_content">
 					<span class="tit_nickname">${vo.userNickName}</span>
