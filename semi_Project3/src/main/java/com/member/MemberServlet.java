@@ -177,7 +177,6 @@ public class MemberServlet extends MyUploadServlet{
 			if (map != null) {
 				filename = map.get("saveFilename");
 			}
-			System.out.println(filename);
 			if (filename != null) { // 프로필 이름을 지정했다면
 				dto.setImageFileName(filename);
 			}
@@ -359,9 +358,6 @@ public class MemberServlet extends MyUploadServlet{
 			if (filename != null) { // 프로필을 새로 지정했으면
 				dto.setImageFileName(filename);
 			}
-			
-			System.out.println(filename);
-			System.out.println(originalimageFileName);
 			
 			dao.updateMember(dto);
 			
