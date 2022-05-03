@@ -21,7 +21,7 @@
         		&nbsp;|&nbsp;
 				<a href="${pageContext.request.contextPath}/member/logout.do">로그아웃</a>
 				&nbsp;|&nbsp;
-				<a href="#">정보수정</a>
+				<a href="${pageContext.request.contextPath}/member/pwd.do?mode=update">정보수정</a>
 			</c:if>
         </div>
     </div>
@@ -29,7 +29,7 @@
 
 <div class="wrap">
 	<ul id="nav" class="first">
-		<li><a href="#">홈페이지</a></li>
+		<li><a href="${pageContext.request.contextPath}/">홈</a></li>
 		<li><a href="#">정보</a>
 			<ul>
 				<li><a href="${pageContext.request.contextPath}/infoBoard/list.do">정보 게시판</a></li>
