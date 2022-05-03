@@ -237,7 +237,7 @@ hr.hr {
 	<jsp:include page="/WEB-INF/views/layout/header.jsp"></jsp:include>
 </header>
 	
-<main style="margin-top : 200px">
+<main>
 	<div class="body-container" style="width: 1200px;">
 		
 		<h4 class="h4 h4-left">
@@ -252,15 +252,14 @@ hr.hr {
 			</a>
 		</div>
 		
-		<hr class="hr hr-both">
-		<div class="list-container">
+		<div class="list-container" style="clear: both; border-top: 3px double #ccc; padding-top: 5px;">
     		<ul>
     			
     			<!-- 갤러리 랭킹 1 -->
     			<li class="item">
     				<div class="item-box">
     					<c:forEach var="image" items="${imageListFreeGallery}" begin="0" end="0">
-    					<a href="${pageContext.request.contextPath }/freeGallery/article.do?num=${image.num}" class="list-a">
+    					<a href="${pageContext.request.contextPath }/freeGallery/article.do?num=${image.num}&page=1" class="list-a">
     						<img src="${pageContext.request.contextPath}/uploads/freeGallery/${image.imageFilename}" >
 	    					<span class="sp-subj ellipsis">
 	    						<span><b>1등 ${image.subject }</b></span>
@@ -279,7 +278,7 @@ hr.hr {
 				<li class="item">
     				<div class="item-box">
     					<c:forEach var="image" items="${imageListFreeGallery}" begin="1" end="1">
-    					<a href="${pageContext.request.contextPath }/freeGallery/article.do?num=${image.num}" class="list-a">
+    					<a href="${pageContext.request.contextPath }/freeGallery/article.do?num=${image.num}&page=1" class="list-a">
     						<img src="${pageContext.request.contextPath}/uploads/freeGallery/${image.imageFilename}" >
 	    					<span class="sp-subj ellipsis">
 	    						<span><b>2등 ${image.subject }</b></span>
@@ -298,7 +297,7 @@ hr.hr {
 				<li class="item">
     				<div class="item-box">
     					<c:forEach var="image" items="${imageListFreeGallery}" begin="2" end="2">
-    					<a href="${pageContext.request.contextPath }/freeGallery/article.do?num=${image.num}" class="list-a">
+    					<a href="${pageContext.request.contextPath }/freeGallery/article.do?num=${image.num}&page=1" class="list-a">
     						<img src="${pageContext.request.contextPath}/uploads/freeGallery/${image.imageFilename}" >
 	    					<span class="sp-subj ellipsis">
 	    						<span><b>3등 ${image.subject }</b></span>
@@ -388,7 +387,7 @@ hr.hr {
     					</a>
 						
 						<c:forEach var="dto" items="${freeGalleryList}">
-							<a href="${pageContext.request.contextPath }/freeGallery/article.do?num=${dto.num}" class="ellipsis list-a">
+							<a href="${pageContext.request.contextPath }/freeGallery/article.do?num=${dto.num}&page=1" class="ellipsis list-a">
 							<span class="wr-icon wr-new"></span>
 							
 							<span class="pull-right">
@@ -427,7 +426,7 @@ hr.hr {
     					</a>
 						
 						<c:forEach var="dto" items="${noticeList}">
-							<a href="${pageContext.request.contextPath }/notice/article.do?num=${dto.num}" class="ellipsis list-a">
+							<a href="${pageContext.request.contextPath }/notice/article.do?num=${dto.num}&page=1" class="ellipsis list-a">
 							<span class="wr-icon wr-new"></span>
 							
 							<span class="pull-right">
@@ -466,7 +465,7 @@ hr.hr {
     					</a>
 						
 						<c:forEach var="dto" items="${freeBoardList}">
-							<a href="${pageContext.request.contextPath }/freeBoard/article.do?num=${dto.num}" class="ellipsis list-a">
+							<a href="${pageContext.request.contextPath }/freeBoard/article.do?num=${dto.num}&page=1" class="ellipsis list-a">
 							<span class="wr-icon wr-new"></span>
 							
 							<span class="pull-right">
@@ -505,7 +504,7 @@ hr.hr {
     					</a>
 						
 						<c:forEach var="dto" items="${infoBoardList}">
-							<a href="${pageContext.request.contextPath }/infoBoard/article.do?num=${dto.num}" class="ellipsis list-a">
+							<a href="${pageContext.request.contextPath }/infoBoard/article.do?num=${dto.num}&page=1" class="ellipsis list-a">
 							<span class="wr-icon wr-new"></span>
 							
 							<span class="pull-right">
@@ -557,7 +556,7 @@ hr.hr {
     						
     						<c:forEach var="image" items="${listTradeImage }" begin="0" end="1">
     						<div class="col-xs-6 col-10">
-    							<a href="${pageContext.request.contextPath }/sell/article.do?tradeNum=${image.tradeNum}" class="list-a">
+    							<a href="${pageContext.request.contextPath }/sell/article.do?tradeNum=${image.tradeNum}&page=1" class="list-a">
     								<span class="img-box img-bg">
     									<img src="${pageContext.request.contextPath}/uploads/sell/${image.imageFilename}" >
     								</span>  
@@ -573,7 +572,7 @@ hr.hr {
     					</div>
 						
 						<c:forEach var="dto" items="${listTrade }" begin="0" end="4">			
-							<a href="${pageContext.request.contextPath }/sell/article.do?tradeNum=${dto.tradeNum}" class="ellipsis list-a">
+							<a href="${pageContext.request.contextPath }/sell/article.do?tradeNum=${dto.tradeNum}&page=1" class="ellipsis list-a">
 							<span class="wr-icon wr-new"></span>
 							
 							<span class="pull-right">
@@ -598,7 +597,7 @@ hr.hr {
     					<div class="row row-10">
     						<c:forEach var="image" items="${listTradeImage }" begin="2" end="3">
     						<div class="col-xs-6 col-10">
-    							<a href="${pageContext.request.contextPath }/sell/article.do?tradeNum=${image.tradeNum}" class="list-a">
+    							<a href="${pageContext.request.contextPath }/sell/article.do?tradeNum=${image.tradeNum}&page=1" class="list-a">
     								<span class="img-box img-bg">
     									<img src="${pageContext.request.contextPath}/uploads/sell/${image.imageFilename}" >
     								</span>
@@ -614,7 +613,7 @@ hr.hr {
     					
     					</div>
 						<c:forEach var="dto" items="${listTrade }" begin="5" end="9">
-							<a href="${pageContext.request.contextPath }/sell/article.do?tradeNum=${dto.tradeNum}" class="ellipsis list-a">
+							<a href="${pageContext.request.contextPath }/sell/article.do?tradeNum=${dto.tradeNum}&page=1" class="ellipsis list-a">
 							<span class="wr-icon wr-new"></span>
 							
 							<span class="pull-right">
@@ -662,7 +661,7 @@ hr.hr {
     					<a class="list-a">
     					</a>
 						<c:forEach var="dto" items="${listTradebuy}">
-							<a href="${pageContext.request.contextPath }/buy/article.do?buyNum=${dto.buyNum}" class="ellipsis list-a only-list">
+							<a href="${pageContext.request.contextPath }/buy/article.do?buyNum=${dto.buyNum}&page=1" class="ellipsis list-a only-list">
 							
 							<span class="pull-right">
 	   							<span class="view">
