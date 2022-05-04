@@ -48,7 +48,7 @@ public class InfoServlet extends MyUploadServlet {
 		
 
 		String root = session.getServletContext().getRealPath("/");
-		pathname = root + "upload" + File.separator + "infoBoard";
+		pathname = root + "uploads" + File.separator + "infoBoard";
 		
 		
 
@@ -325,6 +325,10 @@ public class InfoServlet extends MyUploadServlet {
 				return;
 			}
 			
+			if (!dto.getUserId().equals(info.getUserId())) {
+				resp.sendRedirect(cp + "/infoBoard/list.do?page=" + page);
+				return;
+			}
 			
 			List<InfoBoardDTO> listFile = dao.listInfoFile(num);
 			
@@ -339,14 +343,15 @@ public class InfoServlet extends MyUploadServlet {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		resp.sendRedirect(cp + "/infoBoard/list.do?page=" + page);
 		
 	}
 
 	
 	
 	protected void updateSubmit(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		HttpSession session = req.getSession();
-		SessionInfo info = (SessionInfo)session.getAttribute("member");
+		// HttpSession session = req.getSession();
+		// SessionInfo info = (SessionInfo)session.getAttribute("member");
 		String cp = req.getContextPath();
 		
 		
@@ -406,8 +411,8 @@ public class InfoServlet extends MyUploadServlet {
 	
 	
 	protected void deleteFile(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		HttpSession session = req.getSession();
-		SessionInfo info = (SessionInfo)session.getAttribute("member");
+		// HttpSession session = req.getSession();
+		// SessionInfo info = (SessionInfo)session.getAttribute("member");
 		InfoBoardDAO dao = new InfoBoardDAO();
 		String cp = req.getContextPath();
 		

@@ -205,9 +205,9 @@ function searchList() {
 					</form>
 				</td>
 				<td align="right" width="100">
-					<c:if test="${sessionScope.member.userId==dto.userId || sessionScope.member.userId=='admin'}">						
+						
 						<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/infoBoard/write.do';">글올리기</button>
-					</c:if>
+					
 				</td>
 			</tr>
 		</table>	
