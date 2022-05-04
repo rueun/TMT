@@ -16,6 +16,7 @@ public class FreeBoardDTO {
 	private int parent;
 	private int likeCount;
 	private int replyCount;
+	private int boardLikeCount;
 	
 	public int getListNum() {
 		return listNum;
@@ -106,6 +107,12 @@ public class FreeBoardDTO {
 	}
 	public void setLikeCount(int likeCount) {
 		this.likeCount = likeCount;
+	}
+	public int getBoardLikeCount() {
+		return boardLikeCount;
+	}
+	public void setBoardLikeCount(int boardLikeCount) {
+		this.boardLikeCount = boardLikeCount;
 	}
 	
 	

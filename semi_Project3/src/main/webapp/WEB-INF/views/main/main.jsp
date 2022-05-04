@@ -354,7 +354,7 @@ hr.hr {
 							<span class="pull-right">
 								<span class="count">
 									<img alt="" src="${pageContext.request.contextPath}/resource/images/answer.png">
-	   								{dto.replyCount}
+	   								${dto.replyCount}
 	   							</span>
 	   							<span class="view">
 	   								<img alt="" src="${pageContext.request.contextPath}/resource/images/view.png">

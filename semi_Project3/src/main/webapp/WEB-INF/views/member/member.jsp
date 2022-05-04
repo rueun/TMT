@@ -196,13 +196,16 @@ $(function() {
 		$('.profileReset').css('display', 'block');
 	});
 	
+	// 기본이미지 버튼
 	$("body").on("click", ".profileReset", function() {
 		$('form input[name=selectFile]').val(''); // 파일 초기화
-		$profile.attr("src", "${pageContext.request.contextPath}/resource/images/add_photo.png");
-		$profile.removeAttr("data-filename");
+		$(".profile").attr("src", "${pageContext.request.contextPath}/resource/images/add_photo.png");
+		$(".profile").removeAttr("data-filename");
 		$('.profileReset').css('display', 'none');
+		$('#imageFileName').val(null);
 	});
 	
+	// 다시 입력 버튼
 	$("body").on("click", "form button[type=reset]", function() {
 		$(".profileReset").trigger("click");
 		
@@ -228,10 +231,17 @@ $(function() {
 			<tr>
 				<td>프&nbsp;로&nbsp;필<br>사&nbsp;진</td>
 				<td>
-					<img class="profile" name="userprofile" src="${pageContext.request.contextPath}/resource/images/add_photo.png">
+					<c:choose>
+						<c:when test="${dto.imageFileName == null}">
+							<img class="profile" name="userprofile" src="${pageContext.request.contextPath}/resource/images/add_photo.png">
+						</c:when>
+						<c:otherwise>
+							<img class="profile" name="userprofile" src="${pageContext.request.contextPath}/uploads/profile/${dto.imageFileName}">
+						</c:otherwise>
+					</c:choose>
 					<input type="file" name="selectFile" accept="image/*" style="display: none;" >
 					<div>
-						<input type="button" class="btn profileReset" value="기본 이미지" style="display: none;">
+						<input type="button" class="btn profileReset" value="기본 이미지" ${dto.imageFileName == null ? "style='display: none;'" : ""}>
 					</div>
 				</td>
 			</tr>
@@ -277,7 +287,7 @@ $(function() {
 			<tr>
 				<td>닉&nbsp;네&nbsp;임</td>
 				<td>
-					<input type="text" name="userNickName" maxlength="10" class="form-control" style="width: 50%;">
+					<input type="text" name="userNickName" maxlength="10" class="form-control" value="${dto.userNickName}" style="width: 50%;">
 				</td>
 			</tr>
 		
@@ -337,7 +347,7 @@ $(function() {
 			<tr>
 				<td>우편번호</td>
 				<td>
-					<input type="text" name="zip" id="zip" maxlength="7" class="form-control" value="${dto.zip}" readonly="readonly" style="width: 50%;">
+					<input type="text" name="post" id="post" maxlength="7" class="form-control" value="${dto.post}" readonly="readonly" style="width: 50%;">
 					<button type="button" class="btn" onclick="daumPostcode();">우편번호검색</button>
 				</td>
 			</tr>
@@ -374,9 +384,11 @@ $(function() {
 				    <button type="button" class="btn" name="btnOk" onclick="memberOk();"> ${mode=="member"?"회원가입":"정보수정"} </button>
 				    <button type="reset" class="btn"> 다시입력 </button>
 				    <button type="button" class="btn" 
-				    	onclick="javascript:location.href='${pageContext.request.contextPath}/';"> ${mode=="member"?"가입취소":"수정취소"}
-				    </button>
-				    
+				    	onclick="javascript:location.href='${pageContext.request.contextPath}/';"> ${mode=="member"?"가입취소":"수정취소"}</button>
+				    <c:if test="${mode=='update'}">
+						<input type="hidden" name="imageFileName" id="imageFileName" value="${dto.imageFileName}">
+						<input type="hidden" name="originalimageFileName" id="originalimageFileName" value="${dto.imageFileName}">
+					</c:if>
 				</td>
 			</tr>
 			
@@ -426,7 +438,7 @@ $(function() {
                 }
 
                 // 우편번호와 주소 정보를 해당 필드에 넣는다.
-                document.getElementById('zip').value = data.zonecode; //5자리 새우편번호 사용
+                document.getElementById('post').value = data.zonecode; //5자리 새 우편번호 사용
                 document.getElementById('addr1').value = fullAddr;
 
                 // 커서를 상세주소 필드로 이동한다.

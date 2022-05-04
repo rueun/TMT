@@ -411,14 +411,69 @@ public class FreeBoardDAO {
 		}
 	}
 	
-	public int dataCountReply(int num) {
+	
+	
+	public void insertBoardLike(int num, String userId) throws SQLException {
+		PreparedStatement pstmt = null;
+		String sql;
+		
+		try {
+			sql = "INSERT INTO freeBoardLike(num, userId) VALUES (?, ?)";
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setInt(1, num);
+			pstmt.setString(2, userId);
+			
+			pstmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			if(pstmt != null) {
+				try {
+					pstmt.close();
+				} catch (SQLException e) {
+				}
+			}
+		}
+		
+	}
+	
+	public void deleteBoardLike(int num, String userId) throws SQLException {
+		PreparedStatement pstmt = null;
+		String sql;
+		
+		try {
+			sql = "DELETE FROM freeBoardLike WHERE num = ? AND userId = ?";
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setInt(1, num);
+			pstmt.setString(2, userId);
+			
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			if(pstmt != null) {
+				try {
+					pstmt.close();
+				} catch (Exception e2) {
+				}
+			}
+		}
+		
+	}
+	
+	public int countBoardLike(int num) {
 		int result = 0;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		String sql;
 		
 		try {
-			sql = "SELECT NVL(COUNT(*), 0) FROM freeboardReply WHERE num=? AND answer=0";
+			sql = "SELECT NVL(COUNT(*), 0) FROM freeBoardLike WHERE num=?";
 			pstmt = conn.prepareStatement(sql);
 			
 			pstmt.setInt(1, num);
@@ -449,4 +504,147 @@ public class FreeBoardDAO {
 		return result;
 	}
 	
+	// 댓
+	public void insertReply(ReplyDTO dto) throws SQLException {
+		PreparedStatement pstmt = null;
+		String sql;
+		
+		try {
+			sql = "INSERT INTO freeBoardReply(replyNum, num, userId, content, answer, reg_date) "
+					+ " VALUES (freeBoardReply_seq.NEXTVAL, ?, ?, ?, ?, SYSDATE)";
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setInt(1, dto.getNum());
+			pstmt.setString(2, dto.getUserId());
+			pstmt.setString(3, dto.getContent());
+			pstmt.setInt(4, dto.getAnswer());
+			
+			pstmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			if(pstmt != null)
+				try {
+					pstmt.close();
+				} catch (SQLException e) {
+				}
+		}
+		
+	}
+	
+	public int dataCountReply(int num) {
+		int result = 0;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql;
+		
+		try {
+			sql = "SELECT NVL(COUNT(*), 0) FROM freeboardReply WHERE num=? AND answer=0";
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setInt(1, num);
+			
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()) {
+				result = rs.getInt(1);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+				}
+			}
+			
+			if(pstmt != null) {
+				try {
+					pstmt.close();
+				} catch (SQLException e) {
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	public List<ReplyDTO> listReply(int num, int start, int end) {
+		List<ReplyDTO> list = new ArrayList<>();
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		StringBuilder sb = new StringBuilder();
+		
+		try {
+			sb.append(" SELECT * FROM ( ");
+			sb.append("     SELECT ROWNUM rnum, tb.* FROM ( ");
+			sb.append("         SELECT r.replyNum, r.userId, userName, num, content, r.reg_date, ");
+			sb.append("                NVL(answerCount, 0) answerCount, ");
+			sb.append("                NVL(likeCount, 0) likeCount, ");
+			sb.append("                NVL(disLikeCount, 0) disLikeCount ");
+			sb.append("         FROM freeboardReply r ");
+			sb.append("         JOIN member1 m ON r.userId = m.userId ");
+			sb.append("	        LEFT OUTER  JOIN (");
+			sb.append("	            SELECT answer, COUNT(*) answerCount ");
+			sb.append("             FROM bbsReply  WHERE answer != 0 ");
+			sb.append("             GROUP BY answer ");
+			sb.append("         ) a ON r.replyNum = a.answer ");
+			sb.append("         LEFT OUTER  JOIN ( ");
+			sb.append("	            SELECT replyNum,  ");
+			sb.append("                 COUNT(DECODE(replyLike, 1, 1)) likeCount, ");
+			sb.append("                 COUNT(DECODE(replyLike, 0, 1)) disLikeCount ");
+			sb.append("             FROM freeboardReplyLike GROUP BY replyNum  ");
+			sb.append("         ) b ON r.replyNum = b.replyNum  ");
+			sb.append("	        WHERE num = ? AND r.answer=0 ");
+			sb.append("         ORDER BY r.replyNum DESC ");
+			sb.append("     ) tb WHERE ROWNUM <= ? ");
+			sb.append(" ) WHERE rnum >= ? ");
+			
+			pstmt = conn.prepareStatement(sb.toString());
+			
+			pstmt.setInt(1, num);
+			pstmt.setInt(2, end);
+			pstmt.setInt(3, start);
+
+			rs = pstmt.executeQuery();
+			
+			while(rs.next()) {
+				ReplyDTO dto = new ReplyDTO();
+				
+				dto.setReplyNum(rs.getInt("replyNum"));
+				dto.setNum(rs.getInt("num"));
+				dto.setUserId(rs.getString("userId"));
+				dto.setUserName(rs.getString("userName"));
+				dto.setContent(rs.getString("content"));
+				dto.setReg_date(rs.getString("reg_date"));
+				dto.setAnswerCount(rs.getInt("answerCount"));
+				dto.setLikeCount(rs.getInt("likeCount"));
+				dto.setDisLikeCount(rs.getInt("disLikeCount"));
+				
+				list.add(dto);
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if(rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+				}
+			}
+			if(pstmt != null) {
+				try {
+					pstmt.close();
+				} catch (SQLException e) {
+				}
+			}
+		}
+		
+		return list;
+		
+	}
 }
