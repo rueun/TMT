@@ -384,7 +384,7 @@ public class MainDAO {
 			rs = pstmt.executeQuery();
 			while (rs.next()) {
 				InfoBoardDTO dto = new InfoBoardDTO();
-				dto.setNum(rs.getInt("boardNum"));
+				dto.setNum(rs.getInt("num"));
 				dto.setSubject(rs.getString("subject"));
 				dto.setUserName(rs.getString("userName"));
 				dto.setHitCount(rs.getInt("hitCount"));
