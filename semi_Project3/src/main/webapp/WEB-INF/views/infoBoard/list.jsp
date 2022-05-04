@@ -137,7 +137,7 @@ function searchList() {
 </header>
 	
 <main>
-	<div class="body-container" style="width: 700px;">
+	<div class="body-container" style="width: 1000px;">
 		<div class="body-title">
 			<h3><i class="fa-solid fa-book"></i> 정보게시판 </h3>
 		</div>
@@ -169,7 +169,7 @@ function searchList() {
 							<a href="${articleUrl}&num=${dto.num}">${dto.subject}</a>
 							<!-- 글 올린시간이 1시간 이내라면(gap이 등록된 시간) -> 맨 앞에 이미지 띄워준다. -->
 							<c:if test="${dto.gap<1}">
-								<img src="${pageContext.request.contextPath}/resource/images/new.gif">
+								<img src="${pageContext.request.contextPath}/resource/images/icon_new.gif">
 							</c:if>
 						</td>
 						<td>${dto.userName}</td>

@@ -108,7 +108,7 @@ function deleteNotice() {
 </header>
 	
 <main>
-	<div class="body-container" style="width: 700px;">
+	<div class="body-container" style="width: 1000px;">
 		<div class="body-title">
 			<h3><i class="fa-solid fa-book"></i> 정보게시판 </h3>
 		</div>

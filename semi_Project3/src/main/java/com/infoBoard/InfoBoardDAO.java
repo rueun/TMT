@@ -12,7 +12,6 @@ import com.util.DBConn;
 public class InfoBoardDAO {
 	private Connection conn = DBConn.getConnection();
 	
-	// 데이터 추가
 	public void insertInfoBoard(InfoBoardDTO dto) throws SQLException {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -20,7 +19,7 @@ public class InfoBoardDAO {
 		int seq;
 		
 		try {
-			// 다음 시퀀스값 가져오기
+
 			sql = "SELECT infoBoard_seq.NEXTVAL FROM dual";
 			
 			pstmt = conn.prepareStatement(sql);
@@ -37,8 +36,7 @@ public class InfoBoardDAO {
 			rs = null;
 			pstmt = null;
 			
-			
-			// 테이블에 게시물 추가 -> num의 값은 위에서 저장했기에 그 값을 넣어준다.
+
 			sql = "INSERT INTO infoBoard (num, userId, subject, content, hitCount, reg_date) "
 					+ " VALUES (?, ?, ?, ?, 0, SYSDATE)";
 			pstmt = conn.prepareStatement(sql);
@@ -53,7 +51,7 @@ public class InfoBoardDAO {
 			pstmt.close();
 			pstmt = null;
 			
-			// 추가할 첨부파일이 존재하는 경우
+
 			if(dto.getSaveFiles() != null) {
 				sql = "INSERT INTO infoFile(fileNum, num, saveFilename, originalFilename) "
 						+ " VALUES(infoFile_seq.NEXTVAL, ?, ?, ?)";
@@ -90,7 +88,7 @@ public class InfoBoardDAO {
 	}
 	
 	
-	// 데이터 개수세기(검색안할때)
+
 	public int dataCount() {
 		int result = 0;
 		PreparedStatement pstmt = null;
@@ -128,7 +126,7 @@ public class InfoBoardDAO {
 	}
 	
 	
-	// 데이터개수 세기(검색시)
+
 	public int dataCount(String condition, String keyword) {
 		int result = 0;
 		PreparedStatement pstmt = null;
@@ -139,18 +137,18 @@ public class InfoBoardDAO {
 			sql = " SELECT COUNT(*) FROM infoBoard n";
 			sql += " JOIN member1 m ON n.userId = m.userId ";
 			
-			// 제목+내용인 경우 : subject, content
+
 			if(condition.equals("all")) {
 				sql += " WHERE INSTR(subject, ?) >= 1 OR INSTR(content, ?) >= 1 ";
 			}
 			
-			// 등록일 : reg_date
+
 			else if(condition.equals("reg_date")) {
 				keyword = keyword.replaceAll("(\\-|\\.|\\/.)", "");
 				sql += " WHERE TO_CHAR(reg_date, 'YYYYMMDD') = ? "; 
 			}
 			
-			// 나머지 -> 작성자, 제목, 내용
+
 			else {
 				sql += " WHERE INSTR(" + condition + ", ?) >= 1 ";
 			}
@@ -189,7 +187,7 @@ public class InfoBoardDAO {
 	}
 	
 	
-	// 지정 범위의 리스트 가져오기 (검색안할때)
+
 	public List<InfoBoardDTO> listInfoBoard(int start, int end) {
 		List<InfoBoardDTO> list = new ArrayList<>();
 		StringBuilder sb = new StringBuilder();
@@ -244,7 +242,7 @@ public class InfoBoardDAO {
 	}
 	
 	
-	// 지정 범위의 리스트 가져오기 (검색시)
+
 	public List<InfoBoardDTO> listInfoBoard(int start, int end, String condition, String keyword) {
 		List<InfoBoardDTO> list = new ArrayList<>();
 		StringBuilder sb = new StringBuilder();
@@ -258,18 +256,18 @@ public class InfoBoardDAO {
 			sb.append("          reg_date FROM infoBoard n ");
 			sb.append("          JOIN member1 m ON n.userId = m.userId ");
 			
-			// 제목+내용일 경우
+
 			if(condition.equals("all")) {
 				sb.append(" WHERE INSTR(subject, ?) >= 1 OR INSTR(content, ?) >= 1");
 			}
 			
-			// 등록일일 경우
+
 			else if(condition.equals("reg_date")) {
 				keyword = keyword.replaceAll("(\\.|\\/|\\-.)", "");
 				sb.append(" WHERE TO_CHAR(reg_date, 'YYYYMMDD') = ? ");
 			}
 			
-			// 나머지
+
 			else {
 				sb.append(" WHERE INSTR(" + condition + ", ?) >= 1 ");
 			}
@@ -327,9 +325,7 @@ public class InfoBoardDAO {
 
 	
 	
-	
-	
-	// 게시글 가져오기
+
 	public InfoBoardDTO readInfoBoard(int num) {
 		InfoBoardDTO dto = null;
 		PreparedStatement pstmt = null;
@@ -381,7 +377,7 @@ public class InfoBoardDAO {
 	}
 	
 	
-	// 이전글 게시글
+
 	public InfoBoardDTO preReadInfoBoard(int num, String condition, String keyword) {
 		InfoBoardDTO dto = null;
 		PreparedStatement pstmt = null;
@@ -454,8 +450,7 @@ public class InfoBoardDAO {
 		return dto;
 	}
 
-	
-	// 다음글 게시글
+
 	public InfoBoardDTO nextReadInfoBoard(int num, String condition, String keyword) {
 		InfoBoardDTO dto = null;
 		PreparedStatement pstmt = null;
@@ -529,7 +524,6 @@ public class InfoBoardDAO {
 	}
 	
 	
-	// 조회수
 	public void updateHitCount(int num) throws Exception {
 		PreparedStatement pstmt = null;
 		String sql;
@@ -554,7 +548,7 @@ public class InfoBoardDAO {
 	}
 	
 	
-	// 해당 게시물의 모든 첨부파일 리스트 가져오기
+
 	public List<InfoBoardDTO> listInfoFile(int num) {
 		List<InfoBoardDTO> list = new ArrayList<InfoBoardDTO>();
 		PreparedStatement pstmt = null;
@@ -599,7 +593,7 @@ public class InfoBoardDAO {
 	}
 	
 	
-	// 파일번호에 해당하는 파일이름
+
 	public InfoBoardDTO readInfoFile(int fileNum) {
 		InfoBoardDTO dto = null;
 		PreparedStatement pstmt = null;
@@ -643,8 +637,7 @@ public class InfoBoardDAO {
 		return dto;
 	}
 
-	
-	// 게시글 수정
+
 	public void updateInfoBoard(InfoBoardDTO dto) throws SQLException {
 		PreparedStatement pstmt = null;
 		String sql;
@@ -663,7 +656,6 @@ public class InfoBoardDAO {
 			pstmt = null;
 			
 			
-			// 추가할 첨부파일이 존재하는 경우
 			if(dto.getSaveFiles() != null) {
 				sql = "INSERT INTO infoFile(fileNum, num, saveFilename, originalFilename) "
 						+ " VALUES(infoFile_seq.NEXTVAL, ?, ?, ?)";
@@ -693,17 +685,16 @@ public class InfoBoardDAO {
 	}
 	
 	
-	// 파일 테이블 삭제
-	// mode = all -> 모든 파일삭제, mode != all -> 선택한 파일만 삭제
+
 	public void deleteInfoFile(String mode, int num) throws SQLException {
 		PreparedStatement pstmt = null;
 		String sql;
 		
 		try {
-			// 게시글이 삭제된 경우 게시글의 모든 첨부파일을 삭제한다.
+
 			if(mode.equals("all")) {
 				sql = "DELETE FROM infoFile WHERE num=?";
-			} else {  // 해당 첨부 파일만 삭제
+			} else {  
 				sql = "DELETE FROM infoFile WHERE fileNum=?";
 			}
 			
@@ -725,7 +716,7 @@ public class InfoBoardDAO {
 	}
 	
 	
-	// 게시글 삭제
+
 	public void deleteInfoBoard(int num) throws SQLException {
 		PreparedStatement pstmt = null;
 		String sql;

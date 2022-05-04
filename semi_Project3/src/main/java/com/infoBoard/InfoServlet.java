@@ -32,26 +32,25 @@ public class InfoServlet extends MyUploadServlet {
 	protected void process(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		req.setCharacterEncoding("utf-8");
 		
-		// uri와 cp
 		String uri = req.getRequestURI();
 		String cp = req.getContextPath();
 		
-		// 로그인 정보
+
 		HttpSession session = req.getSession();
 		SessionInfo info = (SessionInfo)session.getAttribute("member");
 		
-		// 주소가 게시글 리스트가 아니면서 로그인이 되어 있지 않은 경우 -> 로그인 화면으로 이동한다.
+
 		if(uri.indexOf("list.do") == -1 && info == null) {
 			resp.sendRedirect(cp+"/member/login.do");
 			return;
 		}
 		
-		// 파일을 저장할 경로 -> pathname
+
 		String root = session.getServletContext().getRealPath("/");
 		pathname = root + "upload" + File.separator + "infoBoard";
 		
 		
-		// 주소에 따른 작업 구분
+
 		if(uri.indexOf("list.do") != -1) {
 			list(req, resp);
 		}
@@ -82,23 +81,23 @@ public class InfoServlet extends MyUploadServlet {
 	}
 	
 	
-	// 게시판 리스트
+
 	protected void list(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		// 리스트
+	
 		InfoBoardDAO dao = new InfoBoardDAO();
 		MyUtil myUtil = new MyUtil();
 		String cp = req.getContextPath();
 		
 		try {
 			String page = req.getParameter("page");
-			// 맨 처음만 1페이지, 데이터 추가되면 상황에맞게 페이지 변경
+
 			int current_page = 1;
 			if(page != null) {
 				current_page = Integer.parseInt(page);
 			}
 			
 			
-			// 검색 변수들 (condition : 검색종류, keyword : 검색명)
+
 			String condition = req.getParameter("condition");
 			String keyword = req.getParameter("keyword");
 			if(condition == null) {
@@ -106,17 +105,17 @@ public class InfoServlet extends MyUploadServlet {
 				keyword = "";
 			}
 			
-			// GET방식이면 -> 디코딩으로 받기(한글인경우도있음)
+
 			if(req.getMethod().equalsIgnoreCase("GET")) {
 				keyword = URLDecoder.decode(keyword, "utf-8");
 			}
 			
 			
-			// 한 페이지 개시물개수, 데이터개수, 전체페이지
+
 			int rows = 10;
 			int dataCount, total_page;
 			
-			// 검색인경우와 검색아닌경우 데이터개수
+
 			if(keyword.length() == 0) {
 				dataCount = dao.dataCount();
 			} else {
@@ -128,11 +127,11 @@ public class InfoServlet extends MyUploadServlet {
 				current_page = total_page;
 			}
 			
-			// 시작번호와 끝번호 설정
+
 			int start = (current_page - 1) * rows + 1;
 			int end = current_page * rows;
 			
-			// 리스트 가져오기
+
 			List<InfoBoardDTO> list = null;
 			if(keyword.length() == 0) {
 				list = dao.listInfoBoard(start, end);
@@ -140,24 +139,23 @@ public class InfoServlet extends MyUploadServlet {
 				list = dao.listInfoBoard(start, end, condition, keyword);
 			}
 			
-			// 공지사항 체크한 것들 처리
-			// 현재시간 : curDate, 등록시간 : date
+
 			long gap;
 			Date curDate = new Date(); 
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			
-			// 게시판 게시글의 순서 변수
+
 			int listNum, n=0;
 			for(InfoBoardDTO dto : list) {
 				listNum = dataCount - (start + n - 1);
 				dto.setListNum(listNum);
 				
-				// String -> java.util.Date로 변환
+
 				Date date = sdf.parse(dto.getReg_date());
 				gap = (curDate.getTime() - date.getTime()) / (1000*60*60);
 				dto.setGap(gap);
 				
-				// 년월일로 시간을 짤라냈음
+
 				dto.setReg_date(dto.getReg_date().substring(0, 10));
 				
 				n++;
@@ -194,13 +192,12 @@ public class InfoServlet extends MyUploadServlet {
 		forward(req, resp, "/WEB-INF/views/infoBoard/list.jsp");
 	}
 
-	// 게시글 입력 폼
+
 	protected void writeForm(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		req.setAttribute("mode", "write");
 		forward(req, resp, "/WEB-INF/views/infoBoard/write.jsp");
 	}
-	
-	// 게시글 저장
+
 	protected void writeSubmit(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		HttpSession session = req.getSession();
 		SessionInfo info = (SessionInfo)session.getAttribute("member");
@@ -212,24 +209,21 @@ public class InfoServlet extends MyUploadServlet {
 			return;
 		}
 		
-		// admin만 글을 등록할 수 있다.
-		if(! info.getUserId().equals("admin")) {
-			resp.sendRedirect(cp+"/infoBoard/list.do");
-			return;
-		}
+
+		
 		
 		InfoBoardDAO dao = new InfoBoardDAO();
 		try {
 			InfoBoardDTO dto = new InfoBoardDTO();
 			
-			// 세션에 저장 된 userId
+			
 			dto.setUserId(info.getUserId());
  
 			dto.setSubject(req.getParameter("subject"));
 			dto.setContent(req.getParameter("content"));
 
 			
-			// 파일
+			
 			Map<String, String[]> map = doFileUpload(req.getParts(), pathname);
 			if(map != null) {
 				String []saveFiles = map.get("saveFilename");
@@ -249,7 +243,7 @@ public class InfoServlet extends MyUploadServlet {
 	}
 
 	
-	// 게시글 보기
+	
 	protected void article(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		InfoBoardDAO dao = new InfoBoardDAO();
 		String cp = req.getContextPath();
@@ -281,15 +275,15 @@ public class InfoServlet extends MyUploadServlet {
 			dto.setContent(dto.getContent().replaceAll("\n", "<br>"));
 			
 			
-			// 이전글, 다음글
+			
 			InfoBoardDTO preReadInfoBoard = dao.preReadInfoBoard(num, condition, keyword);
 			InfoBoardDTO nextReadInfoBoard = dao.nextReadInfoBoard(num, condition, keyword);
 			
 			
-			// 파일가져오기
+			
 			List<InfoBoardDTO> listFile = dao.listInfoFile(num);
 			
-			// jsp로 넘겨준 속성들
+			
 			req.setAttribute("dto", dto);
 			req.setAttribute("listFile", listFile);
 			req.setAttribute("query", query);
@@ -297,7 +291,7 @@ public class InfoServlet extends MyUploadServlet {
 			req.setAttribute("preReadInfoBoard", preReadInfoBoard);
 			req.setAttribute("nextReadInfoBoard", nextReadInfoBoard);
 			
-			// 정상 작동시 article로 이동
+		
 			forward(req, resp, "/WEB-INF/views/infoBoard/article.jsp");
 			return;
 			
@@ -305,22 +299,19 @@ public class InfoServlet extends MyUploadServlet {
 			e.printStackTrace();
 		}
 		
-		// 중간에 에러 발생시 공지사항 리스트로 이동
+		
 		resp.sendRedirect(cp+"/infoBoard/list.do?"+query);
 	}
 
 	
-	// 게시글 수정 폼
+
 	protected void updateForm(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		HttpSession session = req.getSession();
 		SessionInfo info = (SessionInfo)session.getAttribute("member");
 		String cp = req.getContextPath();
 		
-		// 아이디가 admin(관리자)이 아니라면 -> 리스트로 복귀
-		if(! info.getUserId().equals("admin")) {
-			resp.sendRedirect(cp+"/infoBoard/list.do");
-			return;
-		}
+		
+		
 		
 		InfoBoardDAO dao = new InfoBoardDAO();
 		String page = req.getParameter("page");
@@ -333,7 +324,7 @@ public class InfoServlet extends MyUploadServlet {
 				return;
 			}
 			
-			// 첨부파일 목록
+			
 			List<InfoBoardDTO> listFile = dao.listInfoFile(num);
 			
 			req.setAttribute("dto", dto);
@@ -351,19 +342,15 @@ public class InfoServlet extends MyUploadServlet {
 	}
 
 	
-	// 게시글 수정 완료
+	
 	protected void updateSubmit(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		HttpSession session = req.getSession();
 		SessionInfo info = (SessionInfo)session.getAttribute("member");
 		String cp = req.getContextPath();
 		
-		// 아이디가 admin(관리자)이 아니라면 -> 리스트로 복귀
-		if(! info.getUserId().equals("admin")) {
-			resp.sendRedirect(cp+"/infoBoard/list.do");
-			return;
-		}
 		
-		// GET방식이면 -> 리스트로 복귀
+		
+		
 		if(req.getMethod().equalsIgnoreCase("GET")) {
 			resp.sendRedirect(cp+"/infoBoard/list.do");
 			return;
@@ -397,7 +384,7 @@ public class InfoServlet extends MyUploadServlet {
 	}
 	
 	
-	// 게시글 삭제
+	
 	protected void delete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		InfoBoardDAO dao = new InfoBoardDAO();
 		String cp = req.getContextPath();
@@ -416,18 +403,14 @@ public class InfoServlet extends MyUploadServlet {
 	}
 	
 	
-	// 수정에서 파일 삭제
+	
 	protected void deleteFile(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		HttpSession session = req.getSession();
 		SessionInfo info = (SessionInfo)session.getAttribute("member");
 		InfoBoardDAO dao = new InfoBoardDAO();
 		String cp = req.getContextPath();
 		
-		// 관리자만 가능
-		if(! info.getUserId().equals("admin")) {
-			resp.sendRedirect(cp+"/infoBoard/list.do");
-			return;
-		}
+		
 		
 		String page = req.getParameter("page");
 		
@@ -435,18 +418,18 @@ public class InfoServlet extends MyUploadServlet {
 			int num = Integer.parseInt(req.getParameter("num"));
 			int fileNum = Integer.parseInt(req.getParameter("fileNum"));
 			
-			// 삭제할 파일 정보
+			
 			InfoBoardDTO dto = dao.readInfoFile(fileNum);
-			// 삭제할 파일 존재하면 -> 페이지의 파일을 삭제한다.
+			
 			if(dto != null) {
-				// 실제 파일 삭제
+			
 				FileManager.doFiledelete(pathname, dto.getSaveFilename());
 				
-				// 파일 테이블 데이터 삭제
+				
 				dao.deleteInfoFile("one", fileNum);
 			}
 			
-			// 다시 수정 화면으로
+		
 			resp.sendRedirect(cp+"/infoBoard/update.do?num="+num+"&page="+page);
 			return;
 			
@@ -457,7 +440,7 @@ public class InfoServlet extends MyUploadServlet {
 		resp.sendRedirect(cp+"infoBoard/list.do?page="+page);
 	}
 
-	// 첨부파일 다운로드
+	
 	protected void download(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		InfoBoardDAO dao = new InfoBoardDAO();
 		boolean b = false;
