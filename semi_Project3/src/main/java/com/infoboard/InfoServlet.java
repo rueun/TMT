@@ -23,7 +23,7 @@ import com.util.MyUploadServlet;
 import com.util.MyUtil;
 
 @MultipartConfig
-@WebServlet("/infoBoard/*")
+@WebServlet("/infoboard/*")
 public class InfoServlet extends MyUploadServlet {
 	private static final long serialVersionUID = 1L;
 	private String pathname;
@@ -48,7 +48,7 @@ public class InfoServlet extends MyUploadServlet {
 		
 		// 파일을 저장할 경로 -> pathname
 		String root = session.getServletContext().getRealPath("/");
-		pathname = root + "uploads" + File.separator + "infoboard";
+		pathname = root + "upload" + File.separator + "infoboard";
 		
 		
 		// 주소에 따른 작업 구분
@@ -76,15 +76,13 @@ public class InfoServlet extends MyUploadServlet {
 		else if(uri.indexOf("deleteFile.do") != -1) {
 			deleteFile(req,resp);
 		}
-		else if(uri.indexOf("deleteList.do") != -1) {
-			deleteList(req,resp);
-		}
 		else if(uri.indexOf("download.do") != -1) {
 			download(req,resp);
 		}
 	}
 	
 	
+	// 게시판 리스트
 	protected void list(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		// 리스트
 		InfoBoardDAO dao = new InfoBoardDAO();
@@ -142,16 +140,22 @@ public class InfoServlet extends MyUploadServlet {
 				list = dao.listInfoBoard(start, end, condition, keyword);
 			}
 			
+			// 공지사항 체크한 것들 처리
 			// 현재시간 : curDate, 등록시간 : date
-			
-			// Date curDate = new Date(); 
-			// SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			long gap;
+			Date curDate = new Date(); 
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			
 			// 게시판 게시글의 순서 변수
-			int BoardNum, n=0;
+			int listNum, n=0;
 			for(InfoBoardDTO dto : list) {
-				BoardNum = dataCount - (start + n - 1);
-				dto.setBoardNum(BoardNum);
+				listNum = dataCount - (start + n - 1);
+				dto.setListNum(listNum);
+				
+				// String -> java.util.Date로 변환
+				Date date = sdf.parse(dto.getReg_date());
+				gap = (curDate.getTime() - date.getTime()) / (1000*60*60);
+				dto.setGap(gap);
 				
 				// 년월일로 시간을 짤라냈음
 				dto.setReg_date(dto.getReg_date().substring(0, 10));
@@ -162,8 +166,8 @@ public class InfoServlet extends MyUploadServlet {
 			String query = "";
 			String listUrl, articleUrl;
 			
-			listUrl = cp + "/in/list.do";
-			articleUrl = cp + "/infoBoard/article.do?page=" + current_page;
+			listUrl = cp + "/infoboard/list.do";
+			articleUrl = cp + "/infoboard/article.do?page=" + current_page;
 			
 			if(keyword.length() == 0) {
 				query += "condition="+condition+"&keyword"+URLEncoder.encode(keyword, "utf-8");listUrl = "?" + query;
@@ -174,7 +178,6 @@ public class InfoServlet extends MyUploadServlet {
 			String paging = myUtil.paging(current_page, total_page, listUrl);
 			
 			req.setAttribute("list", list);
-			// req.setAttribute("listInfoBoard", listInfoBoard);		
 			req.setAttribute("page", current_page);
 			req.setAttribute("dataCount", dataCount);
 			req.setAttribute("total_page", total_page);
@@ -188,25 +191,32 @@ public class InfoServlet extends MyUploadServlet {
 		}
 		
 		
-		forward(req, resp, "/WEB-INF/views/infoBoard/list.jsp");
+		forward(req, resp, "/WEB-INF/views/infoboard/list.jsp");
+	}
+
+	// 게시글 입력 폼
+	protected void writeForm(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		req.setAttribute("mode", "write");
+		forward(req, resp, "/WEB-INF/views/infoboard/write.jsp");
 	}
 	
-	private void writeForm(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		req.setAttribute("mode", "write");
-		forward(req, resp, "/WEB-INF/views/infoBoard/write.jsp");
-	}
-	private void writeSubmit(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	// 게시글 저장
+	protected void writeSubmit(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		HttpSession session = req.getSession();
 		SessionInfo info = (SessionInfo)session.getAttribute("member");
 		
 		String cp = req.getContextPath();
 
 		if(req.getMethod().equalsIgnoreCase("GET")) {
-			resp.sendRedirect(cp+"/infoBoard/list.do");
+			resp.sendRedirect(cp+"/infoboard/list.do");
 			return;
 		}
 		
-		
+		// admin만 글을 등록할 수 있다.
+		if(! info.getUserId().equals("admin")) {
+			resp.sendRedirect(cp+"/infoboard/list.do");
+			return;
+		}
 		
 		InfoBoardDAO dao = new InfoBoardDAO();
 		try {
@@ -216,7 +226,6 @@ public class InfoServlet extends MyUploadServlet {
 			dto.setUserId(info.getUserId());
  
 			dto.setSubject(req.getParameter("subject"));
-			
 			dto.setContent(req.getParameter("content"));
 
 			
@@ -236,9 +245,12 @@ public class InfoServlet extends MyUploadServlet {
 			e.printStackTrace();
 		}
 		
-		resp.sendRedirect(cp+"/infoBoard/list.do");
+		resp.sendRedirect(cp+"/infoboard/list.do");
 	}
-	private void article(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+	
+	// 게시글 보기
+	protected void article(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		InfoBoardDAO dao = new InfoBoardDAO();
 		String cp = req.getContextPath();
 		
@@ -264,14 +276,14 @@ public class InfoServlet extends MyUploadServlet {
 			
 			InfoBoardDTO dto = dao.readInfoBoard(num);
 			if(dto == null) {
-				resp.sendRedirect(cp+"/infoBoard/list.do?"+query);
+				resp.sendRedirect(cp+"/infoboard/list.do?"+query);
 			}
 			dto.setContent(dto.getContent().replaceAll("\n", "<br>"));
 			
 			
 			// 이전글, 다음글
-			// InfoBoardDTO preReadInfoBoard = dao.preReadInfoBoard(num, condition, keyword);
-			// InfoBoardDTO nextReadInfoBoard = dao.nextReadInfoBoard(num, condition, keyword);
+			InfoBoardDTO preReadInfoBoard = dao.preReadInfoBoard(num, condition, keyword);
+			InfoBoardDTO nextReadInfoBoard = dao.nextReadInfoBoard(num, condition, keyword);
 			
 			
 			// 파일가져오기
@@ -282,25 +294,33 @@ public class InfoServlet extends MyUploadServlet {
 			req.setAttribute("listFile", listFile);
 			req.setAttribute("query", query);
 			req.setAttribute("page", page);
-			// req.setAttribute("preReadInfoBoard", preReadInfoBoard);
-			// req.setAttribute("nextReadInfoBoard", nextReadInfoBoard);
+			req.setAttribute("preReadInfoBoard", preReadInfoBoard);
+			req.setAttribute("nextReadInfoBoard", nextReadInfoBoard);
 			
 			// 정상 작동시 article로 이동
-			forward(req, resp, "/WEB-INF/views/infoBoard/article.jsp");
+			forward(req, resp, "/WEB-INF/views/infoboard/article.jsp");
 			return;
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
-		// 중간에 에러 발생시 리스트로 이동
-		resp.sendRedirect(cp+"/infoBoard/list.do?"+query);
+		// 중간에 에러 발생시 공지사항 리스트로 이동
+		resp.sendRedirect(cp+"/infoboard/list.do?"+query);
 	}
-	private void updateForm(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		// HttpSession session = req.getSession();
-		// SessionInfo info = (SessionInfo)session.getAttribute("member");
+
+	
+	// 게시글 수정 폼
+	protected void updateForm(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		HttpSession session = req.getSession();
+		SessionInfo info = (SessionInfo)session.getAttribute("member");
 		String cp = req.getContextPath();
 		
+		// 아이디가 admin(관리자)이 아니라면 -> 리스트로 복귀
+		if(! info.getUserId().equals("admin")) {
+			resp.sendRedirect(cp+"/infoboard/list.do");
+			return;
+		}
 		
 		InfoBoardDAO dao = new InfoBoardDAO();
 		String page = req.getParameter("page");
@@ -309,7 +329,7 @@ public class InfoServlet extends MyUploadServlet {
 			int num = Integer.parseInt(req.getParameter("num"));
 			InfoBoardDTO dto = dao.readInfoBoard(num);
 			if(dto == null) {
-				resp.sendRedirect(cp+"/infoBoard/list.do");
+				resp.sendRedirect(cp+"/infoboard/list.do");
 				return;
 			}
 			
@@ -321,21 +341,31 @@ public class InfoServlet extends MyUploadServlet {
 			req.setAttribute("page", page);
 			req.setAttribute("mode", "update");
 			
-			forward(req, resp, "/WEB-INF/views/infoBoard/write.jsp");
+			forward(req, resp, "/WEB-INF/views/infoboard/write.jsp");
 			return;
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
 	}
-	private void updateSubmit(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		// HttpSession session = req.getSession();
-		// SessionInfo info = (SessionInfo)session.getAttribute("member");
+
+	
+	// 게시글 수정 완료
+	protected void updateSubmit(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		HttpSession session = req.getSession();
+		SessionInfo info = (SessionInfo)session.getAttribute("member");
 		String cp = req.getContextPath();
+		
+		// 아이디가 admin(관리자)이 아니라면 -> 리스트로 복귀
+		if(! info.getUserId().equals("admin")) {
+			resp.sendRedirect(cp+"/infoboard/list.do");
+			return;
+		}
 		
 		// GET방식이면 -> 리스트로 복귀
 		if(req.getMethod().equalsIgnoreCase("GET")) {
-			resp.sendRedirect(cp+"/infoBoard/list.do");
+			resp.sendRedirect(cp+"/infoboard/list.do");
 			return;
 		}
 		
@@ -363,30 +393,92 @@ public class InfoServlet extends MyUploadServlet {
 			e.printStackTrace();
 		}
 		
-		resp.sendRedirect(cp+"/infoBoard/list.do?page="+page);
+		resp.sendRedirect(cp+"/infoboard/list.do?page="+page);
 	}
-	private void delete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	
+	
+	// 게시글 삭제
+	protected void delete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		InfoBoardDAO dao = new InfoBoardDAO();
 		String cp = req.getContextPath();
 		int page = Integer.parseInt(req.getParameter("page"));
 		
 		try {
 			int num = Integer.parseInt(req.getParameter("num"));
-			dao.deleteInfoBoardFile("all", num);
+			dao.deleteInfoFile("all", num);
+			dao.deleteInfoBoard(num);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
-		resp.sendRedirect(cp+"/infoBoard/list.do?page="+page);
+		resp.sendRedirect(cp+"/infoboard/list.do?page="+page);
 	}
-	private void deleteFile(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	
+	
+	// 수정에서 파일 삭제
+	protected void deleteFile(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		HttpSession session = req.getSession();
+		SessionInfo info = (SessionInfo)session.getAttribute("member");
+		InfoBoardDAO dao = new InfoBoardDAO();
+		String cp = req.getContextPath();
 		
-	}
-	private void deleteList(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		// 관리자만 가능
+		if(! info.getUserId().equals("admin")) {
+			resp.sendRedirect(cp+"/infoboard/list.do");
+			return;
+		}
 		
+		String page = req.getParameter("page");
+		
+		try {
+			int num = Integer.parseInt(req.getParameter("num"));
+			int fileNum = Integer.parseInt(req.getParameter("fileNum"));
+			
+			// 삭제할 파일 정보
+			InfoBoardDTO dto = dao.readInfoFile(fileNum);
+			// 삭제할 파일 존재하면 -> 페이지의 파일을 삭제한다.
+			if(dto != null) {
+				// 실제 파일 삭제
+				FileManager.doFiledelete(pathname, dto.getSaveFilename());
+				
+				// 파일 테이블 데이터 삭제
+				dao.deleteInfoFile("one", fileNum);
+			}
+			
+			// 다시 수정 화면으로
+			resp.sendRedirect(cp+"/infoboard/update.do?num="+num+"&page="+page);
+			return;
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		resp.sendRedirect(cp+"infoboard/list.do?page="+page);
 	}
-	private void download(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+	// 첨부파일 다운로드
+	protected void download(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		InfoBoardDAO dao = new InfoBoardDAO();
+		boolean b = false;
+		
+		try {
+			int fileNum = Integer.parseInt(req.getParameter("fileNum"));
+			InfoBoardDTO dto = dao.readInfoFile(fileNum);
+			
+			if(dto != null) {
+				b = FileManager.doFiledownload(dto.getSaveFilename(), dto.getOriginalFilename(), pathname, resp);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		if(! b) {
+			resp.setContentType("text/html;charset=utf-8");
+			PrintWriter out = resp.getWriter();
+			out.print("<script>alert('파일다운로드가 불가능합니다.');history.back();</script>");
+		}
 		
 	}
 }
