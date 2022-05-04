@@ -1,4 +1,4 @@
-package com.infoboard;
+package com.infoBoard;
 
 public class InfoBoardDTO {
 		private int listNum;

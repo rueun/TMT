@@ -1,4 +1,4 @@
-package com.infoboard;
+package com.infoBoard;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

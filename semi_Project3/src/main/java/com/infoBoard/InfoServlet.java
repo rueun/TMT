@@ -1,4 +1,4 @@
-package com.infoboard;
+package com.infoBoard;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +23,7 @@ import com.util.MyUploadServlet;
 import com.util.MyUtil;
 
 @MultipartConfig
-@WebServlet("/infoboard/*")
+@WebServlet("/infoBoard/*")
 public class InfoServlet extends MyUploadServlet {
 	private static final long serialVersionUID = 1L;
 	private String pathname;
@@ -48,7 +48,7 @@ public class InfoServlet extends MyUploadServlet {
 		
 		// 파일을 저장할 경로 -> pathname
 		String root = session.getServletContext().getRealPath("/");
-		pathname = root + "upload" + File.separator + "infoboard";
+		pathname = root + "upload" + File.separator + "infoBoard";
 		
 		
 		// 주소에 따른 작업 구분
@@ -166,8 +166,8 @@ public class InfoServlet extends MyUploadServlet {
 			String query = "";
 			String listUrl, articleUrl;
 			
-			listUrl = cp + "/infoboard/list.do";
-			articleUrl = cp + "/infoboard/article.do?page=" + current_page;
+			listUrl = cp + "/infoBoard/list.do";
+			articleUrl = cp + "/infoBoard/article.do?page=" + current_page;
 			
 			if(keyword.length() == 0) {
 				query += "condition="+condition+"&keyword"+URLEncoder.encode(keyword, "utf-8");listUrl = "?" + query;
@@ -191,13 +191,13 @@ public class InfoServlet extends MyUploadServlet {
 		}
 		
 		
-		forward(req, resp, "/WEB-INF/views/infoboard/list.jsp");
+		forward(req, resp, "/WEB-INF/views/infoBoard/list.jsp");
 	}
 
 	// 게시글 입력 폼
 	protected void writeForm(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		req.setAttribute("mode", "write");
-		forward(req, resp, "/WEB-INF/views/infoboard/write.jsp");
+		forward(req, resp, "/WEB-INF/views/infoBoard/write.jsp");
 	}
 	
 	// 게시글 저장
@@ -208,13 +208,13 @@ public class InfoServlet extends MyUploadServlet {
 		String cp = req.getContextPath();
 
 		if(req.getMethod().equalsIgnoreCase("GET")) {
-			resp.sendRedirect(cp+"/infoboard/list.do");
+			resp.sendRedirect(cp+"/infoBoard/list.do");
 			return;
 		}
 		
 		// admin만 글을 등록할 수 있다.
 		if(! info.getUserId().equals("admin")) {
-			resp.sendRedirect(cp+"/infoboard/list.do");
+			resp.sendRedirect(cp+"/infoBoard/list.do");
 			return;
 		}
 		
@@ -245,7 +245,7 @@ public class InfoServlet extends MyUploadServlet {
 			e.printStackTrace();
 		}
 		
-		resp.sendRedirect(cp+"/infoboard/list.do");
+		resp.sendRedirect(cp+"/infoBoard/list.do");
 	}
 
 	
@@ -276,7 +276,7 @@ public class InfoServlet extends MyUploadServlet {
 			
 			InfoBoardDTO dto = dao.readInfoBoard(num);
 			if(dto == null) {
-				resp.sendRedirect(cp+"/infoboard/list.do?"+query);
+				resp.sendRedirect(cp+"/infoBoard/list.do?"+query);
 			}
 			dto.setContent(dto.getContent().replaceAll("\n", "<br>"));
 			
@@ -298,7 +298,7 @@ public class InfoServlet extends MyUploadServlet {
 			req.setAttribute("nextReadInfoBoard", nextReadInfoBoard);
 			
 			// 정상 작동시 article로 이동
-			forward(req, resp, "/WEB-INF/views/infoboard/article.jsp");
+			forward(req, resp, "/WEB-INF/views/infoBoard/article.jsp");
 			return;
 			
 		} catch (Exception e) {
@@ -306,7 +306,7 @@ public class InfoServlet extends MyUploadServlet {
 		}
 		
 		// 중간에 에러 발생시 공지사항 리스트로 이동
-		resp.sendRedirect(cp+"/infoboard/list.do?"+query);
+		resp.sendRedirect(cp+"/infoBoard/list.do?"+query);
 	}
 
 	
@@ -318,7 +318,7 @@ public class InfoServlet extends MyUploadServlet {
 		
 		// 아이디가 admin(관리자)이 아니라면 -> 리스트로 복귀
 		if(! info.getUserId().equals("admin")) {
-			resp.sendRedirect(cp+"/infoboard/list.do");
+			resp.sendRedirect(cp+"/infoBoard/list.do");
 			return;
 		}
 		
@@ -329,7 +329,7 @@ public class InfoServlet extends MyUploadServlet {
 			int num = Integer.parseInt(req.getParameter("num"));
 			InfoBoardDTO dto = dao.readInfoBoard(num);
 			if(dto == null) {
-				resp.sendRedirect(cp+"/infoboard/list.do");
+				resp.sendRedirect(cp+"/infoBoard/list.do");
 				return;
 			}
 			
@@ -341,7 +341,7 @@ public class InfoServlet extends MyUploadServlet {
 			req.setAttribute("page", page);
 			req.setAttribute("mode", "update");
 			
-			forward(req, resp, "/WEB-INF/views/infoboard/write.jsp");
+			forward(req, resp, "/WEB-INF/views/infoBoard/write.jsp");
 			return;
 			
 		} catch (Exception e) {
@@ -359,13 +359,13 @@ public class InfoServlet extends MyUploadServlet {
 		
 		// 아이디가 admin(관리자)이 아니라면 -> 리스트로 복귀
 		if(! info.getUserId().equals("admin")) {
-			resp.sendRedirect(cp+"/infoboard/list.do");
+			resp.sendRedirect(cp+"/infoBoard/list.do");
 			return;
 		}
 		
 		// GET방식이면 -> 리스트로 복귀
 		if(req.getMethod().equalsIgnoreCase("GET")) {
-			resp.sendRedirect(cp+"/infoboard/list.do");
+			resp.sendRedirect(cp+"/infoBoard/list.do");
 			return;
 		}
 		
@@ -393,7 +393,7 @@ public class InfoServlet extends MyUploadServlet {
 			e.printStackTrace();
 		}
 		
-		resp.sendRedirect(cp+"/infoboard/list.do?page="+page);
+		resp.sendRedirect(cp+"/infoBoard/list.do?page="+page);
 	}
 	
 	
@@ -412,7 +412,7 @@ public class InfoServlet extends MyUploadServlet {
 			e.printStackTrace();
 		}
 		
-		resp.sendRedirect(cp+"/infoboard/list.do?page="+page);
+		resp.sendRedirect(cp+"/infoBoard/list.do?page="+page);
 	}
 	
 	
@@ -425,7 +425,7 @@ public class InfoServlet extends MyUploadServlet {
 		
 		// 관리자만 가능
 		if(! info.getUserId().equals("admin")) {
-			resp.sendRedirect(cp+"/infoboard/list.do");
+			resp.sendRedirect(cp+"/infoBoard/list.do");
 			return;
 		}
 		
@@ -447,14 +447,14 @@ public class InfoServlet extends MyUploadServlet {
 			}
 			
 			// 다시 수정 화면으로
-			resp.sendRedirect(cp+"/infoboard/update.do?num="+num+"&page="+page);
+			resp.sendRedirect(cp+"/infoBoard/update.do?num="+num+"&page="+page);
 			return;
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
-		resp.sendRedirect(cp+"infoboard/list.do?page="+page);
+		resp.sendRedirect(cp+"infoBoard/list.do?page="+page);
 	}
 
 	// 첨부파일 다운로드

@@ -10,8 +10,79 @@
 <title>spring</title>
 <jsp:include page="/WEB-INF/views/layout/staticHeader.jsp"/>
 <style type="text/css">
-.table-list thead > tr:first-child{
-	background: #f8f8f8;
+.page-box {
+	clear: both;
+	padding: 20px 0;
+	text-align: center;
+}
+.paginate {
+	clear: both;
+	text-align: center;
+	white-space: nowrap;
+	font-size: 14px;	
+}
+.paginate a {
+	border: 1px solid #ccc;
+	color: #000;
+	font-weight: 600;
+	text-decoration: none;
+	padding: 3px 7px;
+	margin-left: 3px;
+	vertical-align: middle;
+}
+.paginate a:hover, .paginate a:active {
+	color: #FF5E00;
+}
+.paginate span {
+	border: 1px solid tomato;
+	color: tomato;
+	font-weight: 600;
+	padding: 3px 7px;
+	margin-left: 3px;
+	vertical-align: middle;
+}
+.paginate :first-child {
+	margin-left: 0;
+}
+
+
+.body-container {
+    margin: 0 auto 15px;
+    width: 700px;
+    min-height: 450px;
+    position: relative;
+}
+
+.body-title {
+    color: #424951;
+    padding-top: 25px;
+    padding-bottom: 5px;
+    margin: 0 0 25px 0;
+}
+
+.body-title h3 {
+    font-size: 23px;
+    min-width: 300px;
+    font-family: "Malgun Gothic", "맑은 고딕", NanumGothic, 나눔고딕, 돋움, sans-serif;
+    font-weight: bold;
+    margin: 0 0 -5px 0;
+    padding-bottom: 5px;
+    display: inline-block;
+    border-bottom: 3px solid #424951;
+}
+
+.board_write .cont textarea {
+    display: block;
+    width: 100%;
+    height: 300px;
+    padding: 15px;
+    box-sizing: border-box;
+    border: 0;
+    resize: vertical;
+}
+
+.table-list thead > tr:first-child{ 
+	background: #fff;
 }
 .table-list th, .table-list td {
 	text-align: center;
@@ -38,8 +109,16 @@
 .table-list .file {
 	width: 50px; color: #787878;
 }
-.table-list .notice {
-	display: inline-block; padding: 1px 3px; background: #ed4c00; color: #fff;
+
+
+.btn {
+    text-align: center;
+    display: inline-block;
+    min-width: 50px;
+    padding: 5px;
+    border: 1px solid #000;
+    border-radius: 2px;
+    font-size: inherit;
 }
 
 </style>
@@ -110,10 +189,10 @@ function searchList() {
 		<table class="table">
 			<tr>
 				<td width="100">
-					<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/infoboard/list.do';">새로고침</button>
+					<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/infoBoard/list.do';">새로고침</button>
 				</td>
 				<td align="center">
-					<form name="searchForm" action="${pageContext.request.contextPath}/infoboard/list.do" method="post">
+					<form name="searchForm" action="${pageContext.request.contextPath}/infoBoard/list.do" method="post">
 						<select name="condition" class="form-select">
 							<option value="all" ${condition =="all" ? "selected='selected'" : "" }>제목+내용</option>
 							<option value="userName" ${condition =="userName" ? "selected='selected'" : "" }>작성자</option>
@@ -126,9 +205,8 @@ function searchList() {
 					</form>
 				</td>
 				<td align="right" width="100">
-					<!-- admin인 경우에만 공지사항을 올릴 수 있다. -->
-					<c:if test="${sessionScope.member.userId == 'admin'}">						
-						<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/infoboard/write.do';">글올리기</button>
+					<c:if test="${sessionScope.member.userId==dto.userId || sessionScope.member.userId=='admin'}">						
+						<button type="button" class="btn" onclick="location.href='${pageContext.request.contextPath}/infoBoard/write.do';">글올리기</button>
 					</c:if>
 				</td>
 			</tr>
