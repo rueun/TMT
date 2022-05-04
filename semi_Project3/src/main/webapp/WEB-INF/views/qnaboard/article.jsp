@@ -223,27 +223,292 @@ li {list-style: none;}
 	</c:if>
 	
 	
-	$(document).ready(function(){
-	    $('.content').click(function(){
-	    	
-	    	var id_value = $('#like_num').text();
-	     	if($(".content").hasClass("heart-active") === true) { // 버튼이 active 상태이면
-	     		var input_like = Number(id_value) - 1;
-	     	} else { 
-	     		var input_like = Number(id_value) + 1;
-	     	}
-	     	
-	    	$('#like_num').text(input_like);
-	    	$('.content').toggleClass("heart-active")
-	      	$('.text').toggleClass("heart-active")
-	     	$('.numb').toggleClass("heart-active")
-	     	$('.heart').toggleClass("heart-active")
-	     	
-	     	
-	    	
-	    });
-	});
 </script>
+
+<script type="text/javascript">
+function login() {
+	location.href="${pageContext.request.contextPath}/member/login.do";
+}
+
+function ajaxFun(url, method, query, dataType, fn) {
+	$.ajax({
+		type:method,
+		url:url,
+		data:query,
+		dataType:dataType,
+		success:function(data){
+			fn(data);
+		},
+		beforeSend:function(jqXHR){
+			jqXHR.setRequestHeader("AJAX", true); // header에 AJAX라는 속성명에 true를 설정
+		},
+		error:function(jqXHR) {
+			if(jqXHR.status === 403){
+				login();
+				return false;
+			} else if(jqXHR.status === 400){
+				alert("요청처리를 실패했습니다.");
+				return false;
+			}
+			
+			console.log(jqXHR.responseTet);
+		}
+	});
+}
+
+// 게시글 공감 여부
+$(function() {
+   $(".content").click(function() {
+      let isLike = $(".content").hasClass("heart-active");
+      let msg = isLike ? '게시글 공감을 취소 하시겠습니까 ? ' : '게시글에 공감하십니까 ? ';
+      
+      if(! confirm(msg)) {
+         return false;
+      }
+      
+      let url = "${pageContext.request.contextPath}/qnaboard/insertQnALike.do";
+      let query = "num=${dto.boardNum}&isLike="+isLike;
+      const fn = function(data) {
+         let state = data.state;
+         
+         if(state === "true") {
+        	$('.content').toggleClass("heart-active")
+           	$('.text').toggleClass("heart-active")
+          	$('.numb').toggleClass("heart-active")
+          	$('.heart').toggleClass("heart-active")
+            
+            let count = data.QnALikeCount;
+            $("#like_num").text(count);
+         }
+      };
+      
+      ajaxFun(url, "post", query, "json", fn);
+      
+   });
+});
+
+//글보기 화면이 보임과 동시에 AJAX로 1페이지 리플 리스트를 가져오기
+$(function() {
+   listPage(1);
+});
+
+
+// 페이징 처리에서 호출하는 자바스크립트 함수
+function listPage(page) {
+   	let url = "${pageContext.request.contextPath}/qnaboard/listReply.do";
+   	let query = "boardNum=${dto.boardNum}&pageNo="+page;
+   	let selector = "#listReply";
+   
+   	const fn = function(data) {
+      	$(selector).html(data);
+   	};
+   
+   	// AJAX-Text
+   	ajaxFun(url, "get", query, "html", fn);
+}
+
+
+
+//댓글(리플) 등록
+$(function() {
+   	// send 버튼 클릭 시
+	$(".btn_enter").click(function() {
+    	let boardNum = "${dto.boardNum}"; // 리플을 등록할 게시물번호
+      	let content = $(".tf_reply").val().trim();
+      	if(! content) {
+      		$(".tf_reply").focus();
+         	return false;
+      	}
+      	content = encodeURIComponent(content);
+      
+      	let url = "${pageContext.request.contextPath}/qnaboard/insertReply.do";
+      	let query = "boardNum="+boardNum+"&content="+content+"&answer=0";
+      
+      	const fn = function(data) {
+      		$(".tf_reply").val("");
+         
+         	let state = data.state;
+         	if(state === "true") {
+            	// 등록 완료 후 1페이지의 댓글 다시 불러오기
+            	listPage(1);
+         	} else {
+            	alert("댓글을 추가하지 못했습니다.");
+         	}
+      	};
+      	ajaxFun(url, "post", query, "json", fn);      
+   	});
+});
+
+// 댓글 삭제
+$(function() {
+	$("body").on("click", ".deleteReply", function() {
+		if(! confirm('댓글을 삭제하시겠습니까 ? ')) {
+			return false;
+		}
+		
+		let replyNum = $(this).attr('data-replyNum');
+		let page = $(this).attr('data-pageNo');
+		
+		let url =  '${pageContext.request.contextPath}/qnaboard/deleteReply.do';
+		let query = 'replyNum=' + replyNum;
+		
+		const fn = function(data) {
+			listPage(page);
+		};
+		
+		ajaxFun(url, "post", query, "html", fn);
+	});
+});
+
+// 댓글 좋아요 / 싫어요
+$(function(){
+	// 댓글 좋아요 / 싫어요 등록
+	$("body").on("click", ".btnSendReplyLike", function(){
+		let replyNum = $(this).attr("data-replyNum");
+		let replyLike = $(this).attr("data-replyLike");
+		const $btn = $(this);
+		
+		let msg = "해당 댓글이 마음에 들지 않으십니까 ?";
+		if(replyLike === "1") {
+			msg="해당 댓글에 공감하십니까 ?";
+		}
+		
+		if(! confirm(msg)) {
+			return false;
+		}
+		
+		let url = "${pageContext.request.contextPath}/qnaboard/insertReplyLike.do";
+		let query = "replyNum=" + replyNum + "&replyLike=" + replyLike;
+		
+		const fn = function(data){
+			let state = data.state;
+			if(state === "true") {
+				let likeCount = data.likeCount;
+				let disLikeCount = data.disLikeCount;
+				
+				$btn.parent("span").children().eq(0).find("span").html(likeCount);
+				$btn.parent("span").children().eq(1).find("span").html(disLikeCount);
+			} else if(state === "liked") {
+				alert("댓글 공감/비공감은 한 번만 가능합니다.");
+			} else {
+				alert("게시물 공감 여부 처리가 실패했습니다.");
+			}
+		};
+		
+		ajaxFun(url, "post", query, "json", fn);
+	});
+});
+
+
+
+// 댓글별 답글 리스트
+function listReplyAnswer(answer) {
+   let url="${pageContext.request.contextPath}/qnaboard/listReplyAnswer.do";
+   let query = "answer="+answer;
+   let selector = "#listReplyAnswer" + answer;
+   
+   const fn = function(data) {
+      $(selector).html(data);
+   };
+   ajaxFun(url, "get", query, "html", fn);
+}
+
+
+// 댓글별 답글 개수
+function countReplyAnswer(answer) {
+	let url = "${pageContext.request.contextPath}/qnaboard/countReplyAnswer.do";
+	let query = "answer="+answer;
+	
+	const fn = function(data) {
+		let count = data.count;
+		let selector = "#answerCount" + answer;
+		 $(selector).html(count);
+	};
+	ajaxFun(url, "get", query, "json", fn);
+}
+
+// 답글 버튼(댓글별 답글 등록폼 및 답글리스트)
+$(function() {
+   $("body").on("click", ".btnReplyAnswerLayout", function() {
+      const $div = $(this).closest("div").next();
+      
+      let isVisible = $div.is(':visible');
+      let replyNum = $(this).attr("data-replyNum");
+      
+      if( isVisible ){
+         $div.hide();
+      } else {
+         $div.show();
+         
+         // 답글 리스트
+         listReplyAnswer(replyNum);
+         
+         // 답글 개수
+         countReplyAnswer(replyNum)
+         
+         
+      }
+   });
+});
+
+// 댓글별 답글 등록
+$(function() {
+   $("body").on("click", ".btnSendReplyAnswer", function() {
+      let boardNum = "${dto.boardNum}";
+      let replyNum = $(this).attr("data-replyNum");
+      const $div = $(this).parent().prev("div");
+      
+      let content = $div.find("textarea").val().trim();
+      if( ! content){
+         $div.find("textarea").focus();
+         return false;
+      }
+      content = encodeURIComponent(content);
+      
+      let url = "${pageContext.request.contextPath}/qnaboard/insertReply.do";
+      let query = "boardNum="+boardNum+"&content="+content+"&answer="+replyNum;
+   
+      const fn = function(data) {
+         $div.find("textarea").val("");
+         
+         let state = data.state;
+         if(state === "true") {
+            // 답글 리스트
+            listReplyAnswer(replyNum);
+            
+            // 답글 개수
+            countReplyAnswer(replyNum)
+         }
+      };
+      
+      ajaxFun(url, "post", query, "json", fn);
+   });
+});
+
+
+// 댓글별 답글 삭제
+$(function(){
+	$("body").on("click", ".deleteReplyAnswer", function(){
+		if(! confirm("댓글을 삭제하시겠습니까 ? ")) {
+		    return false;
+		}
+		
+		let replyNum = $(this).attr("data-replyNum");
+		let answer = $(this).attr("data-answer");
+		
+		let url = "${pageContext.request.contextPath}/qnaboard/deleteReply.do";
+		let query = "replyNum=" + replyNum;
+		
+		const fn = function(data){
+			listReplyAnswer(answer);
+			countReplyAnswer(answer);
+		};
+		
+		ajaxFun(url, "post", query, "json", fn);
+	});
+});
+</script>
+
 </head>
 <body>
 
@@ -283,30 +548,6 @@ li {list-style: none;}
 				</tbody>
 			</table>
 			
-			<div class="heart-btn">
-      			<div class="content">
-        			<span class="heart"></span>
-        			<span class="text">LIKE</span>
-        			<span class="numb" id="like_num">12</span>
-      			</div>
-    		</div>
-
-			<div id="area_reply"></div>
-			<div class="reply">
-				<form action="" onsubmit="return false" method="post">
-					<fieldset class="fld_reply">
-						<div class="reply_write">
-							<textarea name="comment" id="comment" class="tf_reply"
-								placeholder="댓글을 입력해주세요" tabindex="3"></textarea>
-						</div>
-						<div class="writer_btn">
-							<button type="submit" class="btn_enter"
-								onclick="addComment(); return false;" tabindex="5">Send</button>
-						</div>
-					</fieldset>
-				</form>
-			</div>
-
 			<table class="table table-border table-article">
 				<tbody>
 					<tr>
@@ -356,6 +597,33 @@ li {list-style: none;}
 					</td>
 				</tr>
 			</table>
+			
+			<div class="heart-btn">
+      			<div class="content ${isUserLike?'heart-active':''}">
+        			<span class="heart ${isUserLike?'heart-active':''}"></span>
+        			<span class="text ${isUserLike?'heart-active':''}">LIKE</span>
+        			<span class="numb ${isUserLike?'heart-active':''}" id="like_num">${dto.likeCount}</span>
+      			</div>
+    		</div>
+
+
+			<div class="reply">
+				<form action="" onsubmit="return false" method="post">
+					<fieldset class="fld_reply">
+						<div class="reply_write">
+							<textarea name="comment" id="comment" class="tf_reply"
+								placeholder="댓글을 입력해주세요" tabindex="3"></textarea>
+						</div>
+						<div class="writer_btn">
+							<button type="submit" class="btn_enter" tabindex="5">Send</button>
+						</div>
+					</fieldset>
+				</form>
+			</div>
+			<div id="listReply" class="area_reply"></div>
+			
+
+			
 
 		</div>
 	</main>

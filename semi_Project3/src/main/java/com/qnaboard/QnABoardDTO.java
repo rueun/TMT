@@ -10,11 +10,14 @@ public class QnABoardDTO {
 	private String subject;
 	private String content;
 	private String reg_date;
-	private int hitCount;
 	private int groupNum;
 	private int orderNo;
 	private int depth;
 	private int parent;
+	
+	private int hitCount;
+	private int likeCount;
+	private int replyCount;
 	
 	private int fileNum;
 	private String imageFilename;
@@ -123,4 +126,17 @@ public class QnABoardDTO {
 	public void setParent(int parent) {
 		this.parent = parent;
 	}
+	public int getLikeCount() {
+		return likeCount;
+	}
+	public void setLikeCount(int likeCount) {
+		this.likeCount = likeCount;
+	}
+	public int getReplyCount() {
+		return replyCount;
+	}
+	public void setReplyCount(int replyCount) {
+		this.replyCount = replyCount;
+	}
+	
 }

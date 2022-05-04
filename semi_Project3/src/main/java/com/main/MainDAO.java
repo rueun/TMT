@@ -108,11 +108,22 @@ public class MainDAO {
 		try {
 			sb.append(" SELECT * FROM ( ");
 			sb.append("     SELECT ROWNUM rnum, tb.* FROM ( ");
-			sb.append("         SELECT boardNum, b.userId, userName, userNickName, categoryType, ");
+			sb.append("         SELECT b.boardNum, b.userId, userName, userNickName, categoryType, ");
 			sb.append("               subject, groupNum, orderNo, depth, hitCount,");
-			sb.append("               TO_CHAR(reg_date, 'YYYY-MM-DD') reg_date ");
+			sb.append("               TO_CHAR(reg_date, 'YYYY-MM-DD') reg_date, likecount, NVL(replycount,0) replycount ");
 			sb.append("         FROM QnAboard b ");
 			sb.append("         JOIN member1 m ON b.userId = m.userId ");
+			sb.append("         LEFT OUTER JOIN ( ");
+			sb.append("             select boardNum, count(*) likecount ");
+			sb.append("             from QnALike ");
+			sb.append("             group by boardNum ");
+			sb.append("         )qnal ON b.boardNum = qnal.boardNum ");
+			sb.append("         LEFT OUTER JOIN ( ");
+			sb.append("             select boardNum, count(*) replycount ");
+			sb.append("             FROM QnAReply ");
+			sb.append("             group by boardNum ");
+			sb.append("         )qnar ON b.boardNum = qnar.boardNum ");
+			sb.append("         WHERE parent = 0 ");
 			sb.append("         ORDER BY reg_date DESC");
 			sb.append("     ) tb WHERE ROWNUM <= 10 ");
 			sb.append(" ) WHERE rnum >= 1 ");
@@ -135,6 +146,8 @@ public class MainDAO {
 				dto.setOrderNo(rs.getInt("orderNo"));
 				dto.setHitCount(rs.getInt("hitCount"));
 				dto.setReg_date(rs.getString("reg_date"));
+				dto.setLikeCount(rs.getInt("likecount"));
+				dto.setReplyCount(rs.getInt("replycount"));
 
 				list.add(dto);
 			}
