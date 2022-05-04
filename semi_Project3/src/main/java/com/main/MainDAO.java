@@ -372,7 +372,7 @@ public class MainDAO {
 		try {
 			sb.append(" SELECT * FROM ( ");
 			sb.append("    SELECT ROWNUM rnum, tb.* FROM ( ");
-			sb.append("       SELECT boardNum, subject, userName, hitCount, ");
+			sb.append("       SELECT num, subject, userName, hitCount, ");
 			sb.append("          reg_date FROM infoboard n ");
 			sb.append("          JOIN member1 m ON n.userId = m.userId ");
 			sb.append("          ORDER BY reg_date DESC ");
