@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.buy.TradebuyDTO;
 import com.freeBoard.FreeBoardDTO;
 import com.freeGallery.FreeGalleryDTO;
-import com.infoboard.InfoBoardDTO;
+import com.infoBoard.InfoBoardDTO;
 import com.notice.NoticeDTO;
 import com.qnaboard.QnABoardDTO;
 import com.sell.TradeDTO;
