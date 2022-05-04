@@ -287,7 +287,7 @@ public class FreeBoardServlet extends MyServlet {
 			FreeBoardDTO dto = new FreeBoardDTO();
 			
 			dto.setNum(Integer.parseInt(req.getParameter("num")));
-			dto.setTitle(req.getParameter("subject"));
+			dto.setTitle(req.getParameter("title"));
 			dto.setContent(req.getParameter("content"));
 			
 			dto.setUserId(info.getUserId());

@@ -245,6 +245,144 @@ $(document).ready(function(){
 
 
 </script>
+
+<script type="text/javascript">
+function login() {
+	location.href="${pageContext.request.contextPath}/member/login.do";
+}
+
+function ajaxFun(url, method, query, dataType, fn) {
+	$.ajax({
+		type:method,
+		url:url,
+		data:query,
+		dataType:dataType,
+		success:function(data) {
+			fn(data);
+		},
+		beforeSend:function(jqXHR) {
+			jqXHR.setRequestHeader("AJAX", true);
+		},
+		error:function(jqXHR) {
+			if(jqXHR.status === 403) {
+				login();
+				return false;
+			} else if(jqXHR.status === 400) {
+				alert("요청 처리가 실패 했습니다.");
+				return false;
+			}
+	    	
+			console.log(jqXHR.responseText);
+		}
+	});
+}
+
+$(function(){
+	$(".btnSendBoardLike").click(function(){
+		const $i = $(this).find("i");
+		let isNoLike = $i.css("color") == "rgb(0, 0, 0)";
+		let msg = isNoLike ? "게시글에 공감하십니까 ? " : "게시글 공감을 취소하시겠습니까 ? ";
+		
+		if(! confirm( msg )) {
+			return false;
+		}
+		
+		let url = "${pageContext.request.contextPath}/freeBoard/insertBoardLike.do";
+		let num = "${dto.num}";
+		// var query = {num:num, isNoLike:isNoLike};
+		let query = "num=" + num + "&isNoLike=" + isNoLike;;
+
+		const fn = function(data) {
+			let state = data.state;
+			if(state === "true") {
+				let color = "black";
+				if( isNoLike ) {
+					color = "blue";
+				}
+				$i.css("color", color);
+				
+				let count = data.boardLikeCount;
+				$("#boardLikeCount").text(count);
+			} else if(state === "liked") {
+				alert("좋아요는 한번만 가능합니다.");
+			}
+		};
+		
+		ajaxFun(url, "post", query, "json", fn);
+	});
+});
+
+$(function(){
+	listPage(1);
+});
+
+function listPage(page) {
+	let url = "${pageContext.request.contextPath}/freeBoard/listReply.do";
+	let query = "num=${dto.num}&pageNo="+page;
+	let selector = "#listReply";
+	
+	const fn = function(data){
+		$(selector).html(data);
+	};
+	ajaxFun(url, "get", query, "html", fn);
+}
+
+// 댓
+$(function() {
+   	// send 버튼 클릭 시
+	$(".btn_enter").click(function() {
+    	let num = "${dto.num}"; // 리플을 등록할 게시물번호
+      	let content = $(".tf_reply").val().trim();
+      	if(! content) {
+      		$(".tf_reply").focus();
+         	return false;
+      	}
+      	content = encodeURIComponent(content);
+      
+      	let url = "${pageContext.request.contextPath}/freeBoard/insertReply.do";
+      	let query = "num="+num+"&content="+content+"&answer=0";
+      
+      	const fn = function(data) {
+      		$(".tf_reply").val("");
+         
+         	let state = data.state;
+         	if(state === "true") {
+            	// 등록 완료 후 1페이지의 댓글 다시 불러오기
+            	listPage(1);
+         	} else {
+            	alert("댓글을 추가하지 못했습니다.");
+         	}
+      	};
+      	ajaxFun(url, "post", query, "json", fn);      
+   	});
+});
+
+// 댓삭
+$(function(){
+	$("body").on("click", ".deleteReply", function(){
+		if(! confirm("댓글을 삭제하시겠습니까?")) {
+		    return false;
+		}
+		
+		let replyNum = $(this).attr("data-replyNum");
+		let page = $(this).attr("data-pageNo");
+		
+		let url = "${pageContext.request.contextPath}/freeBoard/deleteReply.do";
+		let query = "replyNum="+replyNum;
+		
+		const fn = function(data){
+			// let state = data.state;
+			listPage(page);
+		};
+		
+		ajaxFun(url, "post", query, "json", fn);
+	});
+});
+
+</script>
+
+
+
 </head>
 <body>
 
@@ -305,77 +443,6 @@ $(document).ready(function(){
 	     	</form>
      	</div>
         <div id="listReply" class="area_reply"></div>
-       	
-        <div class="area_reply">
-        	<strong class="tit_reply"><span id="commentCount9543_0">2</span> Comments</strong>
-        	<div class="entry_comment">
-        		<ul class="list_reply">
-        			<li class="rp_general">
-        				<span class="ico_skin thumb_profile">
-        					<img src="${pageContext.request.contextPath}/resource/images/ring.png" width="48" height="48" class="img_profile" alt="프로필사진">
-        				</span>
-        				<span class="reply_content">
-        					<span class="tit_nickname">금</span>
-        					<span class="txt_date">2022-12-31 12:23</span>
-        					<span class="txt_reply">
-        						기본
-        						<br>
-        						대래대래댇댇댓글
-        						<br>
-        						
-        					</span>
-        				</span>
-        				<div class="area_more">
-	        				<div class="reply_layer">
-	        					<div class="inner_reply_layer">
-	        						<div class="layer_body">
-	        							<a href="#none" onclick="updateComment();" class="link_reply">수정</a>
-	        							<a href="#none" onclick="deleteComment();" class="link_reply">삭제</a>
-	        						</div>
-	        					</div>
-	        				</div>
-        				</div>
-        			</li>
-        			
-        			<li class="rp_general">
-        				<span class="ico_skin thumb_profile">
-        					<img src="${pageContext.request.contextPath}/resource/images/ring.png" width="48" height="48" class="img_profile" alt="프로필사진">
-        				</span>
-        				<span class="reply_content">
-        					<span class="tit_nickname">링</span>
-        					<span class="txt_date">2022-12-31 12:23</span>
-        					<span class="txt_reply">
-        						설정
-        						<br>
-        						트리가드 너
-        					</span>
-        				</span>
-        				<div class="area_more">
-	        				<div class="reply_layer">
-	        					<div class="inner_reply_layer">
-	        						<div class="layer_body">
-	        							<a href="#none" onclick="updateComment();" class="link_reply">수정</a>
-	        							<a href="#none" onclick="deleteComment();" class="link_reply">삭제</a>
-	        						</div>
-	        					</div>
-	        				</div>
-        				</div>
-        			</li>
-        		</ul>
-        		
-        		<form action="" onsubmit="return false" method="post">
-        			<fieldset class="fld_reply">
-        				<div class="reply_write">
-							<textarea name="comment" id="comment" class="tf_reply" placeholder="댓글을 입력해주세요" tabindex="3"></textarea>
-						</div>
-						<div class="writer_btn">
-							<button type="submit" class="btn_enter" onclick="addComment(); return false;" tabindex="5">Send</button>
-						</div>
-        			</fieldset>
-        		</form>
-        	</div>
-        </div>
-        
         
 
 		<table class="table table-border table-article">
@@ -384,7 +451,7 @@ $(document).ready(function(){
 					<td colspan="2" class="pre">
 						이전글 :
 						<c:if test="${not empty preReadDto}">
-							<a href="${pageContext.request.contextPath}/sphoto/article.do?num=${preReadDto.num}&page=${page}">${preReadDto.subject}</a>
+							<a href="${pageContext.request.contextPath}/freeBoard/article.do?num=${preReadDto.num}&page=${page}">${preReadDto.subject}</a>
 						</c:if>
 					</td>
 				</tr>
@@ -392,7 +459,7 @@ $(document).ready(function(){
 					<td colspan="2">
 						다음글 :
 						<c:if test="${not empty nextReadDto}">
-							<a href="${pageContext.request.contextPath}/sphoto/article.do?num=${nextReadDto.num}&page=${page}">${nextReadDto.subject}</a>
+							<a href="${pageContext.request.contextPath}/freeBoard/article.do?num=${nextReadDto.num}&page=${page}">${nextReadDto.subject}</a>
 						</c:if>
 					</td>
 				</tr>

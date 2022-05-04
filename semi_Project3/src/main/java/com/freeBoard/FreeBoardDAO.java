@@ -581,25 +581,25 @@ public class FreeBoardDAO {
 		try {
 			sb.append(" SELECT * FROM ( ");
 			sb.append("     SELECT ROWNUM rnum, tb.* FROM ( ");
-			sb.append("         SELECT r.replyNum, r.userId, userName, num, content, r.reg_date, ");
+			sb.append("         SELECT f.replyNum, f.userId, userName, num, content, f.reg_date, ");
 			sb.append("                NVL(answerCount, 0) answerCount, ");
 			sb.append("                NVL(likeCount, 0) likeCount, ");
 			sb.append("                NVL(disLikeCount, 0) disLikeCount ");
-			sb.append("         FROM freeboardReply r ");
-			sb.append("         JOIN member1 m ON r.userId = m.userId ");
+			sb.append("         FROM freeboardReply f ");
+			sb.append("         JOIN member1 m ON f.userId = m.userId ");
 			sb.append("	        LEFT OUTER  JOIN (");
 			sb.append("	            SELECT answer, COUNT(*) answerCount ");
-			sb.append("             FROM bbsReply  WHERE answer != 0 ");
+			sb.append("             FROM freeBoardReply  WHERE answer != 0 ");
 			sb.append("             GROUP BY answer ");
-			sb.append("         ) a ON r.replyNum = a.answer ");
+			sb.append("         ) a ON f.replyNum = a.answer ");
 			sb.append("         LEFT OUTER  JOIN ( ");
 			sb.append("	            SELECT replyNum,  ");
 			sb.append("                 COUNT(DECODE(replyLike, 1, 1)) likeCount, ");
 			sb.append("                 COUNT(DECODE(replyLike, 0, 1)) disLikeCount ");
 			sb.append("             FROM freeboardReplyLike GROUP BY replyNum  ");
-			sb.append("         ) b ON r.replyNum = b.replyNum  ");
-			sb.append("	        WHERE num = ? AND r.answer=0 ");
-			sb.append("         ORDER BY r.replyNum DESC ");
+			sb.append("         ) b ON f.replyNum = b.replyNum  ");
+			sb.append("	        WHERE num = ? AND f.answer=0 ");
+			sb.append("         ORDER BY f.replyNum DESC ");
 			sb.append("     ) tb WHERE ROWNUM <= ? ");
 			sb.append(" ) WHERE rnum >= ? ");
 			
