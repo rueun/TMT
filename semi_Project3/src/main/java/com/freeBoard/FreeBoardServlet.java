@@ -1,8 +1,10 @@
 package com.freeBoard;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -10,6 +12,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import org.json.JSONObject;
 
 import com.member.SessionInfo;
 import com.util.MyServlet;
@@ -47,10 +51,18 @@ public class FreeBoardServlet extends MyServlet {
 			updateSubmit(req, resp);
 		} else if (uri.indexOf("delete.do") != -1) {
 			delete(req, resp);
-		}
-		
+		} else if (uri.indexOf("insertBoardLike.do") != -1) {
+			// 게시물 공감 저장
+			insertBoardLike(req, resp);
+		} else if (uri.indexOf("insertReply.do") != -1) {
+			// 댓글 추가
+			insertReply(req, resp);
+		} else if (uri.indexOf("listReply.do") != -1) {
+			// 댓글 리스트
+			listReply(req, resp);
+		} 
 	}
-	
+
 	protected void list(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		FreeBoardDAO dao = new FreeBoardDAO();
 		MyUtil util = new MyUtil();
@@ -225,8 +237,8 @@ public class FreeBoardServlet extends MyServlet {
 	
 	private void updateForm(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		FreeBoardDAO dao = new FreeBoardDAO();
-		
-
+		HttpSession session = req.getSession();
+		SessionInfo info = (SessionInfo) session.getAttribute("member");
 		String cp = req.getContextPath();
 
 		String page = req.getParameter("page");
@@ -236,6 +248,11 @@ public class FreeBoardServlet extends MyServlet {
 			FreeBoardDTO dto = dao.readfBoard(num);
 			
 			if(dto == null) {
+				resp.sendRedirect(cp + "/freeBoard/list.do?page=" + page);
+				return;
+			}
+			
+			if(!dto.getUserId().equals(info.getUserId())) {
 				resp.sendRedirect(cp + "/freeBoard/list.do?page=" + page);
 				return;
 			}
@@ -315,6 +332,126 @@ public class FreeBoardServlet extends MyServlet {
 
 		resp.sendRedirect(cp + "/freeBoard/list.do?" + query);
 	}
-	
+	private void insertBoardLike(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException{
+		FreeBoardDAO dao = new FreeBoardDAO();
+		
+		HttpSession session = req.getSession();
+		SessionInfo info = (SessionInfo) session.getAttribute("member");
 
+		String state = "false";
+		int boardLikeCount = 0;
+		
+		try {
+			int num = Integer.parseInt(req.getParameter("num"));
+			String isNoLike = req.getParameter("isNoLike");
+			
+			if(isNoLike.equals("true")) {
+				dao.insertBoardLike(num, info.getUserId()); // 공감
+			} else {
+				dao.deleteBoardLike(num, info.getUserId()); // 공감 취소
+			}
+			
+			boardLikeCount = dao.countBoardLike(num);
+
+			state = "true";
+		} catch (SQLException e) {
+			state = "liked";
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		JSONObject job = new JSONObject();
+		job.put("state", state);
+		job.put("boardLikeCount", boardLikeCount);
+
+		resp.setContentType("text/html;charset=utf-8");
+		PrintWriter out = resp.getWriter();
+		out.print(job.toString());
+		
+	}
+	
+	private void listReply(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		FreeBoardDAO dao = new FreeBoardDAO();
+		MyUtil util = new MyUtil();
+		
+		try {
+			int num = Integer.parseInt(req.getParameter("num"));
+			String pageNo = req.getParameter("pageNo");
+			int current_page = 1;
+			if (pageNo != null)
+				current_page = Integer.parseInt(pageNo);
+
+			int rows = 5;
+			int total_page = 0;
+			int replyCount = 0;
+
+			replyCount = dao.dataCountReply(num);
+			total_page = util.pageCount(rows, replyCount);
+			if (current_page > total_page) {
+				current_page = total_page;
+			}
+
+			int start = (current_page - 1) * rows + 1;
+			int end = current_page * rows;
+			
+			List<ReplyDTO> listReply = dao.listReply(num, start, end);
+			
+			for(ReplyDTO dto : listReply) {
+				dto.setContent(dto.getContent().replaceAll("\n", "<br>"));
+			}
+			
+			String paging = util.pagingMethod(current_page, total_page, "listPage");
+
+			req.setAttribute("listReply", listReply);
+			req.setAttribute("pageNo", current_page);
+			req.setAttribute("replyCount", replyCount);
+			req.setAttribute("total_page", total_page);
+			req.setAttribute("paging", paging);
+			
+			forward(req, resp, "/WEB-INF/views/freeBoard/listReply.jsp");
+			return;
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		resp.sendError(400);
+		
+	}
+	
+	private void insertReply(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		FreeBoardDAO dao = new FreeBoardDAO();
+		HttpSession session = req.getSession();
+		SessionInfo info = (SessionInfo) session.getAttribute("member");
+		
+		String state = "false";
+		
+		try {
+			ReplyDTO dto = new ReplyDTO();
+			
+			int num = Integer.parseInt(req.getParameter("num"));
+			dto.setNum(num);
+			dto.setUserId(info.getUserId());
+			dto.setContent(req.getParameter("content"));
+			String answer = req.getParameter("answer");
+			if(answer != null) {
+				dto.setAnswer(Integer.parseInt(answer));
+			}
+			
+			dao.insertReply(dto);
+			
+			state = "true";			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		JSONObject job = new JSONObject();
+		job.put("state", state);
+
+		resp.setContentType("text/html;charset=utf-8");
+		PrintWriter out = resp.getWriter();
+		out.print(job.toString());
+	}
+	
 }

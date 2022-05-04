@@ -11,6 +11,28 @@ public class ReplyDTO {
 	private int answer;
 	private int replyLike;
 	
+	private int answerCount;
+	private int likeCount;
+	private int disLikeCount;
+	
+	public int getAnswerCount() {
+		return answerCount;
+	}
+	public void setAnswerCount(int answerCount) {
+		this.answerCount = answerCount;
+	}
+	public int getLikeCount() {
+		return likeCount;
+	}
+	public void setLikeCount(int likeCount) {
+		this.likeCount = likeCount;
+	}
+	public int getDisLikeCount() {
+		return disLikeCount;
+	}
+	public void setDisLikeCount(int disLikeCount) {
+		this.disLikeCount = disLikeCount;
+	}
 	public int getReplyNum() {
 		return replyNum;
 	}

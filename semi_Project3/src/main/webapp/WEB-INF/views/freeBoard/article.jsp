@@ -215,7 +215,7 @@ li {list-style: none;}
 </style>
 <script type="text/javascript">
 <c:if test="${sessionScope.member.userId==dto.userId || sessionScope.member.userId=='admin'}">
-	function deletePhoto() {
+	function deleteBoard() {
 	    if(confirm("글을 삭제하시겠습니까 ? ")) {
 		    let query = "num=${dto.num}&${query}";
 		    let url = "${pageContext.request.contextPath}/freeBoard/delete.do?" + query;
@@ -284,13 +284,28 @@ $(document).ready(function(){
        		
        		</div>
        		<div class="heart-btn">
-      			<div class="content">
-        			<span class="heart"></span>
-        			<span class="text">LIKE</span>
-        			<span class="numb" id="like_num">12</span>
+      			<div class="content ${isUserLike?'heart-active':''}">
+        			<span class="heart ${isUserLike?'heart-active':''}"></span>
+        			<span class="text ${isUserLike?'heart-active':''}">LIKE</span>
+        			<span class="numb ${isUserLike?'heart-active':''}" id="like_num">${dto.likeCount}</span>
       			</div>
     		</div>
        	</div>
+       	
+       	<div class="reply">
+	        <form action="" onsubmit="return false" method="post">
+	     		<fieldset class="fld_reply">
+		     		<div class="reply_write">
+						<textarea name="comment" id="comment" class="tf_reply" placeholder="댓글을 입력해주세요" tabindex="3"></textarea>
+					</div>
+					<div class="writer_btn">
+						<button type="submit" class="btn_enter" tabindex="5">Send</button>
+					</div>
+	     		</fieldset>
+	     	</form>
+     	</div>
+        <div id="listReply" class="area_reply"></div>
+       	
         <div class="area_reply">
         	<strong class="tit_reply"><span id="commentCount9543_0">2</span> Comments</strong>
         	<div class="entry_comment">
