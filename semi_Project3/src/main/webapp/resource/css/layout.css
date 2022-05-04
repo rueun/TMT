@@ -30,6 +30,7 @@ footer:before, footer:after{
 	font-weight: 600;
 	letter-spacing: 0.8px;
 	font-family: sans-serif;
+	text-align: center;
 }
 
 .logo a {

@@ -340,9 +340,6 @@ hr.hr {
 	    					<span class="sp-subj ellipsis">
 	    						<span><b>QnA</b></span>
 		    						<span class="pull-right">
-		   							<span class="date">
-			   								${date }
-			   						</span>
 		   						</span>
 	    					</span>
     					</a>
@@ -379,9 +376,6 @@ hr.hr {
 	    					<span class="sp-subj ellipsis">
 	    						<span><b>자유 갤러리</b></span>
 		    						<span class="pull-right">
-		   							<span class="date">
-			   								${date }
-			   						</span>
 		   						</span>
 	    					</span>
     					</a>
@@ -418,9 +412,6 @@ hr.hr {
 	    					<span class="sp-subj ellipsis">
 	    						<span><b>공지사항</b></span>
 		    						<span class="pull-right">
-		   							<span class="date">
-										${date}
-			   						</span>
 		   						</span>
 	    					</span>
     					</a>
@@ -457,9 +448,6 @@ hr.hr {
 	    					<span class="sp-subj ellipsis">
 	    						<span><b>소통공간</b></span>
 		    						<span class="pull-right">
-		   							<span class="date">
-			   								${date }
-			   						</span>
 		   						</span>
 	    					</span>
     					</a>
@@ -496,9 +484,6 @@ hr.hr {
 	    					<span class="sp-subj ellipsis">
 	    						<span><b>정보게시판</b></span>
 		    						<span class="pull-right">
-		   							<span class="date">
-			   								${date }
-			   						</span>
 		   						</span>
 	    					</span>
     					</a>

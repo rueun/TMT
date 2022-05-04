@@ -6,7 +6,7 @@
 
 <div class="header-top">
     <div class="header-left">
-        <h1 class="logo"><a href="${pageContext.request.contextPath}/">3조 professional<span>.</span></a></h1>
+        <h1 class="logo"><a href="${pageContext.request.contextPath}/">Triple</a></h1>
     </div>
     
     <div class="header-right">
