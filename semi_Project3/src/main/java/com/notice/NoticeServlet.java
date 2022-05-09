@@ -397,10 +397,10 @@ public class NoticeServlet extends MyUploadServlet {
 	// 게시글 삭제
 	protected void delete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		NoticeDAO dao = new NoticeDAO();
-		HttpSession session = req.getSession();
+		// HttpSession session = req.getSession();
 		String cp = req.getContextPath();
 		String page = req.getParameter("page");
-		String query = "page="+page;
+		// String query = "page="+page;
 		
 		try {
 			
@@ -411,7 +411,7 @@ public class NoticeServlet extends MyUploadServlet {
 				return;
 			}
 			
-			List<NoticeDTO> listFile = dao.listNoticeFile(num);
+			// List<NoticeDTO> listFile = dao.listNoticeFile(num);
 
 			dao.deleteNoticeFile("all", num);
 			dao.deleteNotice(num);
